@@ -548,7 +548,7 @@ function viewDep(sub){
 function viewRitmo(){
   const ufs=UFS.concat('zz'),rank=ufRanking(),pr=presProj();
   const opts=ufs.map(u=>`<option value="${u}">${u.toUpperCase()} · ${esc(UFN[u])}</option>`).join('');
-  let h=`<div class="callout" style="margin-bottom:14px">Esta aba reproduz a análise do notebook de 2022: o ritmo de totalização de cada UF define como a contagem nacional se move. Aqui o ritmo é medido em tempo real, a cada leitura, a partir das 17h. Quanto mais tempo a página ficar aberta, mais completa fica a curva. O histórico fica salvo neste navegador.</div>`;
+  let h=`<div class="callout" style="margin-bottom:14px">O ritmo de totalização de cada UF define como a contagem nacional se move. Aqui o ritmo é medido em tempo real, a cada leitura, a partir das 17h. Quanto mais tempo a página ficar aberta, mais completa fica a curva. O histórico fica salvo neste navegador.</div>`;
   h+=`<div class="card" style="margin-bottom:14px"><h2>Seções totalizadas por UF<span class="sub">passe o mouse para identificar a linha</span></h2><div class="chart" id="ch-speed"></div></div>`;
   h+=`<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-bottom:14px">
    <div class="card"><h2>Mais rápidas<span class="sub">tempo até 50% das seções</span></h2>${rankTable(rank.slice(0,8))}</div>
