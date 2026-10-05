@@ -482,7 +482,7 @@ function viewTroca(){
     const mk=(v)=>{if(u===v)return '';const l=leadSeries(sigmaOf([[u,v]]));
       return lineChart('sm_'+u+'_'+v,{w:230,h:110,mini:true,series:[{c:'var(--fg2)',xs:base.xs,ys:base.ys,d:'3 3',w:1},{c:v===fast?'var(--c5)':'var(--c1)',xs:l.xs,ys:l.ys}],hl:[{y:0,d:'2 3'},{y:fl,c:'var(--good)',d:'2 3'}],yd:0,tipf:null})};
     return `<div class="mini-c"><div class="t">${u.toUpperCase()}${u===fast?' (mais rápido)':u===slow?' (mais lento)':''}</div>${u===fast?'<div class="note">—</div>':mk(fast)}${u===slow?'':mk(slow)}</div>`}).join('');
-  return `<div class="card prose"><h2>Trocas na dinâmica de apuração</div>
+  return `<div class="card prose"><h2>Trocas na dinâmica de apuração</h2>
    <p>Cada troca faz o estado A apurar na velocidade do estado B (e vice-versa), mantendo seus votos finais. O gráfico mostra a diferença entre <b>${esc(NAMES[a])}</b> e <b>${esc(NAMES[b])}</b> em pontos percentuais dos votos válidos nacionais.</p>
    <div class="sim-ctrl"><button class="btn" id="preset">Trocar mais rápido ⇄ mais lento (${fast.toUpperCase()} ⇄ ${slow.toUpperCase()})</button>
    <select id="sa">${opts}</select> ⇄ <select id="sb">${opts.replace(`value="${ALL27[1]}"`,`value="${ALL27[1]}" selected`)}</select><button class="btn" id="add">Adicionar troca</button><button class="btn" id="clr">Limpar</button></div>
