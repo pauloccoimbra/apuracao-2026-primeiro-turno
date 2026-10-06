@@ -72,14 +72,21 @@ header.top{background:var(--surface);border-bottom:1px solid var(--line)}
 #map .tl{font:500 var(--fs) var(--mono);fill:#fff;pointer-events:none;text-anchor:middle;paint-order:stroke;stroke:rgba(0,0,0,.5);stroke-width:calc(var(--fs)*.18)}
 .zoomb{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:4px}
 .zoomb button{width:30px;height:30px;border:1px solid var(--line);background:var(--surface);border-radius:6px;cursor:pointer;font-size:16px}
-.prog{position:absolute;left:12px;right:12px;bottom:12px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12.5px;display:none}
+.prog{position:absolute;left:12px;right:56px;top:12px;z-index:2;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12.5px;display:none}
 .prog .b{height:6px;background:var(--surface2);border-radius:3px;margin-top:6px;overflow:hidden}
 .prog .b i{display:block;height:100%;background:var(--accent);width:0}
 .tip{position:fixed;z-index:50;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12.5px;box-shadow:0 4px 18px rgba(0,0,0,.18);max-width:260px;display:none}
 .tip b{display:block;margin-bottom:3px}
 .tip .r{display:flex;justify-content:space-between;gap:12px}
 .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:baseline}
-.legend{display:flex;flex-wrap:wrap;gap:4px 12px;padding:8px 12px;border-top:1px solid var(--line);font-size:12px;color:var(--fg2)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;padding:8px 12px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--fg2)}
+.legend .ex{flex-basis:100%;font-size:11.5px;color:var(--muted)}
+.pick{position:absolute;left:8px;right:8px;bottom:8px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;box-shadow:0 4px 18px rgba(0,0,0,.2);display:none;font-size:13px}
+.pick b{font-size:14px}.pick .r{display:flex;justify-content:space-between;gap:12px;margin-top:2px}
+.pick .row{display:flex;gap:8px;margin-top:8px}.pick .row .btn{flex:1}
+.pick .btn.go{background:var(--accent);color:#fff;border-color:var(--accent)}
+#map .sh.pk{stroke:var(--fg);stroke-width:2.5px}
+@media(max-width:600px){#map{height:58vh;min-height:320px}.bar{padding-block:8px}.wrap{padding-inline:10px}}
 .side{padding:14px}
 .side h2{margin:0;font-size:18px;letter-spacing:-.01em}
 .side .sub{color:var(--muted);font-size:12px;margin-bottom:10px}
@@ -125,11 +132,11 @@ footer a{color:var(--accent)}
     <label id="lblGrp" style="display:none">Agrupar <div class="seg" id="segGrp"><button data-g="uf" class="on">Estados</button><button data-g="reg">Regiões</button><button data-g="mun">Municípios</button></div></label>
   </div>
   <div class="grid">
-    <div class="card"><div class="mapbox">
+    <div class="card"><div class="legend" id="legend"></div><div class="mapbox">
       <svg id="map" role="img" aria-label="Mapa da apuração"></svg>
       <div class="zoomb"><button id="zi" aria-label="Aproximar">+</button><button id="zo" aria-label="Afastar">−</button><button id="zr" aria-label="Reiniciar" style="font-size:12px">⟲</button></div>
       <div class="prog" id="prog"><span id="progT"></span><div class="b"><i id="progB"></i></div></div>
-    </div><div class="legend" id="legend"></div></div>
+    <div class="pick" id="pick"></div></div></div>
     <aside class="card side" id="side"></aside>
   </div>
   <footer>Fonte: <a href="https://resultados.tse.jus.br/" target="_blank" rel="noopener">resultados.tse.jus.br</a> (arquivos JSON públicos) · malhas: <a href="https://servicodados.ibge.gov.br/api/docs/malhas" target="_blank" rel="noopener">IBGE</a>. Zonas eleitorais não têm malha oficial: os limites são aproximados a partir das coordenadas dos locais de votação (TSE, 2026). Projeto independente, sem vínculo com o TSE.</footer>
@@ -416,7 +423,7 @@ function render(){
   const key=S.lv+S.reg+S.uf+S.mun+S.grp+(S.lv==='mun'?'':'')+(S.lv==='uf'?(ufReady(S.uf)?'r':'p'):'');
   if(!L.length){setVB(VB)}
   else if(S.vbKey!==key){const first=!S.vbKey;S.vbKey=key;if(first)setVB(VB0);else animVB(VB0)}else setVB(VB);
-  renderSide();renderLegend();renderStatus();
+  renderSide();renderLegend();renderStatus();renderPick();
 }
 /* ========= Painel lateral ========= */
 function curAgg(){
@@ -504,7 +511,7 @@ function renderLegend(){
   const u=new Set();const L=[];const LL={};
   if(S.mode==='cand'){$('legend').innerHTML=`<span><i class="sw" style="background:${colv(S.cand)}"></i>${esc(candLabel(S.cand))}: tom mais forte = maior % dos votos válidos (máx. no mapa: ${(PMAX*100).toFixed(1).replace('.',',')}%)</span>`;return}
   for(const s of SH){const l=s.a&&leader(s.a);if(l&&!u.has(l.n)){u.add(l.n);L.push(l.n);LL[l.n]=lab(l.r[0])}}
-  $('legend').innerHTML=(L.length?L.map(n=>`<span><i class="sw" style="background:${colv(n)}"></i>${esc(S.off==='gov'&&S.lv==='br'||S.off==='gov'&&S.lv==='reg'?(LL[n].sg||('Nº '+n)):LL[n].nm+(S.off==='gov'&&LL[n].sg?' ('+LL[n].sg+')':''))}</span>`).join(''):'<span>Sem dados apurados</span>')+'<span style="margin-left:auto">Cor = candidato mais votado · intensidade = vantagem sobre o 2º</span>';
+  $('legend').innerHTML=(L.length?L.map(n=>`<span><i class="sw" style="background:${colv(n)}"></i>${esc(S.off==='gov'&&S.lv==='br'||S.off==='gov'&&S.lv==='reg'?(LL[n].sg||('Nº '+n)):LL[n].nm+(S.off==='gov'&&LL[n].sg?' ('+LL[n].sg+')':''))}</span>`).join(''):'<span>Sem dados apurados</span>')+'<span class="ex">Cor = candidato mais votado · intensidade = vantagem sobre o 2º. Toque num lugar para ver os números.</span>';
 }
 function renderStatus(){
   const t=sumAgg(ALLUF.map(u=>UFT[u]));
@@ -522,7 +529,7 @@ function fillCandSelect(){
 }
 /* ========= Navegação ========= */
 async function go(lv,a,b,force){
-  const tok=++S.tok;S.zsel=null;
+  const tok=++S.tok;S.zsel=null;S.pick=null;
   if(lv==='br'){S.lv='br';S.reg=S.uf=S.mun=null}
   else if(lv==='reg'){S.lv='reg';S.reg=a;S.uf=S.mun=null}
   else if(lv==='uf'){S.lv='uf';S.uf=a;S.reg=UFS[a][2];S.mun=null;LQ=''}
@@ -562,7 +569,14 @@ document.addEventListener('click',e=>{
   const g=e.target.closest('[data-go]');if(g){goArr(g.dataset.go.split(','));return}
   const c=e.target.closest('[data-cand]');if(c){S.mode='cand';S.cand=c.dataset.cand;render();return}
   const sh=e.target.closest('#map .sh');
-  if(sh&&!S.moved){if(sh.classList.contains('zt')){S.zsel=S.zsel===sh.dataset.id?null:sh.dataset.id;render();return}const s=SH.find(x=>String(x.id)===sh.dataset.id);if(s&&s.go)goArr(s.go)}
+  const op=e.target.closest('[data-open]');if(op){const s=SH.find(x=>String(x.id)===String(S.pick));if(s&&s.go)goArr(s.go);return}
+  if(e.target.closest('[data-close]')){S.pick=null;S.zsel=null;render();return}
+  if(sh&&!S.moved){
+    const s=SH.find(x=>String(x.id)===sh.dataset.id);
+    if(S.touch){S.pick=sh.dataset.id;if(sh.classList.contains('zt'))S.zsel=sh.dataset.id;render();return}
+    if(sh.classList.contains('zt')){S.zsel=S.zsel===sh.dataset.id?null:sh.dataset.id;render();return}
+    if(s&&s.go)goArr(s.go)}
+  else if(!sh&&S.touch&&e.target.closest('#map')&&!S.moved){S.pick=null;render()}
 });
 document.addEventListener('input',e=>{if(e.target.id==='q'){LQ=e.target.value;const l=$('lst');if(l)l.innerHTML=listHTML(listItems())}});
 $('segOff').onclick=e=>{const b=e.target.closest('button');if(!b||b.dataset.o===S.off)return;
@@ -576,38 +590,17 @@ $('bAuto').onclick=()=>{
   if(S.auto){clearInterval(S.auto);S.auto=null}else S.auto=setInterval(()=>goArr([S.lv,S.lv==='reg'?S.reg:S.uf,S.mun],true),60000);
   $('bAuto').classList.toggle('on',!!S.auto)};
 /* tooltip */
-$('map').addEventListener('mousemove',e=>{
-  const sh=e.target.closest('.sh');if(!sh){tip.style.display='none';return}
-  const s=SH.find(x=>String(x.id)===sh.dataset.id);if(!s){return}
+function tipHTML(s){
   const a=s.a;let h=`<b>${esc(s.nm)}</b>`;if(s.sub)h+=`<div style="color:var(--muted);margin-bottom:3px">${esc(s.sub)}</div>`;
   if(!a||!a.vv)h+='<div style="color:var(--muted)">'+(s.unm?'Sem correspondência no TSE':'Sem votos apurados')+'</div>';
-  else{h+=rank(a).slice(0,3).map(c=>`<div class="r"><span><i class="sw" style="background:${colv(c.n)}"></i>${esc(lab(c).nm)}</span><span>${pct(c.v,a.vv)}</span></div>`).join('');
+  else{h+=rank(a).slice(0,3).map(c=>`<div class="r"><span><i class="sw" style="background:${colv(c.n)}"></i>${esc(lab(c).nm)}${lab(c).sg?' <span style="color:var(--muted)">'+esc(lab(c).sg)+'</span>':''}</span><span>${pct(c.v,a.vv)}</span></div>`).join('');
     h+=`<div style="color:var(--muted);margin-top:3px">${pct(a.st,a.ts,1)} das seções · ${fmt(a.vv)} válidos</div>`}
-  tip.innerHTML=h;tip.style.display='block';
-  const w=tip.offsetWidth,hh=tip.offsetHeight;let x=e.clientX+14,y=e.clientY+14;
-  if(x+w>innerWidth-8)x=e.clientX-w-14;if(y+hh>innerHeight-8)y=e.clientY-hh-14;tip.style.left=x+'px';tip.style.top=y+'px';
-});
-$('map').addEventListener('mouseleave',()=>tip.style.display='none');
-/* zoom e pan */
-function zoomAt(f,cx,cy){cancelAnimationFrame(ANIM);
-  const w=VB[2]*f,h=VB[3]*f;
-  if(w>VB0[2]*1.05){animVB(VB0,250);return}
-  setVB([VB[0]+(VB[2]-w)*cx,VB[1]+(VB[3]-h)*cy,w,h]);
+  return h;
 }
-$('map').addEventListener('wheel',e=>{e.preventDefault();const r=$('map').getBoundingClientRect();zoomAt(e.deltaY<0?.8:1.25,(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height)},{passive:false});
-$('zi').onclick=()=>zoomAt(.7,.5,.5);$('zo').onclick=()=>zoomAt(1/.7,.5,.5);$('zr').onclick=()=>animVB(VB0,300);
-let drag=null;
-$('map').addEventListener('pointerdown',e=>{cancelAnimationFrame(ANIM);drag={x:e.clientX,y:e.clientY,vb:VB.slice()};S.moved=false});
-window.addEventListener('pointermove',e=>{
-  if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
-  if(!S.moved&&Math.hypot(dx,dy)<5)return;S.moved=true;$('map').classList.add('drag');
-  const r=$('map').getBoundingClientRect();
-  setVB([drag.vb[0]-dx*drag.vb[2]/r.width,drag.vb[1]-dy*drag.vb[3]/r.height,drag.vb[2],drag.vb[3]]);
-});
-window.addEventListener('pointerup',()=>{drag=null;$('map').classList.remove('drag');setTimeout(()=>S.moved=false,0)});
-window.addEventListener('resize',()=>{S.vbKey=null;render()});
-/* início */
-go('br');
-</script>
-</body>
-</html>
+$('map').addEventListener('mousemove',e=>{
+  if(S.touch)return;
+  const sh=e.target.closest('.sh');if(!sh){tip.style.display='none';return}
+  const s=SH.find(x=>String(x.id)===sh.dataset.id);if(!s){return}
+  tip.innerHTML=tipHTML(s);tip.style.display='block';
+  const w=tip.offsetWidth,hh=tip.offsetHeight;let x=e.clientX+14,y=e.clientY+14;
+  if(x+w>innerWidth-8)x=e.clientX-w-14;if(y+hh>innerHeight-8)y=e.clientY-hh-14;tip.style.left=x+
