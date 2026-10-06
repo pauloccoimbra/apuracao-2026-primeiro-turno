@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Mapa da Apuração 2026</title>
-<meta name="description" content="Mapa da apuração do 1º turno de 2026 para presidente: país, regiões, estados, municípios e zonas eleitorais, com dados públicos do TSE.">
+<meta name="description" content="Mapa da apuração do 1º turno de 2026 para presidente e governador: país, regiões, estados, municípios e zonas eleitorais, com dados públicos do TSE.">
 <meta name="theme-color" content="#0b5cad">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b5cad'/%3E%3Cpath d='M8 9l6-2 5 3 5-2v15l-5 2-5-3-6 2z' fill='white'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -110,7 +110,7 @@ footer a{color:var(--accent)}
 </head>
 <body>
 <header class="top"><div class="wrap bar">
-  <div class="brand">Mapa da Apuração 2026<small>1º turno · Presidente · dados públicos do TSE</small></div>
+  <div class="brand">Mapa da Apuração 2026<small id="sub">1º turno · Presidente · dados públicos do TSE</small></div>
   <div class="status"><span><i class="dot wait" id="dot"></i><span id="stt">Iniciando…</span></span><span id="upd"></span></div>
   <div class="sp"></div>
   <button class="btn" id="bRef" title="Recarrega os dados do nível atual">Atualizar</button>
@@ -119,6 +119,7 @@ footer a{color:var(--accent)}
 <main class="wrap">
   <div class="crumbs" id="crumbs"></div>
   <div class="ctl">
+    <div class="seg" id="segOff"><button data-o="pres" class="on">Presidente</button><button data-o="gov">Governador</button></div>
     <div class="seg" id="segMode"><button data-m="lead" class="on">Líder</button><button data-m="cand">Candidato</button></div>
     <label id="lblCand" style="display:none">Candidato <select id="selCand"></select></label>
     <label id="lblGrp" style="display:none">Agrupar <div class="seg" id="segGrp"><button data-g="uf" class="on">Estados</button><button data-g="reg">Regiões</button><button data-g="mun">Municípios</button></div></label>
@@ -144,7 +145,18 @@ const TSE='https://resultados.tse.jus.br/oficial/ele2026/';
 const IBGE='https://servicodados.ibge.gov.br/api/';
 const CANDS={"13":["Lula","PT"],"14":["Renan Santos","MISSÃO"],"16":["Hertz Dias","PSTU"],"21":["Edmilson Costa","PCB"],"22":["Flávio Bolsonaro","PL"],"27":["Clariana Barão","DC"],"29":["Rui Costa Pimenta","PCO"],"30":["Zema","NOVO"],"35":["Wilson Grassi","DEMOCRATA"],"55":["Ronaldo Caiado","PSD"],"70":["Augusto Cury","AVANTE"],"80":["Samara","UP"]};
 const CVAR={"13":"--c1","22":"--c2","55":"--c3","30":"--c4","70":"--c5","27":"--c6","14":"--c7","80":"--c8"};
-const colv=n=>'var('+(CVAR[n]||'--o')+')';
+const colv=n=>CVAR[n]?'var('+CVAR[n]+')':(S.off==='gov'?`hsl(${Math.round((+n*137.508)%360)} 52% 46%)`:'var(--o)');
+function lab(c){ // rótulo de um candidato (objeto de agg)
+  if(S.off==='pres')return{nm:cname(c.n),sg:CANDS[c.n]?CANDS[c.n][1]:''};
+  return{nm:title(c.nm||('Nº '+c.n)),sg:c.sg||''};
+}
+function candLabel(n){
+  if(S.off==='pres')return cname(n);
+  const find=a=>a&&a.c&&a.c[n];let c=S.uf&&find(UFT[S.uf]);
+  if(c)return title(c.nm)+' ('+c.sg+')';
+  for(const u of ALLUF){c=find(UFT[u]);if(c)return 'Partido '+n+' · '+c.sg}
+  return 'Nº '+n;
+}
 const UFS={ac:[12,'Acre','N'],al:[27,'Alagoas','NE'],ap:[16,'Amapá','N'],am:[13,'Amazonas','N'],ba:[29,'Bahia','NE'],ce:[23,'Ceará','NE'],df:[53,'Distrito Federal','CO'],es:[32,'Espírito Santo','SE'],go:[52,'Goiás','CO'],ma:[21,'Maranhão','NE'],mt:[51,'Mato Grosso','CO'],ms:[50,'Mato Grosso do Sul','CO'],mg:[31,'Minas Gerais','SE'],pa:[15,'Pará','N'],pb:[25,'Paraíba','NE'],pr:[41,'Paraná','S'],pe:[26,'Pernambuco','NE'],pi:[22,'Piauí','NE'],rj:[33,'Rio de Janeiro','SE'],rn:[24,'Rio Grande do Norte','NE'],rs:[43,'Rio Grande do Sul','S'],ro:[11,'Rondônia','N'],rr:[14,'Roraima','N'],sc:[42,'Santa Catarina','S'],sp:[35,'São Paulo','SE'],se:[28,'Sergipe','NE'],to:[17,'Tocantins','N']};
 const REGS={N:'Norte',NE:'Nordeste',CO:'Centro-Oeste',SE:'Sudeste',S:'Sul'};
 const ID2UF={};for(const k in UFS)ID2UF[UFS[k][0]]=k;
@@ -158,8 +170,10 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const title=s=>String(s||'').toLowerCase().replace(/(^|\s)\S/g,c=>c.toUpperCase());
 const cname=n=>CANDS[n]?CANDS[n][0]:title(n);
 /* ========= Estado ========= */
-const S={lv:'br',reg:null,uf:null,mun:null,mode:'lead',cand:'',grp:'uf',zsel:null,tok:0,auto:null,moved:false};
-const UFT={};            // totais por UF (agg)
+const S={off:'pres',lv:'br',reg:null,uf:null,mun:null,mode:'lead',cand:'',grp:'uf',zsel:null,tok:0,auto:null,moved:false};
+const OFFS={pres:{e:6257,c:1,n:'Presidente'},gov:{e:6259,c:3,n:'Governador'}};
+const UFTs={pres:{},gov:{}};
+const UFT=new Proxy({},{get:(_,k)=>UFTs[S.off][k],set:(_,k,v)=>{UFTs[S.off][k]=v;return true}});
 const MUN={};            // MUN[uf]={list,ibge2cd,data:{cd:agg},zones:{cd:{z:agg}},nm:{cd:nome}}
 const GEO={br:null,mun:{}};
 const CACHE_ERR={};
@@ -182,7 +196,7 @@ function parse(j){
   const car=(j.carg||[])[0];if(!car)return null;
   const c={};let sum=0;
   for(const a of car.agr||[])for(const p of a.par||[])for(const x of p.cand||[]){
-    const n=String(x.n),v=num(x.vap);if(!c[n])c[n]={n,nm:x.nmu||x.nm||'',v:0};c[n].v+=v;sum+=v;
+    const n=String(x.n),v=num(x.vap);if(!c[n])c[n]={n,nm:x.nmu||x.nm||'',sg:p.sg||'',v:0};c[n].v+=v;sum+=v;
   }
   const v=j.v||{},s=j.s||{},e=j.e||{};
   return{c,vv:num(v.vv)||sum,vb:num(v.vb),vn:num(v.vn),tv:num(v.tv),ts:num(s.ts),st:num(s.st),te:num(e.te),cp:num(e.c),ab:num(e.a)};
@@ -191,7 +205,7 @@ function sumAgg(list){
   const r={c:{},vv:0,vb:0,vn:0,tv:0,ts:0,st:0,te:0,cp:0,ab:0};
   for(const a of list){if(!a)continue;
     for(const k of ['vv','vb','vn','tv','ts','st','te','cp','ab'])r[k]+=a[k];
-    for(const n in a.c){const o=r.c[n]||(r.c[n]={n,nm:a.c[n].nm,v:0});o.v+=a.c[n].v}
+    for(const n in a.c){const o=r.c[n]||(r.c[n]={n,nm:a.c[n].nm,sg:a.c[n].sg,v:0});o.v+=a.c[n].v}
   }
   return r;
 }
@@ -203,10 +217,11 @@ function prog(t,d,tot){
 }
 function status(msg,cls){$('stt').textContent=msg;$('dot').className='dot '+(cls||'')}
 /* ========= Carregadores ========= */
-const uUF=(u)=>`${TSE}6257/dados/${u}/${u}-c0001-e006257-u.json`;
+const fcode=o=>{const f=OFFS[o];return `c${String(f.c).padStart(4,'0')}-e${String(f.e).padStart(6,'0')}`};
+const uUF=(u,o)=>`${TSE}${OFFS[o].e}/dados/${u}/${u}-${fcode(o)}-u.json`;
 async function loadUFs(tok){
-  let d=0;
-  const res=await pool(ALLUF.map(u=>async()=>{UFT[u]=parse(await getj(uUF(u)));d++;if(tok===S.tok)prog('Carregando estados',d,27)}),8);
+  let d=0;const off=S.off;
+  const res=await pool(ALLUF.map(u=>async()=>{if(tok!==S.tok)return;UFTs[off][u]=parse(await getj(uUF(u,off)));d++;if(tok===S.tok)prog('Carregando estados',d,27)}),8);
   const er=res.find(r=>r&&r.error);if(er)CACHE_ERR.uf=er.error;else delete CACHE_ERR.uf;
 }
 async function loadGeoBR(){
@@ -218,7 +233,9 @@ async function loadGeoBR(){
 function lev(a,b){const m=a.length,n=b.length;if(Math.abs(m-n)>3)return 9;let p=Array.from({length:n+1},(_,i)=>i);
   for(let i=1;i<=m;i++){const q=[i];for(let j=1;j<=n;j++)q[j]=Math.min(p[j]+1,q[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=q}return p[n]}
 async function loadMunMeta(uf){
-  const M=MUN[uf]||(MUN[uf]={list:null,ibge2cd:null,data:{},zones:{},nm:{}});
+  let M=MUN[uf];
+  if(!M){M=MUN[uf]={list:null,ibge2cd:null,_d:{pres:{},gov:{}},_z:{pres:{},gov:{}},nm:{}};
+    Object.defineProperty(M,'data',{get(){return M._d[S.off]}});Object.defineProperty(M,'zones',{get(){return M._z[S.off]}})}
   if(M.list&&M.ibge2cd&&GEO.mun[uf])return M;
   const id=UFS[uf][0];
   const [cs,names,mesh]=await Promise.all([
@@ -246,22 +263,23 @@ async function loadMunMeta(uf){
   }
   return M;
 }
-const uM=(u,cd)=>`${TSE}6257/dados/${u}/${u}${cd}-c0001-e006257-u.json`;
-const uZ=(u,cd,z)=>`${TSE}6257/dados/${u}/${u}${cd}-z${z}-c0001-e006257-u.json`;
+const uM=(u,cd,o)=>`${TSE}${OFFS[o].e}/dados/${u}/${u}${cd}-${fcode(o)}-u.json`;
+const uZ=(u,cd,z,o)=>`${TSE}${OFFS[o].e}/dados/${u}/${u}${cd}-z${z}-${fcode(o)}-u.json`;
 async function loadMunData(uf,tok,force,label){
-  const M=MUN[uf];const todo=M.list.filter(m=>force||!M.data[m.cd]);
+  const M=MUN[uf];const off=S.off;const D=M._d[off];const todo=M.list.filter(m=>force||!D[m.cd]);
   let d=0,last=0;
   await pool(todo.map(m=>async()=>{
-    M.data[m.cd]=parse(await getj(uM(uf,m.cd)))||{c:{},vv:0,vb:0,vn:0,tv:0,ts:0,st:0,te:0,cp:0,ab:0,empty:1};
+    if(tok!==S.tok)return;
+    D[m.cd]=parse(await getj(uM(uf,m.cd,off)))||{c:{},vv:0,vb:0,vn:0,tv:0,ts:0,st:0,te:0,cp:0,ab:0,empty:1};
     d++;if(tok===S.tok){prog((label||'Carregando municípios')+' · '+uf.toUpperCase(),d,todo.length);
       if(Date.now()-last>500){last=Date.now();render()}}
   }),10);
 }
 async function loadZones(uf,cd,tok,force){
   const M=MUN[uf];const m=M.list.find(x=>x.cd===cd);if(!m)return;
-  const Z=M.zones[cd]||(M.zones[cd]={});let d=0;
+  const off=S.off;const Z=M._z[off][cd]||(M._z[off][cd]={});let d=0;
   const todo=m.zon.filter(z=>force||!Z[z]);
-  await pool(todo.map(z=>async()=>{Z[z]=parse(await getj(uZ(uf,cd,z)))||{c:{},vv:0,vb:0,vn:0,tv:0,ts:0,st:0,te:0,cp:0,ab:0,empty:1};d++;if(tok===S.tok){prog('Carregando zonas',d,todo.length);render()}}),8);
+  await pool(todo.map(z=>async()=>{if(tok!==S.tok)return;Z[z]=parse(await getj(uZ(uf,cd,z,off)))||{c:{},vv:0,vb:0,vn:0,tv:0,ts:0,st:0,te:0,cp:0,ab:0,empty:1};d++;if(tok===S.tok){prog('Carregando zonas',d,todo.length);render()}}),8);
 }
 /* ========= Geometria ========= */
 const K=Math.cos(15*Math.PI/180)*100;
@@ -416,10 +434,17 @@ function candRows(a,limit){
   const r=rank(a);if(!r.length||!a.vv)return '<div class="note">Sem votos apurados neste recorte.</div>';
   const mx=r[0].v||1;
   return r.slice(0,limit).map(c=>`<div class="cand ${S.cand===c.n&&S.mode==='cand'?'sel':''}" data-cand="${c.n}" title="Pintar o mapa por este candidato">
-    <div class="nm"><i class="sw" style="background:${colv(c.n)}"></i><span>${esc(cname(c.n))}</span><span style="color:var(--muted);font-weight:400">${CANDS[c.n]?CANDS[c.n][1]:''}</span></div>
+    <div class="nm"><i class="sw" style="background:${colv(c.n)}"></i><span>${esc(lab(c).nm)}</span><span style="color:var(--muted);font-weight:400">${esc(lab(c).sg)}</span></div>
     <div class="pc">${pct(c.v,a.vv)}</div>
     <div class="bar2"><i style="width:${(100*c.v/mx).toFixed(1)}%;background:${colv(c.n)}"></i></div>
     <div class="vt">${fmt(c.v)} votos</div></div>`).join('');
+}
+function govSummary(){
+  const us=ALLUF.filter(u=>S.lv==='br'||UFS[u][2]===S.reg);const T={};let n=0;
+  for(const u of us){const L=UFT[u]&&leader(UFT[u]);if(!L)continue;n++;const sg=L.r[0].sg||('Nº '+L.n);(T[L.n]||(T[L.n]={n:L.n,sg,k:0})).k++}
+  const rows=Object.values(T).sort((x,y)=>y.k-x.k);
+  if(!rows.length)return '<div class="note">Sem votos apurados neste recorte.</div>';
+  return `<div class="note" style="margin:0 0 4px"><b>Partido do candidato líder, por estado</b> (${n} de ${us.length} estados com votos)</div>`+rows.map(r=>`<div class="cand" data-cand="${r.n}" title="Pintar o mapa pelo partido ${esc(r.sg)}"><div class="nm"><i class="sw" style="background:${colv(r.n)}"></i><span>${esc(r.sg)}</span><span style="color:var(--muted);font-weight:400">${r.n}</span></div><div class="pc">${r.k}</div><div class="bar2"><i style="width:${(100*r.k/n).toFixed(1)}%;background:${colv(r.n)}"></i></div></div>`).join('')+'<div class="note">Cada estado tem a sua própria disputa: abra um estado para ver os candidatos a governador.</div>';
 }
 let LQ='';
 function renderSide(){
@@ -428,12 +453,12 @@ function renderSide(){
   if(!a){h+='<div class="note">Carregando…</div>';el.innerHTML=h;return}
   const ap=a.ts?a.st/a.ts:0;
   h+=`<div class="apu"><div class="t"><span>Seções totalizadas</span><b>${a.ts?pct(a.st,a.ts):'—'}</b></div><div class="b"><i style="width:${(ap*100).toFixed(1)}%"></i></div><div class="t" style="margin:4px 0 0"><span>${fmt(a.st)} de ${fmt(a.ts)}</span></div></div>`;
-  h+=candRows(a,12);
+  h+=(S.off==='gov'&&(S.lv==='br'||S.lv==='reg'))?govSummary():candRows(a,12);
   h+=`<div class="kv"><span>Votos válidos</span><span>${fmt(a.vv)}</span><span>Brancos</span><span>${fmt(a.vb)} (${pct(a.vb,a.tv,2)})</span><span>Nulos</span><span>${fmt(a.vn)} (${pct(a.vn,a.tv,2)})</span><span>Comparecimento</span><span>${fmt(a.cp)}</span><span>Abstenção</span><span>${fmt(a.ab)}</span><span>Eleitorado apto</span><span>${fmt(a.te)}</span></div>`;
   if(S.lv==='mun'){
     const M=MUN[S.uf],Z=M&&M.zones[S.mun]||{};const m=M&&M.list&&M.list.find(x=>x.cd===S.mun);
     h+=`<div class="note" style="margin-bottom:4px"><b>Zonas eleitorais (${m?m.zon.length:0})</b>${S.zsel?` · <a href="#" data-zone="${S.zsel}" style="color:var(--accent)">ver município inteiro</a>`:''}</div><div class="lst">`;
-    h+=(m?m.zon:[]).map(z=>{const L=leader(Z[z]);return `<div data-zone="${z}" class="${z===S.zsel?'sel':''}"><span>Zona ${+z}</span><span style="white-space:nowrap">${L?`<i class="sw" style="background:${colv(L.n)}"></i>${esc(cname(L.n))} ${(L.p*100).toLocaleString('pt-BR',{maximumFractionDigits:1})}%`:'<span style="color:var(--muted)">—</span>'}</span></div>`}).join('')+'</div>';
+    h+=(m?m.zon:[]).map(z=>{const L=leader(Z[z]);return `<div data-zone="${z}" class="${z===S.zsel?'sel':''}"><span>Zona ${+z}</span><span style="white-space:nowrap">${L?`<i class="sw" style="background:${colv(L.n)}"></i>${esc(lab(L.r[0]).nm)} ${(L.p*100).toLocaleString('pt-BR',{maximumFractionDigits:1})}%`:'<span style="color:var(--muted)">—</span>'}</span></div>`}).join('')+'</div>';
     h+=S.zpoly?`<div class="note"><b>Limites aproximados:</b> o TSE não publica polígonos de zonas. Cada zona é a área mais próxima dos seus locais de votação (coordenadas oficiais do TSE), recortada no contorno do município.</div>`:`<div class="note">Sem coordenadas dos locais de votação para desenhar as zonas deste município: cada quadrado é uma zona, sem posição geográfica.</div>`;
   }else{
     const items=listItems();
@@ -455,7 +480,7 @@ function listHTML(items){
   const q=norm(LQ);
   return items.filter(i=>!q||norm(i.nm).includes(q)).sort((x,y)=>x.nm.localeCompare(y.nm,'pt-BR')).slice(0,700).map(i=>{
     const L=leader(i.a);
-    return `<div data-go="${i.go.join(',')}"><span>${esc(i.nm)}</span><span style="white-space:nowrap">${L?`<i class="sw" style="background:${colv(L.n)}"></i>${esc(cname(L.n))} ${(L.p*100).toLocaleString('pt-BR',{maximumFractionDigits:1})}%`:'<span style="color:var(--muted)">—</span>'}</span></div>`}).join('');
+    return `<div data-go="${i.go.join(',')}"><span>${esc(i.nm)}</span><span style="white-space:nowrap">${L?`<i class="sw" style="background:${colv(L.n)}"></i>${esc(lab(L.r[0]).nm)} ${(L.p*100).toLocaleString('pt-BR',{maximumFractionDigits:1})}%`:'<span style="color:var(--muted)">—</span>'}</span></div>`}).join('');
 }
 /* ========= Cabeçalho, controles, legenda ========= */
 function renderCrumbs(){
@@ -466,6 +491,9 @@ function renderCrumbs(){
   $('crumbs').innerHTML=c.map((x,i)=>(i?'<span class="sep">›</span>':'')+(i===c.length-1?`<span class="cur">${esc(x[0])}</span>`:`<button data-go="${x[1].join(',')}">${esc(x[0])}</button>`)).join('');
 }
 function renderControls(){
+  [...$('segOff').children].forEach(b=>b.classList.toggle('on',b.dataset.o===S.off));
+  $('sub').textContent=S.off==='pres'?'1º turno · Presidente · dados públicos do TSE':'1º turno · Governador · uma disputa por estado · dados públicos do TSE';
+  $('segGrp').querySelector('[data-g=reg]').style.display=S.off==='gov'?'none':'';
   $('lblGrp').style.display=S.lv==='br'?'flex':'none';
   [...$('segGrp').children].forEach(b=>b.classList.toggle('on',b.dataset.g===S.grp));
   [...$('segMode').children].forEach(b=>b.classList.toggle('on',b.dataset.m===S.mode));
@@ -473,10 +501,10 @@ function renderControls(){
   if(S.mode==='cand')$('selCand').value=S.cand;
 }
 function renderLegend(){
-  const u=new Set();const L=[];
-  if(S.mode==='cand'){$('legend').innerHTML=`<span><i class="sw" style="background:${colv(S.cand)}"></i>${esc(cname(S.cand))}: tom mais forte = maior % dos votos válidos (máx. no mapa: ${(PMAX*100).toFixed(1).replace('.',',')}%)</span>`;return}
-  for(const s of SH){const l=s.a&&leader(s.a);if(l&&!u.has(l.n)){u.add(l.n);L.push(l.n)}}
-  $('legend').innerHTML=(L.length?L.map(n=>`<span><i class="sw" style="background:${colv(n)}"></i>${esc(cname(n))}</span>`).join(''):'<span>Sem dados apurados</span>')+'<span style="margin-left:auto">Cor = candidato mais votado · intensidade = vantagem sobre o 2º</span>';
+  const u=new Set();const L=[];const LL={};
+  if(S.mode==='cand'){$('legend').innerHTML=`<span><i class="sw" style="background:${colv(S.cand)}"></i>${esc(candLabel(S.cand))}: tom mais forte = maior % dos votos válidos (máx. no mapa: ${(PMAX*100).toFixed(1).replace('.',',')}%)</span>`;return}
+  for(const s of SH){const l=s.a&&leader(s.a);if(l&&!u.has(l.n)){u.add(l.n);L.push(l.n);LL[l.n]=lab(l.r[0])}}
+  $('legend').innerHTML=(L.length?L.map(n=>`<span><i class="sw" style="background:${colv(n)}"></i>${esc(S.off==='gov'&&S.lv==='br'||S.off==='gov'&&S.lv==='reg'?(LL[n].sg||('Nº '+n)):LL[n].nm+(S.off==='gov'&&LL[n].sg?' ('+LL[n].sg+')':''))}</span>`).join(''):'<span>Sem dados apurados</span>')+'<span style="margin-left:auto">Cor = candidato mais votado · intensidade = vantagem sobre o 2º</span>';
 }
 function renderStatus(){
   const t=sumAgg(ALLUF.map(u=>UFT[u]));
@@ -485,9 +513,12 @@ function renderStatus(){
   $('upd').textContent='Atualizado às '+new Date().toLocaleTimeString('pt-BR',{timeZone:'America/Sao_Paulo'})+' (Brasília)';
 }
 function fillCandSelect(){
-  const r=rank(sumAgg(ALLUF.map(u=>UFT[u])));const ns=r.length?r.map(c=>c.n):Object.keys(CANDS);
-  $('selCand').innerHTML=ns.map(n=>`<option value="${n}">${esc(cname(n))}</option>`).join('');
-  if(!S.cand)S.cand=ns[0];$('selCand').value=S.cand;
+  let ns;
+  if(S.off==='pres'){const r=rank(sumAgg(ALLUF.map(u=>UFT[u])));ns=r.length?r.map(c=>c.n):Object.keys(CANDS)}
+  else if(S.uf&&UFT[S.uf]){ns=rank(UFT[S.uf]).map(c=>c.n)}
+  else{ns=rank(sumAgg(ALLUF.map(u=>UFT[u]))).map(c=>c.n)}
+  $('selCand').innerHTML=ns.map(n=>`<option value="${n}">${esc(candLabel(n))}</option>`).join('');
+  if(!ns.includes(S.cand))S.cand=ns[0]||'';$('selCand').value=S.cand;
 }
 /* ========= Navegação ========= */
 async function go(lv,a,b,force){
@@ -501,15 +532,15 @@ async function go(lv,a,b,force){
     if(S.lv==='br'||S.lv==='reg'){
       await loadGeoBR();if(tok!==S.tok)return;render();
       if(force||!UFT[ALLUF[0]]||ALLUF.some(u=>!UFT[u])){await loadUFs(tok);if(tok!==S.tok)return}
-      if(!S.cand)fillCandSelect();render();
+      fillCandSelect();render();
       if(S.lv==='br'&&S.grp==='mun')await loadAllMun(tok,force);
     }else{
       if(ALLUF.some(u=>!UFT[u])||force){await loadUFs(tok);if(tok!==S.tok)return}
-      if(!S.cand)fillCandSelect();
+      fillCandSelect();
       prog('Carregando municípios e malha…');
       await loadMunMeta(S.uf);if(tok!==S.tok)return;render();
       if(S.lv==='uf')await loadMunData(S.uf,tok,force);
-      else{const M=MUN[S.uf];if(!M.data[S.mun]||force){M.data[S.mun]=parse(await getj(uM(S.uf,S.mun)))||{c:{},vv:0,vb:0,vn:0,tv:0,ts:0,st:0,te:0,cp:0,ab:0}}
+      else{const M=MUN[S.uf];const off=S.off;if(!M._d[off][S.mun]||force){M._d[off][S.mun]=parse(await getj(uM(S.uf,S.mun,off)))||{c:{},vv:0,vb:0,vn:0,tv:0,ts:0,st:0,te:0,cp:0,ab:0}}
         render();await loadZones(S.uf,S.mun,tok,force)}
     }
     delete CACHE_ERR.nav;
@@ -534,7 +565,10 @@ document.addEventListener('click',e=>{
   if(sh&&!S.moved){if(sh.classList.contains('zt')){S.zsel=S.zsel===sh.dataset.id?null:sh.dataset.id;render();return}const s=SH.find(x=>String(x.id)===sh.dataset.id);if(s&&s.go)goArr(s.go)}
 });
 document.addEventListener('input',e=>{if(e.target.id==='q'){LQ=e.target.value;const l=$('lst');if(l)l.innerHTML=listHTML(listItems())}});
-$('segMode').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.mode=b.dataset.m;if(S.mode==='cand'&&!S.cand)fillCandSelect();render()};
+$('segOff').onclick=e=>{const b=e.target.closest('button');if(!b||b.dataset.o===S.off)return;
+  S.off=b.dataset.o;S.cand='';S.zsel=null;if(S.off==='gov'&&S.grp==='reg')S.grp='uf';
+  goArr([S.lv,S.lv==='reg'?S.reg:S.uf,S.mun])};
+$('segMode').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.mode=b.dataset.m;if(S.mode==='cand')fillCandSelect();render()};
 $('selCand').onchange=e=>{S.cand=e.target.value;render()};
 $('segGrp').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.grp=b.dataset.g;S.vbKey=null;go('br')};
 $('bRef').onclick=()=>goArr([S.lv,S.lv==='reg'?S.reg:S.uf,S.mun],true);
@@ -547,7 +581,7 @@ $('map').addEventListener('mousemove',e=>{
   const s=SH.find(x=>String(x.id)===sh.dataset.id);if(!s){return}
   const a=s.a;let h=`<b>${esc(s.nm)}</b>`;if(s.sub)h+=`<div style="color:var(--muted);margin-bottom:3px">${esc(s.sub)}</div>`;
   if(!a||!a.vv)h+='<div style="color:var(--muted)">'+(s.unm?'Sem correspondência no TSE':'Sem votos apurados')+'</div>';
-  else{h+=rank(a).slice(0,3).map(c=>`<div class="r"><span><i class="sw" style="background:${colv(c.n)}"></i>${esc(cname(c.n))}</span><span>${pct(c.v,a.vv)}</span></div>`).join('');
+  else{h+=rank(a).slice(0,3).map(c=>`<div class="r"><span><i class="sw" style="background:${colv(c.n)}"></i>${esc(lab(c).nm)}</span><span>${pct(c.v,a.vv)}</span></div>`).join('');
     h+=`<div style="color:var(--muted);margin-top:3px">${pct(a.st,a.ts,1)} das seções · ${fmt(a.vv)} válidos</div>`}
   tip.innerHTML=h;tip.style.display='block';
   const w=tip.offsetWidth,hh=tip.offsetHeight;let x=e.clientX+14,y=e.clientY+14;
