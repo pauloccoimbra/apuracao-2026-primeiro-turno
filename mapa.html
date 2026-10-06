@@ -206,7 +206,7 @@ function parse(j){
     const n=String(x.n),v=num(x.vap);if(!c[n])c[n]={n,nm:x.nmu||x.nm||'',sg:p.sg||'',v:0};c[n].v+=v;sum+=v;
   }
   const v=j.v||{},s=j.s||{},e=j.e||{};
-  return{c,vv:num(v.vv)||sum,vb:num(v.vb),vn:num(v.vn),tv:num(v.tv),ts:num(s.ts),st:num(s.st),te:num(e.te),cp:num(e.c),ab:num(e.a)};
+  return{c,vv:sum||num(v.vv),vb:num(v.vb),vn:num(v.vn),tv:num(v.tv),ts:num(s.ts),st:num(s.st),te:num(e.te),cp:num(e.c),ab:num(e.a)};
 }
 function sumAgg(list){
   const r={c:{},vv:0,vb:0,vn:0,tv:0,ts:0,st:0,te:0,cp:0,ab:0};
@@ -603,4 +603,37 @@ $('map').addEventListener('mousemove',e=>{
   const s=SH.find(x=>String(x.id)===sh.dataset.id);if(!s){return}
   tip.innerHTML=tipHTML(s);tip.style.display='block';
   const w=tip.offsetWidth,hh=tip.offsetHeight;let x=e.clientX+14,y=e.clientY+14;
-  if(x+w>innerWidth-8)x=e.clientX-w-14;if(y+hh>innerHeight-8)y=e.clientY-hh-14;tip.style.left=x+
+  if(x+w>innerWidth-8)x=e.clientX-w-14;if(y+hh>innerHeight-8)y=e.clientY-hh-14;tip.style.left=x+'px';tip.style.top=y+'px';
+});
+/* toque: 1º toque mostra os números; botão "Abrir" aprofunda */
+function renderPick(){
+  const el=$('pick');const s=S.pick!=null&&SH.find(x=>String(x.id)===String(S.pick));
+  if(!s){el.style.display='none';S.pick=null;return}
+  el.innerHTML=tipHTML(s)+`<div class="row">${s.go?`<button class="btn go" data-open="1">Abrir ›</button>`:''}<button class="btn" data-close="1">Fechar</button></div>`;
+  el.style.display='block';
+  const p=$('map').querySelector(`.sh[data-id="${CSS.escape(String(S.pick))}"]`);if(p)p.classList.add('pk');
+}
+$('map').addEventListener('mouseleave',()=>tip.style.display='none');
+/* zoom e pan */
+function zoomAt(f,cx,cy){cancelAnimationFrame(ANIM);
+  const w=VB[2]*f,h=VB[3]*f;
+  if(w>VB0[2]*1.05){animVB(VB0,250);return}
+  setVB([VB[0]+(VB[2]-w)*cx,VB[1]+(VB[3]-h)*cy,w,h]);
+}
+$('map').addEventListener('wheel',e=>{e.preventDefault();const r=$('map').getBoundingClientRect();zoomAt(e.deltaY<0?.8:1.25,(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height)},{passive:false});
+$('zi').onclick=()=>zoomAt(.7,.5,.5);$('zo').onclick=()=>zoomAt(1/.7,.5,.5);$('zr').onclick=()=>animVB(VB0,300);
+let drag=null;
+$('map').addEventListener('pointerdown',e=>{S.touch=e.pointerType!=='mouse';cancelAnimationFrame(ANIM);drag={x:e.clientX,y:e.clientY,vb:VB.slice()};S.moved=false});
+window.addEventListener('pointermove',e=>{
+  if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
+  if(!S.moved&&Math.hypot(dx,dy)<5)return;S.moved=true;$('map').classList.add('drag');
+  const r=$('map').getBoundingClientRect();
+  setVB([drag.vb[0]-dx*drag.vb[2]/r.width,drag.vb[1]-dy*drag.vb[3]/r.height,drag.vb[2],drag.vb[3]]);
+});
+window.addEventListener('pointerup',()=>{drag=null;$('map').classList.remove('drag');setTimeout(()=>S.moved=false,0)});
+window.addEventListener('resize',()=>{S.vbKey=null;render()});
+/* início */
+go('br');
+</script>
+</body>
+</html>
