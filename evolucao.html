@@ -150,7 +150,7 @@ ul.src{margin:6px 0;padding-left:18px} ul.src li{margin:3px 0}
     <div class="bar">
       <div class="brand">Evolução da Apuração 2026<small>Presidente · 1º turno · 4 de outubro · horário de Brasília</small></div>
       <div class="status" id="status"></div>
-      <div class="ctrl"><a class="ext" href="https://resultados.tse.jus.br/oficial/app/index.html" target="_blank" rel="noopener">Abrir site do TSE</a></div>
+      <div class="ctrl"><a class="ext" href="index.html" style="margin-right:12px">Painel em tempo real</a><a class="ext" href="atemporal.html" style="margin-right:12px">Cenário atemporal</a><a class="ext" href="mapa.html" style="margin-right:12px">Mapa</a><a class="ext" href="https://resultados.tse.jus.br/oficial/app/index.html" target="_blank" rel="noopener">Abrir site do TSE</a></div>
     </div>
     <nav class="tabs" id="tabs" role="tablist"></nav>
     <div class="scrub">
@@ -617,7 +617,7 @@ function carNatDep(k){
   const ch=lineChart('carn',{series:sers,hl,ymin:0,yf:v=>v.toFixed(0)+'%',tipf:m=>`<b>${fHM(m)}</b><br>`+top.slice(0,4).map((t,i)=>`${esc(t.com)}: ${fp(ys[i][Math.round(m/STEP)]||0)}`).join('<br>'),aria:'Percentual nacional de votos por partido'});
   const body=ord.slice(0,20).map((x,i)=>`<tr><td>${i<8?`<span class="sw" style="background:var(${colors[i]})"></span>`:''}${esc(x.com)}</td><td class="n num">${fi(x.v)}</td><td class="n num">${fp(x.v/tot*100)}</td><td class="n num">${x.el}</td></tr>`).join('');
   return `<div class="grid two" style="margin-top:14px"><div class="card"><h2>${CARGOS[k].n}: total nacional por partido<span class="sub">soma dos 27 estados, sem exterior</span></h2><div class="tw"><table><thead><tr><th>Agrupamento</th><th class="n">Votos</th><th class="n">%</th><th class="n">Eleitos</th></tr></thead><tbody>${body}</tbody></table></div></div>
-  <div class="card"><h2>Evolução do percentual nacional<span class="sub">: cada estado soma seus votos na velocidade da sua apuração</span></h2>${ch}</div></div>`;
+  <div class="card"><h2>Evolução do percentual nacional<span class="sub">método do notebook: cada estado soma seus votos na velocidade da sua apuração</span></h2>${ch}</div></div>`;
 }
 document.addEventListener('change',e=>{
   if(e.target.id==='cargo'){S.cargo=e.target.value;carAfter()}
@@ -645,4 +645,5 @@ async function refreshPres(){
 }
 S.m=HZ;render();setM(HZ);
 refreshPres().catch(()=>{});
-</script></body></html>
+</script></body>
+</html>
