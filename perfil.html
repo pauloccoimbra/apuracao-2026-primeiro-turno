@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Perfil do voto 2026</title><meta name="description" content="Polarização, fragmentação e geografia dos votos do 1º turno de 2026 por estado."><meta name="theme-color" content="#0b5cad"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b5cad'/%3E%3Cpath d='M5 26L27 6' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/base.css"><link rel="stylesheet" href="assets/page.css">
+</head><body>
+<header class="top"><div class="wrap"><div class="bar"><div class="brand">Perfil do voto<small>Presidente · 1º turno 2026 · polarização, fragmentação e geografia</small></div>
+<div class="ctrl"><a class="ext" href="https://resultados.tse.jus.br/oficial/app/index.html" target="_blank" rel="noopener">Site do TSE</a></div></div></div></header>
+<main class="wrap">
+
+<div><h1 class="page-h">Perfil do voto no 1º turno</h1>
+<p class="lead">Polarização, fragmentação e geografia dos votos dos candidatos que ficaram fora do 2º turno. Todos os números são dos votos válidos (nominais) de cada estado, a partir do resultado final do TSE.</p></div>
+<section class="card"><h2>Resumo nacional</h2><div class="stats" id="kp"></div><p class="note" id="kpn"></p></section>
+<section class="card"><h2>Lula × Flávio por estado <span class="sub">cada bolha é um estado; tamanho = votos válidos; acima da diagonal Flávio lidera</span></h2><div class="chart" id="sc"></div></section>
+<section class="card"><h2>Composição dos votos válidos por estado <span class="sub">ordenados da maior vantagem de Lula à maior de Flávio</span></h2><div class="lg" id="lg"></div><div class="chart" id="st"></div></section>
+<section class="card"><h2>Geografia dos votos dos candidatos eliminados</h2><div class="tw"><table id="geo"></table></div><p class="note">Correlação: entre os 27 estados, coeficiente de Pearson entre o percentual do candidato e a margem Flávio − Lula (em p.p.). Positivo indica votação maior onde Flávio é mais forte; negativo, onde Lula é mais forte. É uma descrição do 1º turno, não uma medida de para onde esses votos irão.</p></section>
+<section class="card"><h2>Estados <span class="sub">clique no cabeçalho para ordenar</span></h2><div class="tw"><table id="tb"></table></div></section>
+<section class="card"><h2>Regiões</h2><div class="tw"><table id="rg"></table></div></section>
+<section class="card"><h2>Brancos e nulos na eleição presidencial <span class="sub">% do comparecimento</span></h2><div class="chart" id="bn"></div><p class="note" id="bnn"></p></section>
+<section class="card"><h2>Como ler</h2><div class="prose"><p><b>Número efetivo de candidatos</b> (Laakso–Taagepera) = 1 / Σ p², com p a fração de votos válidos de cada candidato; vale 2 com dois candidatos iguais e cai para 1 com um só candidato. <b>Polarização</b> aqui é a soma Lula + Flávio em % dos válidos. <b>Margem</b> é Flávio − Lula em pontos percentuais; positiva favorece Flávio.</p><p>Os votos do exterior estão no total nacional e numa linha própria; não pertencem a nenhum estado.</p></div></section>
+
+</main>
+<footer class="site">Fonte dos números: TSE, resultado final do 1º turno de 04/10/2026 (arquivos públicos, posição de 05/10/2026 12h51, 100% das seções), embutidos nesta página. Cálculos próprios; projeções e cenários são hipóteses de trabalho, não previsões nem resultado oficial. Projeto independente, sem vínculo com o TSE.</footer>
+<script src="assets/dados.js"></script><script src="assets/common.js"></script><script src="assets/nav.js"></script>
+<script>
+
+const cols={'13':'var(--c1)','22':'var(--c2)','55':'var(--c3)','30':'var(--c4)','70':'var(--c5)','27':'var(--c6)','14':'var(--c7)','80':'var(--c8)'};
+const nm=n=>R.cands.find(c=>c[0]===n)[1].replace('Flávio Bolsonaro','Flávio'), ix=n=>R.cands.findIndex(c=>c[0]===n);
+const enc=v=>{const t=sum(v);return 1/sum(v.map(x=>(x/t)**2))};
+const rows=ALL.map(u=>{const o=U(u),t=vv(u),p=o.v.map(x=>x/t);return{u,n:o.n,r:o.r,vv:t,L:p[IL],F:p[IF],pool:1-p[IL]-p[IF],m:p[IF]-p[IL],enc:enc(o.v),bn:(o.vb+o.vn)/o.comp,comp:o.comp,p}});
+const ufr=rows.filter(r=>r.u!=='zz');
+const nat={vv:NAT.vv,L:NAT.v[IL]/NAT.vv,F:NAT.v[IF]/NAT.vv,enc:enc(NAT.v)};
+$('#kp').innerHTML=[['Votos válidos',fi(NAT.vv),''],['Lula',fp(nat.L,2),fi(NAT.v[IL])+' votos'],['Flávio',fp(nat.F,2),fi(NAT.v[IF])+' votos'],['Lula + Flávio',fp(nat.L+nat.F,2),'dos válidos'],['Demais candidatos',fp(1-nat.L-nat.F,2),fi(NAT.pool)+' votos'],['Número efetivo de candidatos',fd(nat.enc,2),'1 / Σ p²'],['Brancos + nulos',fp((NAT.vb+NAT.vn)/NAT.comp,2),fi(NAT.vb+NAT.vn)+' votos']].map(a=>`<div class="stat"><div class="lab">${a[0]}</div><div class="val">${a[1]}</div><div class="pc">${a[2]}</div></div>`).join('');
+const lead=ufr.filter(r=>r.m>0).length;
+$('#kpn').textContent=`Flávio lidera em ${lead} estados e Lula em ${27-lead}. A fragmentação é mais alta onde a soma dos dois é menor: o número efetivo de candidatos vai de ${fd(Math.min(...ufr.map(r=>r.enc)),2)} (${up(ufr.reduce((a,b)=>a.enc<b.enc?a:b).u)}) a ${fd(Math.max(...ufr.map(r=>r.enc)),2)} (${up(ufr.reduce((a,b)=>a.enc>b.enc?a:b).u)}).`;
+/* dispersão */
+$('#sc').innerHTML=scatter(ufr.map(r=>({x:r.L*100,y:r.F*100,z:r.vv,k:up(r.u),c:r.m>0?'f2':'f1',tip:`<b>${esc(r.n)}</b><br>Lula ${fp(r.L)} · Flávio ${fp(r.F)}<br>margem ${fpp(r.m)} p.p.<br>${fi(r.vv)} votos válidos`})),{xmin:15,xmax:75,ymin:15,ymax:75,sx:10,sy:10,diag:true,xl:'Lula, % dos válidos',yl:'Flávio, % dos válidos',aria:'Dispersão Lula x Flávio por estado',rmax:26});
+/* empilhado */
+const keys=[{id:'L',nm:'Lula',col:'var(--c1)'},{id:'F',nm:'Flávio',col:'var(--c2)'},{id:'C',nm:'Caiado',col:'var(--c3)'},{id:'Y',nm:'Cury',col:'var(--c5)'},{id:'N',nm:'Renan Santos',col:'var(--c7)'},{id:'Z',nm:'Zema',col:'var(--c4)'},{id:'O',nm:'Outros',col:'var(--o)'}];
+$('#lg').innerHTML=keys.map(k=>`<span><i class="sw" style="background:${k.col}"></i>${k.nm}</span>`).join('');
+const srt=ufr.slice().sort((a,b)=>a.m-b.m);
+$('#st').innerHTML=stack100(srt.map(r=>{const g=n=>r.p[ix(n)];const o=1-g('13')-g('22')-g('55')-g('70')-g('14')-g('30');return{k:up(r.u),v:{L:g('13'),F:g('22'),C:g('55'),Y:g('70'),N:g('14'),Z:g('30'),O:o}}}),keys,{aria:'Composição dos votos por estado'});
+/* geografia */
+const mg=ufr.map(r=>r.m*100);
+const gcs=['70','14','55','30'];
+$('#geo').innerHTML='<thead><tr><th>Candidato</th><th class="n">Votos</th><th class="n">% dos válidos</th><th>Maior percentual</th><th>Maiores volumes</th><th class="n">% dos votos no SE+S</th><th class="n">Correl. com a margem</th></tr></thead><tbody>'+gcs.map(n=>{const i=ix(n);const tot=NAT.v[i];const by=ufr.map(r=>({u:r.u,s:r.p[i],v:U(r.u).v[i]}));const top=by.slice().sort((a,b)=>b.s-a.s)[0],vol=by.slice().sort((a,b)=>b.v-a.v).slice(0,3);const sesu=sum(by.filter(b=>['SE','S'].includes(U(b.u).r)).map(b=>b.v))/tot;const c=corr(by.map(b=>b.s*100),mg);
+return `<tr><td><i class="sw" style="background:${cols[n]}"></i>${nm(n)} <small style="color:var(--muted)">${R.cands[i][2]}</small></td><td class="n">${fi(tot)}</td><td class="n">${fp(tot/NAT.vv,2)}</td><td>${up(top.u)} ${fp(top.s)}</td><td>${vol.map(x=>up(x.u)+' '+fi(x.v)).join(' · ')}</td><td class="n">${fp(sesu,0)}</td><td class="n ${c>0?'pos':'neg'}">${fd(c,2)}</td></tr>`}).join('')+'</tbody>';
+/* tabela de estados */
+let sk='m',sd=-1;const cols2=[['u','UF',0],['vv','Válidos',1],['L','Lula',1],['F','Flávio',1],['pool','Demais',1],['m','Margem (p.p.)',1],['enc','Nº efetivo',1],['bn','Brancos+nulos',1]];
+function tb(){const rs=ufr.slice().sort((a,b)=>sk==='u'?sd*(a.u<b.u?-1:1):sd*(a[sk]-b[sk]));$('#tb').innerHTML='<thead><tr>'+cols2.map(c=>`<th class="s ${c[2]?'n':''}" data-k="${c[0]}" ${sk===c[0]?`data-d="${sd<0?'▼':'▲'}"`:''}>${c[1]}</th>`).join('')+'</tr></thead><tbody>'+rs.map(r=>`<tr><td><b>${up(r.u)}</b> ${esc(r.n)}</td><td class="n">${fi(r.vv)}</td><td class="n">${fp(r.L)}</td><td class="n">${fp(r.F)}</td><td class="n">${fp(r.pool)}</td><td class="n ${r.m>0?'pos':'neg'}">${fpp(r.m)}</td><td class="n">${fd(r.enc,2)}</td><td class="n">${fp(r.bn)}</td></tr>`).join('')+'</tbody>';$$('#tb th').forEach(h=>h.onclick=()=>{const k=h.dataset.k;if(sk===k)sd=-sd;else{sk=k;sd=k==='u'?1:-1}tb()})}
+tb();
+/* regiões */
+const RG=['N','NE','CO','SE','S','EX'];
+$('#rg').innerHTML='<thead><tr><th>Região</th><th class="n">Válidos</th><th class="n">Lula</th><th class="n">Flávio</th><th class="n">Demais</th><th class="n">Margem (votos)</th><th class="n">Nº efetivo</th></tr></thead><tbody>'+RG.map(g=>{const us=ALL.filter(u=>U(u).r===g);const v=R.cands.map((_,i)=>sum(us.map(u=>U(u).v[i])));const t=sum(v);return `<tr><td>${R.regs[g]}</td><td class="n">${fi(t)}</td><td class="n">${fp(v[IL]/t)}</td><td class="n">${fp(v[IF]/t)}</td><td class="n">${fp(1-(v[IL]+v[IF])/t)}</td><td class="n ${v[IF]>v[IL]?'pos':'neg'}">${fs(v[IF]-v[IL])}</td><td class="n">${fd(enc(v),2)}</td></tr>`}).join('')+'</tbody>';
+/* brancos e nulos */
+const bs=ufr.slice().sort((a,b)=>b.bn-a.bn);const bnat=(NAT.vb+NAT.vn)/NAT.comp;
+$('#bn').innerHTML=barsV(bs.map(r=>({k:up(r.u),v:r.bn*100,c:'f5',tip:`<b>${esc(r.n)}</b><br>brancos+nulos ${fp(r.bn,2)}`})),{ymax:8,gridn:4,ref:bnat*100,reflab:'Brasil '+fp(bnat,1),aria:'Brancos e nulos por UF'});
+$('#bnn').textContent=`No país, ${fi(NAT.vb)} votos em branco (${fp(NAT.vb/NAT.comp,2)}) e ${fi(NAT.vn)} nulos (${fp(NAT.vn/NAT.comp,2)}) do comparecimento. Brancos e nulos não entram no cálculo dos votos válidos.`;
+
+</script></body></html>
