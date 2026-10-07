@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Governadores 2026</title><meta name="description" content="Governadores eleitos no 1º turno de 2026, coligações e simulador dos sete segundos turnos estaduais."><meta name="theme-color" content="#0b5cad"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b5cad'/%3E%3Cpath d='M5 26L27 6' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/base.css"><link rel="stylesheet" href="assets/page.css">
+</head><body>
+<header class="top"><div class="wrap"><div class="bar"><div class="brand">Governadores<small>1º turno e segundos turnos estaduais · 2026</small></div>
+<div class="ctrl"><a class="ext" href="https://resultados.tse.jus.br/oficial/app/index.html" target="_blank" rel="noopener">Site do TSE</a></div></div></div></header>
+<main class="wrap">
+
+<div><h1 class="page-h">Governadores: eleitos e segundos turnos</h1>
+<p class="lead">Os 20 estados com governador definido no 1º turno, a coligação de cada eleito e a relação com o voto presidencial no estado; e os sete segundos turnos estaduais, com um simulador por estado. Coligação refere-se à lista de partidos registrada pelo candidato no TSE e não mede apoio declarado a nenhum presidenciável.</p></div>
+<section class="card"><h2>Resumo</h2><div class="stats" id="kp"></div><p class="note" id="kpn"></p></section>
+<section class="card"><h2>Eleitos no 1º turno</h2>
+ <div class="ctl"><div class="seg-b" id="fl"><button data-f="all" aria-pressed="true">Todos</button><button data-f="pt" aria-pressed="false">Com PT na coligação</button><button data-f="pl" aria-pressed="false">Com PL na coligação</button><button data-f="no" aria-pressed="false">Sem PT nem PL</button></div></div>
+ <div class="lg"><span><i class="sw" style="background:var(--c1)"></i>Lula no estado</span><span><i class="sw" style="background:var(--c2)"></i>Flávio no estado</span><span><i class="sw" style="background:var(--fg);border-radius:50%"></i>Governador eleito</span></div>
+ <div class="chart" id="dot"></div><div class="tw"><table id="tb"></table></div></section>
+<section class="card"><h2>Segundos turnos estaduais <span class="sub">ajuste a retenção e a fração dos eliminados que o desafiante capta</span></h2>
+ <div class="ctl"><label>Retenção dos eleitores dos dois <input type="range" id="gr" min="80" max="100" step="1" value="100"><output id="gro"></output></label>
+ <label>Votos dos eliminados que votam em um dos dois <input type="range" id="gf" min="40" max="100" step="5" value="100"><output id="gfo"></output></label></div>
+ <div class="cols2" id="ro"></div></section>
+<section class="card"><h2>Pontos de empate nos sete estados</h2><div class="tw"><table id="st"></table></div><p class="note">s* é a fração dos votos dos eliminados que o desafiante precisa captar para igualar o líder (fração f dos eliminados vota; o restante se abstém ou anula). Acima de 100%, não basta.</p></section>
+<section class="card"><h2>Presidente × governador nos sete estados</h2><div class="tw"><table id="pr"></table></div><p class="note">Percentuais do 1º turno, votos válidos. A coligação indica a presença do PT ou do PL na lista de partidos de cada candidato a governador.</p></section>
+<section class="card"><h2>Limites</h2><div class="prose"><p>Os segundos turnos estaduais e o presidencial ocorrem no mesmo dia; a mobilização pode afetar os dois, mas esta página não modela esse acoplamento. No Rio de Janeiro, 274.411 votos de Garotinho estão <i>sub judice</i>; no Distrito Federal, 1.843 votos. Decisões da Justiça Eleitoral podem alterar os percentuais. O líder precisa de mais da metade dos votos válidos para vencer no 1º turno; na tabela de empate, o desafiante só precisa igualar.</p></div></section>
+
+</main>
+<footer class="site">Fonte dos números: TSE, resultado final do 1º turno de 04/10/2026 (arquivos públicos, posição de 05/10/2026 12h51, 100% das seções), embutidos nesta página. Cálculos próprios; projeções e cenários são hipóteses de trabalho, não previsões nem resultado oficial. Projeto independente, sem vínculo com o TSE.</footer>
+<script src="assets/dados.js"></script><script src="assets/common.js"></script><script src="assets/nav.js"></script>
+<script>
+
+const G=R.gov,RO=R.runoff,N=u=>U(u).n;
+const cnt=f=>G.filter(f).length;
+const par={};G.forEach(g=>par[g.par]=(par[g.par]||0)+1);
+$('#kp').innerHTML=[['Governadores eleitos',G.length,'no 1º turno'],['Segundos turnos',RO.length,RO.map(r=>up(r.uf)).join(', ')],['Com PT na coligação',cnt(g=>g.pt),'dos 20 eleitos'],['Com PL na coligação',cnt(g=>g.pl),'dos 20 eleitos'],['Sem PT nem PL',cnt(g=>!g.pt&&!g.pl),G.filter(g=>!g.pt&&!g.pl).map(g=>up(g.uf)).join(', ')]].map(a=>`<div class="stat"><div class="lab">${a[0]}</div><div class="val">${a[1]}</div><div class="pc">${a[2]}</div></div>`).join('');
+$('#kpn').textContent='Partido do eleito: '+Object.entries(par).sort((a,b)=>b[1]-a[1]).map(([k,v])=>k+' '+v).join(', ')+'.';
+let fl='all';
+function dot(){const gs=G.filter(g=>fl==='all'||(fl==='pt'&&g.pt)||(fl==='pl'&&g.pl)||(fl==='no'&&!g.pt&&!g.pl)).slice().sort((a,b)=>b.lula-a.lula);const w=860,rh=22,l=60,r=20,h=gs.length*rh+34,pw=w-l-r,X=v=>l+v/100*pw;
+ let s=`<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Governador eleito e voto presidencial por estado">`;for(let g=0;g<=100;g+=20)s+=`<line x1="${X(g)}" x2="${X(g)}" y1="14" y2="${h-6}" class="gl"/><text x="${X(g)}" y="10" text-anchor="middle" class="ax">${g}%</text>`;
+ gs.forEach((g,i)=>{const y=26+i*rh;s+=`<text x="${l-8}" y="${y+4}" text-anchor="end" class="ax2">${up(g.uf)}</text><line x1="${X(Math.min(g.lula,g.fl,g.pct))}" x2="${X(Math.max(g.lula,g.fl,g.pct))}" y1="${y}" y2="${y}" style="stroke:var(--line);stroke-width:3"/><circle cx="${X(g.lula)}" cy="${y}" r="5" class="f1" data-tip="Lula em ${up(g.uf)}: ${fd(g.lula,1)}%"/><circle cx="${X(g.fl)}" cy="${y}" r="5" class="f2" data-tip="Flávio em ${up(g.uf)}: ${fd(g.fl,1)}%"/><circle cx="${X(g.pct)}" cy="${y}" r="6" style="fill:none;stroke:var(--fg);stroke-width:2.4" data-tip="<b>${esc(g.nome)}</b> (${g.par}) ${fd(g.pct,1)}%"/>`});
+ $('#dot').innerHTML=s+'</svg>';
+ $('#tb').innerHTML='<thead><tr><th>UF</th><th>Eleito</th><th>Partido</th><th class="n">% 1º turno</th><th>PT</th><th>PL</th><th>Principal rival</th><th class="n">Lula / Flávio</th></tr></thead><tbody>'+gs.map(g=>`<tr><td><b>${up(g.uf)}</b> ${esc(N(g.uf))}</td><td>${esc(g.nome)}</td><td>${g.par}</td><td class="n">${fd(g.pct,1)}</td><td>${g.pt?'<span class="pill pt">PT</span>':''}</td><td>${g.pl?'<span class="pill pl">PL</span>':''}</td><td>${esc(g.rival)} <small style="color:var(--muted)">${g.rpar} ${fd(g.rpct,1)}%${g.rplnote?' · PL na coligação':''}${g.rptnote?' · PT na coligação':''}</small></td><td class="n">${fd(g.lula,1)} / ${fd(g.fl,1)}</td></tr>`).join('')+'</tbody>'}
+dot();$$('#fl button').forEach(b=>b.onclick=()=>{fl=b.dataset.f;$$('#fl button').forEach(x=>x.setAttribute('aria-pressed',x===b));dot()});
+/* segundos turnos */
+let sh={};RO.forEach(r=>sh[r.uf]=.5);
+function ro(){const rt=+$('#gr').value/100,f=+$('#gf').value/100;$('#gro').textContent=fd(rt*100,0)+'%';$('#gfo').textContent=fd(f*100,0)+'%';
+ $('#ro').innerHTML=RO.map(r=>{const s=sh[r.uf],P=r.pool*f,Lf=r.l[2]*rt+P*(1-s),Df=r.d[2]*rt+P*s,t=Lf+Df,mg=Df-Lf;return`<div class="card" style="box-shadow:none"><h2 style="margin-bottom:6px">${up(r.uf)} · ${esc(N(r.uf))}</h2>
+ <div class="strip" style="height:30px"><div style="width:${Lf/t*100}%;background:var(--fg2);color:var(--bg);display:flex;align-items:center;padding-left:8px;font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden">${esc(r.l[0])} ${fd(Lf/t*100,1)}%</div><div style="flex:1;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden">${esc(r.d[0])} ${fd(Df/t*100,1)}%</div></div>
+ <p class="note" style="margin:6px 0 4px">1º turno: <b>${esc(r.l[0])}</b> (${r.l[1]}, ${fd(r.l[3],2)}%, ${r.l[4]}) × <b>${esc(r.d[0])}</b> (${r.d[1]}, ${fd(r.d[3],2)}%, ${r.d[4]}). Eliminados: ${fi(r.pool)} votos.</p>
+ <div class="ctl" style="margin:4px 0"><label>${esc(r.d[0])} capta <input type="range" data-u="${r.uf}" min="0" max="100" value="${Math.round(s*100)}"><output>${fd(s*100,0)}%</output></label></div>
+ <div><span class="pill ${mg>0?'pl':'pt'}" style="${mg>0?'background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)':'background:var(--surface2);color:var(--fg)'}">${mg>0?esc(r.d[0])+' à frente':mg<0?esc(r.l[0])+' à frente':'empate'}</span> <span class="num" style="color:var(--fg2)">margem ${fs(Math.abs(mg))} votos</span></div></div>`}).join('');
+ $$('#ro input[data-u]').forEach(i=>i.oninput=()=>{sh[i.dataset.u]=i.value/100;const y=window.scrollY;ro();window.scrollTo(0,y)})}
+$('#gr').oninput=ro;$('#gf').oninput=ro;ro();
+$('#st').innerHTML='<thead><tr><th>UF</th><th>Líder</th><th>Desafiante</th><th class="n">Diferença (votos)</th><th class="n">Eliminados (votos)</th><th class="n">s* (f=100%)</th><th class="n">s* (f=80%)</th><th class="n">s* (f=60%)</th></tr></thead><tbody>'+RO.map(r=>{const g=r.l[2]-r.d[2],P=r.pool,fm=v=>{const s=.5+g/(2*v*P);return s>1?'<span style="color:var(--muted)">&gt;100%</span>':fp(s,1)};return`<tr><td><b>${up(r.uf)}</b></td><td>${esc(r.l[0])} <small style="color:var(--muted)">${r.l[1]}</small></td><td>${esc(r.d[0])} <small style="color:var(--muted)">${r.d[1]}</small></td><td class="n">${fi(g)}</td><td class="n">${fi(P)}</td><td class="n">${fm(1)}</td><td class="n">${fm(.8)}</td><td class="n">${fm(.6)}</td></tr>`}).join('')+'</tbody>';
+$('#pr').innerHTML='<thead><tr><th>UF</th><th class="n">Lula</th><th class="n">Flávio</th><th>Líder estadual</th><th>Desafiante</th><th>Principais eliminados</th></tr></thead><tbody>'+RO.map(r=>`<tr><td><b>${up(r.uf)}</b> ${esc(N(r.uf))}</td><td class="n">${fd(r.pres[0],1)}%</td><td class="n">${fd(r.pres[1],1)}%</td><td>${esc(r.l[0])} <small style="color:var(--muted)">${r.l[1]} · ${esc(r.l[4])}</small></td><td>${esc(r.d[0])} <small style="color:var(--muted)">${r.d[1]} · ${esc(r.d[4])}</small></td><td style="white-space:normal;min-width:260px">${esc(r.el)}</td></tr>`).join('')+'</tbody>';
+
+</script></body></html>
