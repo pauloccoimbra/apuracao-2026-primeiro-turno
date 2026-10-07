@@ -1,0 +1,23 @@
+/* Complementos de estilo das páginas de análise */
+.gl{stroke:var(--line);stroke-width:1}.gl2{stroke:var(--fg);opacity:.5}
+.ax,.axr,.ax2,.axt{fill:var(--muted);font-size:10.5px;font-family:var(--sans)}.ax2{fill:var(--fg2);font-size:11px}.axt{font-size:11.5px;fill:var(--fg2)}
+.lab{fill:var(--fg);font-size:11px;font-weight:600}.bl{fill:#fff;font-size:9px;font-weight:600;pointer-events:none}
+.ref{stroke:var(--muted);stroke-dasharray:5 4;fill:none}.fit{stroke:var(--fg2);stroke-width:1.5;opacity:.7}
+.f1{fill:var(--c1)}.f2{fill:var(--c2)}.f3{fill:var(--c3)}.f4{fill:var(--c4)}.f5{fill:var(--c5)}.fo{fill:var(--o)}
+.bub{fill-opacity:.72;stroke:var(--surface);stroke-width:1}
+.chart svg{max-width:100%}
+.page-h{margin:0 0 4px;font-size:22px;letter-spacing:-.01em}.lead{color:var(--fg2);max-width:80ch;margin:0 0 16px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:0 0 12px}
+.ctl label{display:flex;align-items:center;gap:8px;color:var(--fg2);font-size:13px}
+.ctl input[type=range]{accent-color:var(--accent);width:150px}.ctl output{font-variant-numeric:tabular-nums;font-weight:600;min-width:46px;color:var(--fg)}
+.seg-b{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}.seg-b button{background:var(--surface);border:0;border-right:1px solid var(--line);padding:5px 12px;cursor:pointer;color:var(--fg2)}.seg-b button:last-child{border-right:0}.seg-b button[aria-pressed=true]{background:var(--accent);color:#fff}
+.lg{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12px;color:var(--fg2);margin:6px 0}.lg span{display:inline-flex;align-items:center}
+.pos{color:var(--c2)}.neg{color:var(--c1)}.cL{color:var(--c1);font-weight:600}.cF{color:var(--c2);font-weight:600}
+.cols2{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
+.heat td{text-align:right;font-variant-numeric:tabular-nums;padding:5px 7px}.heat td.h{font-weight:600;text-align:left;background:var(--surface2)}
+.pill{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11px;font-weight:600;background:var(--surface2);color:var(--fg2)}.pill.pt{background:color-mix(in srgb,var(--c1) 16%,transparent);color:var(--c1)}.pill.pl{background:color-mix(in srgb,var(--c2) 16%,transparent);color:var(--c2)}
+.card p{margin:0 0 9px}.card p:last-child{margin-bottom:0}.card ul{margin:6px 0 0;padding-left:18px}
+.tile2{display:inline-block;width:48px;padding:4px 0;margin:2px;border-radius:5px;text-align:center;font-size:11px;font-weight:600;color:#fff}
+main.wrap>*+*{margin-top:14px}
+th.s{cursor:pointer}th.s:hover{color:var(--fg)}th.s[data-d]::after{content:attr(data-d);margin-left:4px;color:var(--accent)}
+footer.site{color:var(--muted);font-size:12px;padding:20px 16px 40px;max-width:1240px;margin:0 auto}
