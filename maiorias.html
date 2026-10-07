@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maiorias e quóruns · Apuração 2026</title><meta name="description" content="Quóruns para lei, PEC, veto, CPI, impeachment e destituição, e a distância de cada bloco aos limiares no Senado e na Câmara."><meta name="theme-color" content="#0b5cad"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b5cad'/%3E%3Cpath d='M5 26L27 6' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/base.css"><link rel="stylesheet" href="assets/page.css"><link rel="stylesheet" href="assets/cg.css">
+</head><body>
+<header class="top"><div class="wrap"><div class="bar"><div class="brand">Maiorias e quóruns<small>Quanto cada decisão exige e quanto cada bloco tem · Congresso 2027</small></div>
+<div class="ctrl"><a class="ext" href="https://resultados.tse.jus.br/oficial/app/index.html" target="_blank" rel="noopener">Site do TSE</a></div></div></div></header>
+<main class="wrap">
+
+<div><h1 class="page-h">Maiorias e quóruns no Congresso 2027</h1>
+<p class="lead">Quantos votos cada tipo de decisão exige em cada Casa, quanto cada bloco tem hoje e quanto falta. Os números usam a composição eleita em 2026 (mais os senadores de 2022) e a classificação por espectro da página Congresso. É aritmética de cadeiras: não indica como cada parlamentar votará.</p></div>
+<section class="card"><h2>O que cada votação exige</h2><div class="tw"><table id="qt"></table></div>
+ <p class="note">Base: Constituição Federal (artigos citados). "Presentes" vale para a maioria simples: com a Casa cheia ela é igual à maioria absoluta mais um voto; com o quórum mínimo de presença, bastam 129 deputados ou 21 senadores. A figura de referência chama de "maioria simples" os 257 e 41, que na verdade são o quórum de maioria absoluta.</p></section>
+<section class="card"><h2>Presença e maioria simples</h2>
+ <div class="ctl"><label>Deputados presentes <input type="range" id="pc" min="257" max="513" value="513"><output id="pco"></output></label><label>Senadores presentes <input type="range" id="ps" min="41" max="81" value="81"><output id="pso"></output></label></div>
+ <div class="stats" id="pr"></div></section>
+<section class="card"><h2>Blocos e limiares</h2>
+ <div class="cols2"><div><div class="hs2">Senado · 81 cadeiras</div><div id="b1"></div></div><div><div class="hs2">Câmara · 513 cadeiras</div><div id="b2"></div></div></div>
+ <div class="lg" id="lg"></div></section>
+<section class="card"><h2>Quanto falta a cada bloco</h2><div class="ctl"><span class="rule">✓ atinge o limiar (sobra N); caso contrário, faltam N votos.</span></div>
+ <div class="stack"><div><div class="hs2">Senado</div><div class="tw"><table id="fs"></table></div></div><div><div class="hs2">Câmara</div><div class="tw"><table id="fc"></table></div></div></div></section>
+<section class="card"><h2>Montador de coalizões <span class="sub">marque os partidos e veja os limiares</span></h2>
+ <div class="ctl"><div class="seg-b" id="pre"></div></div>
+ <div class="pty" id="py"></div>
+ <div class="cols2"><div><div class="hs2">Senado</div><div id="cs"></div></div><div><div class="hs2">Câmara</div><div id="cc"></div></div></div></section>
+<section class="card"><h2>Partido da mediana <span class="sub">ordenando os partidos da esquerda para a direita</span></h2>
+ <div class="prose" id="mt"></div><div class="cols2"><div><div class="hs2">Senado</div><div id="m1"></div></div><div><div class="hs2">Câmara</div><div id="m2"></div></div></div>
+ <p class="note">A ordem é uma aproximação do posicionamento dos partidos, usada só para esta leitura (esquerda: PSOL, PT, PCdoB, PV, Rede, PSB, PDT; centro: PSDB, Solidariedade, Avante, MDB, Podemos, PSD; direita: PRD, União, PP, Republicanos, PL, Missão, Novo). O senador sem partido fica fora da ordenação. O resultado muda se a ordem mudar. A mediana é o parlamentar cujo voto decide uma maioria quando as votações se alinham em uma só dimensão, hipótese forte.</p></section>
+<section class="card"><h2>Impeachment e destituição</h2><div class="prose" id="ip"></div><div class="tw"><table id="it"></table></div>
+ <p class="note">Presidente da República: a Câmara autoriza por 2/3 a instauração do processo; o Senado, após instaurar o processo, julga e só condena (perda do cargo e inabilitação) por 2/3. Ministros do STF: não passam pela Câmara; o Senado processa e julga e condena por 2/3. Os 2/3 contam os membros da Casa, não os presentes.</p></section>
+<section class="card"><h2>Vetos e sessão conjunta</h2><div class="prose" id="vt"></div></section>
+<section class="card"><h2>Efeito da saída de senadores eleitos governadores</h2><div class="prose" id="sg"></div></section>
+<section class="card"><h2>Notas e limites</h2><div class="prose">
+<p>As regras são as da Constituição; regimentos internos acrescentam procedimentos e quóruns para outras decisões (urgência, requerimentos, comissões) que não entram aqui. Aritmética de cadeiras ignora ausências, trocas de partido, liderança de governo, emendas e a dinâmica política de cada votação.</p>
+<p>A classificação por espectro vem da página Congresso e pode ser alterada lá; o que você escolher vale aqui. Os números por partido refletem o partido da candidatura (deputados e senadores eleitos em 2026) e o atual (senadores de 2022).</p></div></section>
+
+</main>
+<footer class="site">Fonte: TSE, resultado final do 1º turno de 04/10/2026 (arquivos públicos, posição de 05/10/2026 12h51, 100% das seções) para os 54 senadores e 513 deputados federais eleitos; Senado Federal (dados abertos, lista de senadores em exercício) para os 27 senadores com mandato até 2031. Partido é o do registro da candidatura (eleitos em 2026) e o atual (senadores de 2022); trocas de partido posteriores não aparecem. A classificação por espectro é uma leitura de trabalho e pode ser alterada na página. Projeto independente, sem vínculo com o TSE nem com o Congresso.</footer>
+
+<script src="assets/congresso.js"></script><script src="assets/cg.js"></script><script src="assets/nav.js"></script>
+<script>
+
+const QS={cam:quorums('cam'),sen:quorums('sen')};
+const RULES=[
+ ['Quórum para deliberar (instalação da sessão)','maioria absoluta dos membros','abs','CF art. 47'],
+ ['Projeto de lei ordinário, MP, decreto legislativo, resolução','maioria simples (dos presentes)','sim','CF art. 47'],
+ ['Lei complementar','maioria absoluta','abs','CF art. 69'],
+ ['Emenda à Constituição (PEC)','3/5, em dois turnos em cada Casa','tres5','CF art. 60 §2'],
+ ['Tratado de direitos humanos com status de emenda','3/5, em dois turnos em cada Casa','tres5','CF art. 5º §3'],
+ ['Rejeição de veto presidencial','maioria absoluta de cada Casa, em sessão conjunta','abs','CF art. 66 §4'],
+ ['Cassação de mandato de parlamentar','maioria absoluta da respectiva Casa','abs','CF art. 55 §2'],
+ ['Instalação de CPI (assinaturas)','1/3 dos membros da Casa (CPMI: 1/3 de cada uma)','um3','CF art. 58 §3'],
+ ['Aprovação de ministro do STF e do PGR (Senado)','maioria absoluta do Senado','abs','CF arts. 101 e 128 §1'],
+ ['Impeachment do presidente: autorização na Câmara','2/3 dos deputados','dois3','CF art. 51, I'],
+ ['Impeachment do presidente e destituição de ministro do STF: condenação no Senado','2/3 dos senadores','dois3','CF art. 52, I e II, e parágrafo único']];
+$('#qt').innerHTML='<thead><tr><th>Votação</th><th>Regra</th><th class="n">Câmara</th><th class="n">Senado</th><th>Base</th></tr></thead><tbody>'+RULES.map(r=>{const f=h=>r[2]==='sim'?QS[h].simplesMin+' <span class="rule">(até '+QS[h].abs+')</span>':(r[2]==='sim'?'':QS[h][r[2]]);return`<tr><td>${r[0]}</td><td>${r[1]}${r[2]==='sim'?'':''}</td><td class="n"><b>${r[2]==='sim'?QS.cam.simplesMin+'</b> <span class="rule">a '+QS.cam.abs+'</span>':QS.cam[r[2]]+'</b>'}</td><td class="n"><b>${r[2]==='sim'?QS.sen.simplesMin+'</b> <span class="rule">a '+QS.sen.abs+'</span>':QS.sen[r[2]]+'</b>'}</td><td class="rule">${r[3]}</td></tr>`}).join('')+'</tbody>';
+function pres(){const pc=+$('#pc').value,ps=+$('#ps').value;$('#pco').textContent=pc;$('#pso').textContent=ps;
+ $('#pr').innerHTML=[['Câmara: maioria simples',maj(pc),`com ${pc} presentes (${fpc(maj(pc)/513)} da Casa)`],['Senado: maioria simples',maj(ps),`com ${ps} presentes (${fpc(maj(ps)/81)} da Casa)`],['Câmara: mínimo para decidir',maj(257),'se só o quórum de 257 estiver presente'],['Senado: mínimo para decidir',maj(41),'se só o quórum de 41 estiver presente']].map(a=>`<div class="stat"><div class="lab">${a[0]}</div><div class="val">${a[1]}</div><div class="pc">${a[2]}</div></div>`).join('')}
+$('#pc').oninput=$('#ps').oninput=pres;pres();
+const GRP=[['D'],['C'],['E'],['D','C'],['C','E'],['D','E'],['D','C','E']];
+const nm=a=>a.map(x=>GN[x].n).join(' + ');
+const st=(have,need)=>have>=need?`<span class="ok">✓ +${have-need}</span>`:`<span class="no">−${need-have}</span>`;
+function falta(h){const g=seatsGroup(h),q=QS[h];return '<thead><tr><th>Bloco</th><th class="n">Cadeiras</th><th class="n">%</th><th class="n">1/3 · '+q.um3+'</th><th class="n">Maioria abs. · '+q.abs+'</th><th class="n">3/5 · '+q.tres5+'</th><th class="n">2/3 · '+q.dois3+'</th></tr></thead><tbody>'+GRP.map(a=>{const v=sumA(a.map(x=>g[x]));return`<tr><td><b>${nm(a)}</b></td><td class="n">${v}</td><td class="n">${fd(v/q.tot*100,1)}%</td><td class="n">${st(v,q.um3)}</td><td class="n">${st(v,q.abs)}</td><td class="n">${st(v,q.tres5)}</td><td class="n">${st(v,q.dois3)}</td></tr>`}).join('')+(g.X?`<tr><td class="rule" colspan="7">Sem classificação: ${g.X} cadeira(s), fora das somas acima.</td></tr>`:'')+'</tbody>'}
+function coal(h,set){const q=QS[h],sp=seatsParty(h),v=sumA([...set].map(p=>sp[p]||0));const lines=[['1/3 (CPI)',q.um3],['Maioria absoluta',q.abs],['3/5 (PEC)',q.tres5],['2/3 (impeachment)',q.dois3]];
+ return `<div class="stats"><div class="stat"><div class="lab">Cadeiras</div><div class="val">${v}</div><div class="pc">${fd(v/q.tot*100,1)}% da Casa</div></div>${lines.map(l=>`<div class="stat"><div class="lab">${l[0]} · ${l[1]}</div><div class="val" style="font-size:16px">${st(v,l[1])}</div></div>`).join('')}</div>`}
+let SEL=new Set(['PL','PP','UNIÃO','REPUBLICANOS','NOVO','PRD','MISSÃO']);
+const PRE=[['Direita',()=>PARTIES.filter(p=>gOf(p)==='D')],['Centro + direita',()=>PARTIES.filter(p=>'DC'.includes(gOf(p)))],['Centro',()=>PARTIES.filter(p=>gOf(p)==='C')],['Esquerda + centro',()=>PARTIES.filter(p=>'EC'.includes(gOf(p)))],['Esquerda',()=>PARTIES.filter(p=>gOf(p)==='E')],['Todos',()=>PARTIES],['Limpar',()=>[]]];
+$('#pre').innerHTML=PRE.map((p,i)=>`<button data-i="${i}" aria-pressed="false">${p[0]}</button>`).join('');
+function mont(){const sc=seatsParty('cam'),ss=seatsParty('sen');
+ $('#py').innerHTML=GR.map(g=>{const ps=PARTIES.filter(p=>gOf(p)===g.id).sort((a,b)=>(sc[b]||0)-(sc[a]||0)||(ss[b]||0)-(ss[a]||0));return ps.map(p=>`<label><input type="checkbox" data-p="${esc(p)}"${SEL.has(p)?' checked':''}><i class="sw" style="background:var(${g.v})"></i>${esc(pl(p))} <span class="rule">${sc[p]||0} · ${ss[p]||0}</span></label>`).join('')}).join('');
+ $$('#py input').forEach(c=>c.onchange=()=>{c.checked?SEL.add(c.dataset.p):SEL.delete(c.dataset.p);mont()});
+ $('#cs').innerHTML=coal('sen',SEL);$('#cc').innerHTML=coal('cam',SEL)}
+$$('#pre button').forEach(b=>b.onclick=()=>{SEL=new Set(PRE[+b.dataset.i][1]());mont()});
+/* mediana */
+function strip(h,W){const sp=seatsParty(h),q=QS[h],ps=Object.keys(sp).filter(p=>p!=='S/Partido').sort((a,b)=>(RANK[a]||0)-(RANK[b]||0));const H=96,l=6,pw=W-12;let c=0,s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Partidos em ordem">`;let med=null,cum=0;
+ ps.forEach((p,i)=>{const v=sp[p],w=v/q.tot*pw,g=gOf(p);if(med===null&&cum+v>=q.abs)med=p;cum+=v;s+=`<rect x="${(l+c).toFixed(1)}" y="34" width="${Math.max(.5,w-.8).toFixed(1)}" height="26" fill="var(${GN[g].v})" data-tip="${esc(pl(p))}: ${v} cadeiras"/>`;if(w>22)s+=`<text x="${(l+c+w/2).toFixed(1)}" y="51" text-anchor="middle" class="bl2" style="font-size:10px">${esc(pl(p).slice(0,6))}</text>`;c+=w});
+ [[q.abs,'maioria '+q.abs],[q.tres5,'3/5 '+q.tres5],[q.dois3,'2/3 '+q.dois3]].forEach(([v,lab],i)=>{const x=l+v/q.tot*pw;s+=`<line x1="${x}" x2="${x}" y1="28" y2="66" class="mk"/><text x="${x}" y="${i%2?80:22}" text-anchor="middle" class="mt">${lab}</text>`});
+ const xm=l+q.abs/q.tot*pw;s+=`<text x="${l}" y="${H-4}" class="mt">← esquerda</text><text x="${W-6}" y="${H-4}" text-anchor="end" class="mt">direita →</text></svg>`;return{s,med,ps,sp}}
+function medianas(){const a=strip('sen',420),b=strip('cam',420);$('#m1').innerHTML=a.s;$('#m2').innerHTML=b.s;
+ const from=(h,fromRight)=>{const sp=seatsParty(h),q=QS[h],ps=Object.keys(sp).filter(p=>p!=='S/Partido').sort((x,y)=>fromRight?(RANK[y]||0)-(RANK[x]||0):(RANK[x]||0)-(RANK[y]||0));let c=0,r={};for(const p of ps){c+=sp[p];if(!r.abs&&c>=q.abs)r.abs=p;if(!r.t&&c>=q.tres5)r.t=p;if(!r.d&&c>=q.dois3)r.d=p}return r};
+ const eC=from('cam',false),eS=from('sen',false),dC=from('cam',true),dS=from('sen',true);
+ $('#mt').innerHTML=`<p>No Senado o 41º assento, contando da esquerda, está no <b>${pl(a.med)}</b>; na Câmara, o 257º assento está no <b>${pl(b.med)}</b>. Esse é o partido que, na ordenação adotada, completa uma maioria absoluta somando partidos a partir da esquerda; contando a partir da direita, o partido que completa a maioria é o <b>${pl(dS.abs)}</b> no Senado e o <b>${pl(dC.abs)}</b> na Câmara.</p><p>Para chegar a 3/5 a partir da esquerda é preciso incluir até o <b>${pl(eS.t)}</b> no Senado e o <b>${pl(eC.t)}</b> na Câmara; a partir da direita, até o <b>${pl(dS.t)}</b> e o <b>${pl(dC.t)}</b>. Para 2/3, a partir da esquerda, até o <b>${pl(eS.d)}</b> e o <b>${pl(eC.d)}</b>; a partir da direita, até o <b>${pl(dS.d)}</b> e o <b>${pl(dC.d)}</b>.</p>`}
+function imp(){const gC=seatsGroup('cam'),gS=seatsGroup('sen'),qC=QS.cam,qS=QS.sen;const maior=g=>['D','C','E'].map(x=>[x,g[x]]).sort((a,b)=>b[1]-a[1])[0];const [xc,vc]=maior(gC),[xs,vs]=maior(gS);
+ $('#ip').innerHTML=`<p>A Câmara precisa de <b>${qC.dois3}</b> votos para autorizar o processo contra o presidente; o maior bloco, ${GN[xc].n.toLowerCase()}, tem ${vc} (${vc>=qC.dois3?'+'+(vc-qC.dois3):'faltam '+(qC.dois3-vc)}). O Senado precisa de <b>${qS.dois3}</b> votos para condenar o presidente ou um ministro do STF; o maior bloco, ${GN[xs].n.toLowerCase()}, tem ${vs} (${vs>=qS.dois3?'+'+(vs-qS.dois3):'faltam '+(qS.dois3-vs)}).</p>`;
+ const rows=GRP.map(a=>{const c=sumA(a.map(x=>gC[x])),s=sumA(a.map(x=>gS[x]));return`<tr><td><b>${nm(a)}</b></td><td class="n">${c}</td><td class="n">${st(c,qC.dois3)}</td><td class="n">${s}</td><td class="n">${st(s,qS.dois3)}</td></tr>`}).join('');
+ $('#it').innerHTML=`<thead><tr><th>Bloco</th><th class="n">Câmara</th><th class="n">Autorização · ${qC.dois3}</th><th class="n">Senado</th><th class="n">Condenação · ${qS.dois3}</th></tr></thead><tbody>${rows}</tbody>`}
+function vet(){const gC=seatsGroup('cam'),gS=seatsGroup('sen');const nC=QS.cam.abs,nS=QS.sen.abs;
+ $('#vt').innerHTML=`<p>O Congresso em sessão conjunta reúne 594 parlamentares, mas o veto só é derrubado se ao menos <b>${nC}</b> deputados <i>e</i> <b>${nS}</b> senadores votarem pela rejeição: a maioria é contada separadamente em cada Casa. Ou seja, o Senado, com 81 membros, pesa tanto quanto a Câmara para esse fim, embora tenha 13,6% dos parlamentares.</p><p>Por bloco (Câmara / Senado): direita ${gC.D} e ${gS.D}; centro ${gC.C} e ${gS.C}; esquerda ${gC.E} e ${gS.E}. ${(()=>{const ok=['D','C','E'].filter(x=>gC[x]>=nC&&gS[x]>=nS).map(x=>GN[x].n.toLowerCase());return ok.length?'Com a classificação atual, atingem a maioria absoluta nas duas Casas sozinhos: '+ok.join(', ')+'.':'Com a classificação atual, nenhum bloco atinge sozinho a maioria absoluta nas duas Casas.'})()}</p>`}
+function saida(){const g3=['PL','REPUBLICANOS','UNIÃO'].map(gOf);$('#sg').innerHTML=`<p>Dois senadores com mandato até 2031 foram eleitos governadores no 1º turno e, ao tomar posse, deixam o Senado: <b>Sergio Moro</b> (PL, Paraná; suplentes Luis Felipe Cunha e Ricardo Guerra) e <b>Cleitinho</b> (Republicanos, Minas Gerais; suplentes Alex Diniz e Wander de Souza). Em Tocantins, <b>Professora Dorinha</b> (União) lidera o 2º turno por 13.412 votos de diferença no 1º turno; se vencer, sua cadeira vai ao suplente (Professora Lu). O número de cadeiras do Senado não muda (81), mas o partido do suplente pode ser outro: os dados usados aqui não informam o partido dos suplentes.</p><p>Hoje essas três cadeiras são do PL, dos Republicanos e do União, que a classificação atual coloca em: ${['PL','REPUBLICANOS','UNIÃO'].map(p=>GN[gOf(p)].n.toLowerCase()).join(', ')}. O Senado tem ${seatsGroup('sen').D} cadeiras na direita; se as que hoje estão na direita saíssem desse bloco, o bloco cairia para ${seatsGroup('sen').D-g3.filter(x=>x==='D').length}, ${seatsGroup('sen').D-g3.filter(x=>x==='D').length>=QS.sen.abs?'ainda acima':'abaixo'} da maioria absoluta (${QS.sen.abs}).</p>`}
+function renderAll(){const gC=seatsGroup('cam'),gS=seatsGroup('sen');$('#b1').innerHTML=bloc('sen',{gs:gS});$('#b2').innerHTML=bloc('cam',{gs:gC});$('#lg').innerHTML=GR.filter(g=>g.id!=='X'||gS.X||gC.X).map(g=>`<span><i class="sw" style="background:var(${g.v})"></i>${g.n}</span>`).join('');$('#fs').innerHTML=falta('sen');$('#fc').innerHTML=falta('cam');mont();medianas();imp();vet();saida()}
+renderAll();
+
+</script></body></html>
