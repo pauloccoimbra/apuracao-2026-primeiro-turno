@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Simulador do 2º turno 2026</title><meta name="description" content="Simulador do segundo turno presidencial de 2026 a partir dos votos finais do 1º turno por estado."><meta name="theme-color" content="#0b5cad"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b5cad'/%3E%3Cpath d='M5 26L27 6' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/base.css"><link rel="stylesheet" href="assets/page.css">
+</head><body>
+<header class="top"><div class="wrap"><div class="bar"><div class="brand">Simulador do 2º turno<small>Presidente · transferências, retenção e comparecimento sobre o resultado do 1º turno</small></div>
+<div class="ctrl"><a class="ext" href="https://resultados.tse.jus.br/oficial/app/index.html" target="_blank" rel="noopener">Site do TSE</a></div></div></div></header>
+<main class="wrap">
+
+<div><h1 class="page-h">Simulador do 2º turno presidencial</h1>
+<p class="lead">Parte dos votos finais do 1º turno de cada estado e permite escolher, por candidato eliminado, que fração migra para Lula, para Flávio ou se abstém, além da retenção dos próprios eleitores e de uma mobilização adicional. Não é previsão: cada controle é uma hipótese, e os resultados mostram o que cada hipótese implica.</p></div>
+<section class="card"><h2>Resultado nacional</h2><div class="stats" id="out"></div>
+ <div class="strip" id="bar2" style="margin-top:12px"></div><p class="note" id="outn"></p></section>
+<section class="card"><h2>Hipóteses</h2>
+ <div class="ctl"><b style="color:var(--fg2)">Cenários prontos:</b><div class="seg-b" id="pre"><button data-p="A" aria-pressed="false">A · eliminados pendem a Flávio</button><button data-p="B" aria-pressed="true">B · base</button><button data-p="C" aria-pressed="false">C · eliminados pendem a Lula</button></div></div>
+ <p class="note" id="pren"></p>
+ <h3>Votos dos eliminados, por candidato (% de cada um que vai para Lula e para Flávio; o resto se abstém, vota em branco ou anula)</h3>
+ <div class="tw"><table id="grp"></table></div>
+ <div class="ctl" style="margin-top:12px"><label>Retenção dos eleitores de Lula <input type="range" id="rL" min="80" max="100" step="1" value="100"><output id="rLo"></output></label>
+ <label>Retenção dos eleitores de Flávio <input type="range" id="rF" min="80" max="100" step="1" value="100"><output id="rFo"></output></label></div>
+ <div class="ctl"><label>Comparecimento adicional (p.p. do eleitorado) <input type="range" id="dp" min="0" max="5" step="0.25" value="0"><output id="dpo"></output></label>
+ <label>Novos votantes escolhem <select id="qm"><option value="uf">como os votantes do estado</option><option value="fix">Lula com fração fixa</option></select></label>
+ <label id="qlab" style="display:none">Lula entre novos votantes <input type="range" id="q" min="30" max="70" step="1" value="50"><output id="qo"></output></label></div>
+ <div class="ctl"><button class="btn" id="cp">Copiar link deste cenário</button><button class="btn" id="rs">Restaurar cenário base</button></div></section>
+<section class="card"><h2>Quanto falta <span class="sub">no cenário atual</span></h2><div class="stats" id="gap"></div><p class="note" id="gapn"></p></section>
+<section class="card"><h2>Resultado por estado</h2><div class="lg" id="tl"></div><div id="tiles"></div>
+ <div class="tw" style="margin-top:10px"><table id="tb"></table></div></section>
+<section class="card"><h2>Grade de sensibilidade nacional <span class="sub">margem Lula − Flávio no 2º turno, em milhões de votos</span></h2>
+ <p>Todos os eleitores dos candidatos eliminados entram no cálculo, uma fração <i>r</i> deles vota num dos dois finalistas e uma fração <i>s</i> desses vota em Lula. Eleitores dos finalistas repetem o voto; não há mobilização adicional. Vermelho = Lula à frente; azul = Flávio à frente.</p>
+ <div class="tw"><table class="heat" id="hm"></table></div><p class="note" id="hmn"></p></section>
+<section class="card"><h2>Estados: qual a fração dos eliminados que reverteria o 1º turno?</h2>
+ <p>Fração <i>s</i> dos votos dos eliminados que o <b>desafiante</b> de cada estado (quem ficou atrás entre Lula e Flávio) precisa captar para igualar, supondo que todos votam num dos dois. Acima de 100% significa que nem todos os votos dos eliminados bastariam.</p>
+ <div class="tw"><table id="sst"></table></div></section>
+<section class="card"><h2>Limites</h2><div class="prose"><p>O modelo é linear e agregado por estado: aplica a mesma fração de cada candidato eliminado a todos os estados, o que ignora diferenças regionais de comportamento. Não considera pesquisas, declarações de apoio, nem a mudança de comparecimento entre turnos, exceto no controle explícito. Brancos e nulos do 1º turno não entram nos votos válidos e são tratados como abstenção no 2º turno. O exterior aparece nos totais nacionais.</p></div></section>
+
+</main>
+<footer class="site">Fonte dos números: TSE, resultado final do 1º turno de 04/10/2026 (arquivos públicos, posição de 05/10/2026 12h51, 100% das seções), embutidos nesta página. Cálculos próprios; projeções e cenários são hipóteses de trabalho, não previsões nem resultado oficial. Projeto independente, sem vínculo com o TSE.</footer>
+<script src="assets/dados.js"></script><script src="assets/common.js"></script><script src="assets/nav.js"></script>
+<script>
+
+const G=[{id:'70',nm:'Augusto Cury',pt:'AVANTE'},{id:'55',nm:'Ronaldo Caiado',pt:'PSD'},{id:'14',nm:'Renan Santos',pt:'MISSÃO'},{id:'30',nm:'Zema',pt:'NOVO'},{id:'O',nm:'Demais candidatos',pt:'esq. e dir. menores'}];
+const ci=n=>R.cands.findIndex(c=>c[0]===n);
+const gidx={'70':[ci('70')],'55':[ci('55')],'14':[ci('14')],'30':[ci('30')],'O':OTH.filter(i=>!['70','55','14','30'].includes(R.cands[i][0]))};
+const PP=9316747,PRE={A:{l:1176731/PP,f:5864731/PP},B:{l:1970283/PP,f:4894445/PP},C:{l:2848084/PP,f:3935533/PP}};
+const gv=(u,g)=>sum(gidx[g].map(i=>U(u).v[i]));
+let S;const base=()=>({p:'B',g:Object.fromEntries(G.map(x=>[x.id,{l:PRE.B.l,f:PRE.B.f}])),rL:1,rF:1,dp:0,qm:'uf',q:.5});
+try{const h=location.hash.slice(1);S=h?JSON.parse(decodeURIComponent(escape(atob(h)))):base()}catch(e){S=base()}
+if(!S||!S.g)S=base();
+function calc(){const rows=ALL.map(u=>{const o=U(u),t=vv(u);let L=o.v[IL]*S.rL,F=o.v[IF]*S.rF;G.forEach(x=>{const v=gv(u,x.id);L+=v*S.g[x.id].l;F+=v*S.g[x.id].f});
+  let nv=0,nl=0,nf=0;if(u!=='zz'&&S.dp>0){nv=Math.min(S.dp*o.el,o.el-o.comp);const q=S.qm==='uf'?o.v[IL]/(o.v[IL]+o.v[IF]):S.q;nl=nv*q;nf=nv*(1-q);L+=nl;F+=nf}
+  const L1=o.v[IL],F1=o.v[IF];return{u,n:o.n,r:o.r,L,F,L1,F1,t,nv,m1:L1-F1,m:L-F,pool:t-L1-F1,tot:L+F}});return rows}
+let rows;
+function render(){rows=calc();const T=rows.reduce((a,r)=>{a.L+=r.L;a.F+=r.F;a.nv+=r.nv;a.L1+=r.L1;a.F1+=r.F1;return a},{L:0,F:0,nv:0,L1:0,F1:0});const M=T.L-T.F,tot=T.L+T.F;
+ $('#out').innerHTML=[['Lula',fi(T.L),fp(T.L/tot,2)+' dos válidos dos dois',1],['Flávio',fi(T.F),fp(T.F/tot,2),2],['Margem (Lula − Flávio)',fs(M),M>0?'Lula à frente':M<0?'Flávio à frente':'empate',0],['1º turno (Lula − Flávio)',fs(T.L1-T.F1),'referência',0],['Novos votantes',fi(T.nv),'comparecimento adicional',0]].map(a=>`<div class="stat"><div class="lab">${a[0]}</div><div class="val ${a[3]==1?'cL':a[3]==2?'cF':''}">${a[1]}</div><div class="pc">${a[2]}</div></div>`).join('');
+ const pl=T.L/tot*100;$('#bar2').innerHTML=`<div style="width:${pl}%;background:var(--c1);display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:#fff;font-weight:600">${fd(pl,1)}%</div><div style="flex:1;background:var(--c2);display:flex;align-items:center;padding-left:8px;color:#fff;font-weight:600">${fd(100-pl,1)}%</div><div class="scur" style="left:50%"></div>`;
+ const flip=rows.filter(r=>Math.sign(r.m)!==Math.sign(r.m1)&&r.u!=='zz');
+ $('#outn').textContent=`Estados em que o líder muda em relação ao 1º turno: ${flip.length?flip.map(r=>up(r.u)).join(', '):'nenhum'}. Lula lidera em ${rows.filter(r=>r.m>0&&r.u!=='zz').length} dos 27 estados nesse cenário (1º turno: ${rows.filter(r=>r.m1>0&&r.u!=='zz').length}).`;
+ /* controles de grupos */
+ $('#grp').innerHTML='<thead><tr><th>Candidato</th><th class="n">Votos</th><th>Para Lula</th><th>Para Flávio</th><th class="n">Abstém / branco / nulo</th></tr></thead><tbody>'+G.map(x=>{const v=sum(UFS.map(u=>gv(u,x.id)))+gv('zz',x.id),s=S.g[x.id];return`<tr><td>${x.nm} <small style="color:var(--muted)">${x.pt}</small></td><td class="n">${fi(v)}</td><td><input type="range" data-g="${x.id}" data-k="l" min="0" max="100" value="${Math.round(s.l*100)}"> <output>${fd(s.l*100,0)}%</output></td><td><input type="range" data-g="${x.id}" data-k="f" min="0" max="100" value="${Math.round(s.f*100)}"> <output>${fd(s.f*100,0)}%</output></td><td class="n">${fd(100-(s.l+s.f)*100,0)}%</td></tr>`}).join('')+'</tbody>';
+ $$('#grp input').forEach(i=>i.oninput=()=>{const g=S.g[i.dataset.g],k=i.dataset.k,o=k==='l'?'f':'l';g[k]=+i.value/100;if(g.l+g.f>1)g[o]=1-g[k];S.p='';sync();render()});
+ const eqL=sum(G.map(x=>sum(ALL.map(u=>gv(u,x.id)))*S.g[x.id].l))/NAT.pool,eqF=sum(G.map(x=>sum(ALL.map(u=>gv(u,x.id)))*S.g[x.id].f))/NAT.pool;
+ $('#pren').textContent=`Equivalente nacional: ${fp(eqL,1)} dos votos dos eliminados vão para Lula, ${fp(eqF,1)} para Flávio e ${fp(1-eqL-eqF,1)} não votam em nenhum dos dois. Cenários A, B e C reproduzem os do estudo (A: 12,6% / 63,0%; B: 21,1% / 52,5%; C: 30,6% / 42,2%).`;
+ /* quanto falta */
+ const P=NAT.pool;const need1=-M/(0.02*P);const q=S.qm==='uf'?T.L1/(T.L1+T.F1):S.q;
+ const nn=(2*q-1)!==0?-M/(2*q-1):NaN;
+ $('#gap').innerHTML=[['Margem atual',fs(M),M>0?'Lula à frente':'Flávio à frente'],['Para virar, por pontos de transferência',(M>0?'—':fd(Math.abs(need1),1)+' p.p.'),M>0?'Lula já lidera':'p.p. dos eliminados que passariam de Flávio para Lula'],['Ou, por novos votantes',(M>0?'—':(nn>0?fd(nn/1e6,1)+' mi':'não fecha')),M>0?'':'com Lula a '+fd(q*100,0)+'% entre eles']].map(a=>`<div class="stat"><div class="lab">${a[0]}</div><div class="val">${a[1]}</div><div class="pc">${a[2]}</div></div>`).join('');
+ $('#gapn').textContent=`Cada ponto percentual dos votos dos eliminados (${fi(P*0.01)} votos) que migra de Flávio para Lula muda a margem em ${fi(P*0.02)} votos; cada milhão de novos votantes muda em ${fs((2*q-1)*1e6)} votos.`;
+ /* tiles */
+ const mx=Math.max(...rows.map(r=>Math.abs(r.m/ (r.tot||1))));
+ $('#tl').innerHTML='<span><i class="sw" style="background:var(--c1)"></i>Lula lidera</span><span><i class="sw" style="background:var(--c2)"></i>Flávio lidera</span><span>intensidade = margem em p.p. dos votos válidos dos dois</span>';
+ $('#tiles').innerHTML=rows.filter(r=>r.u!=='zz').slice().sort((a,b)=>a.u<b.u?-1:1).map(r=>{const pp=r.m/r.tot,al=.35+Math.min(1,Math.abs(pp)/.4)*.65;return`<span class="tile2" style="background:color-mix(in srgb,${r.m>0?'var(--c1)':'var(--c2)'} ${Math.round(al*100)}%,var(--surface2))" data-tip="<b>${esc(r.n)}</b><br>Lula ${fp(r.L/r.tot)} · Flávio ${fp(r.F/r.tot)}<br>margem ${fs(r.m)}">${up(r.u)}</span>`}).join('');
+ /* tabela */
+ const srt=rows.filter(r=>r.u!=='zz').slice().sort((a,b)=>b.m-a.m);
+ $('#tb').innerHTML='<thead><tr><th>UF</th><th class="n">Lula</th><th class="n">Flávio</th><th class="n">Margem</th><th class="n">Lula %</th><th class="n">1º turno (margem)</th><th>Muda?</th></tr></thead><tbody>'+srt.map(r=>`<tr><td><b>${up(r.u)}</b> ${esc(r.n)}</td><td class="n">${fi(r.L)}</td><td class="n">${fi(r.F)}</td><td class="n ${r.m>0?'neg':'pos'}">${fs(r.m)}</td><td class="n">${fp(r.L/r.tot)}</td><td class="n">${fs(r.m1)}</td><td>${Math.sign(r.m)!==Math.sign(r.m1)?'<span class="pill">sim</span>':''}</td></tr>`).join('')+`<tr><td><b>Exterior</b></td><td class="n">${fi(rows[27].L)}</td><td class="n">${fi(rows[27].F)}</td><td class="n ${rows[27].m>0?'neg':'pos'}">${fs(rows[27].m)}</td><td class="n">${fp(rows[27].L/rows[27].tot)}</td><td class="n">${fs(rows[27].m1)}</td><td></td></tr></tbody>`;
+ $('#rLo').textContent=fd(S.rL*100,0)+'%';$('#rFo').textContent=fd(S.rF*100,0)+'%';$('#dpo').textContent='+'+fd(S.dp*100,2)+' p.p.';$('#qo').textContent=fd(S.q*100,0)+'%';$('#qlab').style.display=S.qm==='fix'?'':'none'}
+function sync(){$$('#pre button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.p===S.p));$('#rL').value=S.rL*100;$('#rF').value=S.rF*100;$('#dp').value=S.dp*100;$('#qm').value=S.qm;$('#q').value=S.q*100}
+$$('#pre button').forEach(b=>b.onclick=()=>{const p=PRE[b.dataset.p];S.p=b.dataset.p;G.forEach(x=>S.g[x.id]={l:p.l,f:p.f});sync();render()});
+$('#rL').oninput=e=>{S.rL=e.target.value/100;render()};$('#rF').oninput=e=>{S.rF=e.target.value/100;render()};$('#dp').oninput=e=>{S.dp=e.target.value/100;render()};$('#qm').onchange=e=>{S.qm=e.target.value;render()};$('#q').oninput=e=>{S.q=e.target.value/100;render()};
+$('#rs').onclick=()=>{S=base();sync();render()};
+$('#cp').onclick=()=>{const u=location.href.split('#')[0]+'#'+btoa(unescape(encodeURIComponent(JSON.stringify(S))));history.replaceState(null,'',u);if(navigator.clipboard)navigator.clipboard.writeText(u).catch(()=>{});$('#cp').textContent='Link copiado';setTimeout(()=>$('#cp').textContent='Copiar link deste cenário',1800)};
+sync();render();
+/* grade */
+const M0=NAT.v[IL]-NAT.v[IF],Pp=NAT.pool;const rr=[1,.9,.8,.7,.6],ss=[.4,.45,.5,.55,.6,.65,.7,.75,.8];
+const hc=m=>{const a=Math.min(1,Math.abs(m)/8e6)*70;return `background:color-mix(in srgb,${m>0?'var(--c1)':'var(--c2)'} ${a}%,var(--surface))`};
+$('#hm').innerHTML='<thead><tr><th>r \\ s</th>'+ss.map(s=>`<th class="n">${fd(s*100,0)}% a Lula</th>`).join('')+'</tr></thead><tbody>'+rr.map(r=>`<tr><td class="h">${fd(r*100,0)}% votam</td>`+ss.map(s=>{const m=M0+r*Pp*(2*s-1);return`<td style="${hc(m)}">${(m>0?'+':m<0?'−':'')+fd(Math.abs(m)/1e6,2)}</td>`}).join('')+'</tr>').join('')+'</tbody>';
+$('#hmn').textContent=`Ponto de empate nacional: s* = ${fp(.5+(-M0)/(2*Pp),1)} se todos os eleitores dos eliminados votarem num dos dois; ${fp(.5+(-M0)/(2*.8*Pp),1)} se 80% votarem; ${fp(.5+(-M0)/(2*.6*Pp),1)} se 60%. Base: diferença do 1º turno de ${fs(M0)} votos (Lula − Flávio) e ${fi(Pp)} votos de outros candidatos.`;
+/* s* por estado */
+const sr=ALL.filter(u=>u!=='zz').map(u=>{const o=U(u),m=o.v[IL]-o.v[IF],P=pool(u),lead=m>0?'Lula':'Flávio',des=m>0?'Flávio':'Lula';return{u,n:o.n,m:m,P,lead,des,s1:.5+Math.abs(m)/(2*P),s8:.5+Math.abs(m)/(2*.8*P),s6:.5+Math.abs(m)/(2*.6*P),pp:P/vv(u)}}).sort((a,b)=>a.s1-b.s1);
+$('#sst').innerHTML='<thead><tr><th>UF</th><th>Líder</th><th>Desafiante</th><th class="n">Margem (votos)</th><th class="n">Votos dos eliminados</th><th class="n">% dos válidos</th><th class="n">s* se todos votam</th><th class="n">s* se 80%</th><th class="n">s* se 60%</th></tr></thead><tbody>'+sr.map(r=>{const f=v=>v>1?'<span style="color:var(--muted)">&gt;100%</span>':fp(v,1);return`<tr><td><b>${up(r.u)}</b> ${esc(r.n)}</td><td><span class="${r.lead==='Lula'?'cL':'cF'}">${r.lead}</span></td><td>${r.des}</td><td class="n">${fi(Math.abs(r.m))}</td><td class="n">${fi(r.P)}</td><td class="n">${fp(r.pp,1)}</td><td class="n">${f(r.s1)}</td><td class="n">${f(r.s8)}</td><td class="n">${f(r.s6)}</td></tr>`}).join('')+'</tbody>';
+
+</script></body></html>
