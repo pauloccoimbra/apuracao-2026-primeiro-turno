@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Evolução da Apuração 2026</title>
+<meta name="description" content="Reconstrução minuto a minuto da apuração do 1º turno de 2026 para presidente, por estado, no método do notebook de 2022: velocidade de totalização por UF, simulação nacional e trocas entre estados.">
+<meta name="theme-color" content="#0b5cad">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b5cad'/%3E%3Cpath d='M5 24C10 24 11 8 16 8S22 24 27 24' stroke='white' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: painel de controle. Cabeçalho fixo com estado da apuração, abas, e blocos de leitura (KPIs, barras, gráficos, tabelas). */
+:root{
+  --bg:#f3f4f6; --surface:#ffffff; --surface2:#eef0f3; --fg:#161a22; --fg2:#4a5262; --muted:#7a8394; --line:#d9dde4; --accent:#0b5cad;
+  --good:#17803d; --warn:#b26a00; --bad:#b3261e;
+  --c1:#c23a2b; --c2:#2468b4; --c3:#d08a12; --c4:#7b5bc0; --c5:#1f8f78; --c6:#b0508f; --c7:#5b7a2e; --c8:#8a6a4a; --o:#8b93a1;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1116; --surface:#161b23; --surface2:#1d2330; --fg:#e8ebf0; --fg2:#aab2c0; --muted:#7f8899; --line:#2a3140; --accent:#5aa2f0;
+  --good:#4cc77a; --warn:#f0b13e; --bad:#ff7b70;
+  --c1:#ef6b5a; --c2:#5aa2f0; --c3:#f0b13e; --c4:#a58af0; --c5:#4cc5aa; --c6:#e083bb; --c7:#9cc457; --c8:#c9a07a; --o:#8b93a1; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1116; --surface:#161b23; --surface2:#1d2330; --fg:#e8ebf0; --fg2:#aab2c0; --muted:#7f8899; --line:#2a3140; --accent:#5aa2f0;
+  --good:#4cc77a; --warn:#f0b13e; --bad:#ff7b70;
+  --c1:#ef6b5a; --c2:#5aa2f0; --c3:#f0b13e; --c4:#a58af0; --c5:#4cc5aa; --c6:#e083bb; --c7:#9cc457; --c8:#c9a07a; --o:#8b93a1; color-scheme:dark}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 var(--sans);-webkit-font-smoothing:antialiased}
+.num,td.n,th.n{font-variant-numeric:tabular-nums}
+.mono{font-family:var(--mono)}
+button,select,input{font:inherit;color:inherit}
+header.top{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:16px}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding-block:10px}
+.brand{font-weight:600;font-size:17px;letter-spacing:-.01em;margin-right:4px}
+.brand small{display:block;font-weight:400;font-size:11px;color:var(--muted);letter-spacing:.02em}
+.status{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;color:var(--fg2);font-size:12.5px;min-width:0}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;margin-right:6px}
+.dot.live{background:var(--good);box-shadow:0 0 0 3px color-mix(in srgb,var(--good) 25%,transparent)}
+.dot.err{background:var(--bad)} .dot.wait{background:var(--warn)}
+.ctrl{margin-left:auto;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ctrl select,.ctrl button,.btn{background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer}
+.ctrl button:hover,.btn:hover{border-color:var(--accent)}
+a.ext{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--accent) 40%,transparent)}
+nav.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin}
+nav.tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:9px 14px;color:var(--fg2);cursor:pointer;white-space:nowrap;font-weight:500}
+nav.tabs button[aria-selected=true]{color:var(--fg);border-bottom-color:var(--accent)}
+main{padding-block:18px 60px}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.two{grid-template-columns:minmax(0,3fr) minmax(0,2fr);align-items:start}
+@media (max-width:900px){.two{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;min-width:0}
+.card h2{margin:0 0 10px;font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--fg2)}
+.card h2 .sub{text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted);margin-left:6px}
+.kpi .big{font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.15}
+.kpi .lab{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:4px}
+.kpi .det{font-size:12.5px;color:var(--fg2);margin-top:3px}
+.prog{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-top:8px}
+.prog>i{display:block;height:100%;background:var(--accent)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:7px;flex:none}
+.res{display:grid;gap:9px}
+.row{display:grid;grid-template-columns:minmax(170px,1.6fr) minmax(70px,2fr) 82px 62px;gap:10px;align-items:center}
+.row.p4{grid-template-columns:minmax(170px,1.6fr) minmax(70px,2fr) 82px 62px 62px}
+@media (max-width:620px){.row,.row.p4{grid-template-columns:minmax(110px,1.4fr) minmax(40px,.6fr) 70px 56px}.row.p4 .proj{display:none}}
+.row .nm{display:flex;align-items:center;min-width:0}
+.row .nm span.t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .nm small{color:var(--muted);margin-left:6px;font-size:11.5px;white-space:nowrap}
+.trk{height:14px;background:var(--surface2);border-radius:3px;position:relative}
+.trk>i{position:absolute;left:0;top:0;bottom:0;border-radius:3px 4px 4px 3px}
+.trk>b{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--fg);opacity:.55}
+.row .v,.row .p,.row .proj{text-align:right;font-variant-numeric:tabular-nums}
+.row .p{font-weight:600}.row .proj{color:var(--muted)}
+.row.head{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:1px 7px;border-radius:10px;background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good);margin-left:6px;white-space:nowrap}
+.badge.w{background:color-mix(in srgb,var(--warn) 20%,transparent);color:var(--warn)}
+.note{font-size:12px;color:var(--muted);margin-top:10px}
+.callout{border-left:3px solid var(--warn);background:color-mix(in srgb,var(--warn) 9%,var(--surface));padding:9px 12px;border-radius:0 6px 6px 0;font-size:13px;color:var(--fg2)}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;font-weight:500;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap;cursor:default}
+th.sortable{cursor:pointer} th.sortable:hover{color:var(--fg)}
+th.n,td.n{text-align:right}
+td{padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+tr.sel td{background:color-mix(in srgb,var(--accent) 9%,transparent)}
+tr.click{cursor:pointer} tr.click:hover td{background:var(--surface2)}
+.mini{display:inline-block;width:56px;height:5px;background:var(--surface2);border-radius:3px;vertical-align:middle;margin-right:6px;overflow:hidden}
+.mini>i{display:block;height:100%;background:var(--accent)}
+.tiles{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;max-width:420px}
+.tile{aspect-ratio:1.15;border:1px solid var(--line);border-radius:5px;background:var(--surface2);padding:3px 5px;text-align:left;cursor:pointer;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;font-size:11px}
+.tile b{font-size:12px;font-weight:600}
+.tile small{font-size:10px;color:var(--fg2);font-variant-numeric:tabular-nums}
+.tile i{position:absolute;left:0;bottom:0;height:3px;background:var(--accent)}
+.tile.sel{outline:2px solid var(--accent);outline-offset:1px}
+.tile.empty{visibility:hidden}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--fg2);margin-top:8px}
+.legend span{display:inline-flex;align-items:center}
+.sub-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.sub-tabs button{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:5px 14px;cursor:pointer;color:var(--fg2)}
+.sub-tabs button[aria-selected=true]{background:var(--accent);border-color:var(--accent);color:#fff}
+.chart{position:relative;width:100%}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.tip{position:fixed;z-index:50;pointer-events:none;background:var(--fg);color:var(--bg);padding:7px 10px;border-radius:6px;font-size:12px;line-height:1.5;box-shadow:0 4px 14px rgba(0,0,0,.25);max-width:260px;display:none}
+.tip b{font-weight:600}
+.empty-msg{padding:28px 10px;text-align:center;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:3px 6px 3px 10px;font-size:12.5px}
+.chip button{border:0;background:none;cursor:pointer;color:var(--muted);font-size:14px;line-height:1}
+.sim-ctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.sim-ctrl select{background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:5px 8px}
+h3{font-size:13px;margin:16px 0 6px;color:var(--fg2)}
+input[type=search]{background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:5px 10px;min-width:260px;max-width:100%}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){.prog>i,.trk>i{transition:width .5s ease}}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px 16px}
+.stat .lab{font-size:11.5px;color:var(--muted);line-height:1.3;min-height:30px;display:flex;align-items:flex-end}
+.stat .val{font-size:19px;font-weight:600;letter-spacing:-.01em}
+.stat .pc{font-size:12.5px;color:var(--fg2)}
+code{font-family:var(--mono);font-size:12px;background:var(--surface2);padding:1px 5px;border-radius:4px}
+ul.src{margin:6px 0;padding-left:18px} ul.src li{margin:3px 0}
+
+.scrub{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding-block:8px;border-top:1px solid var(--line)}
+.scrub button{background:var(--accent);color:#fff;border:0;border-radius:6px;padding:6px 14px;cursor:pointer;min-width:84px;font-weight:500}
+.scrub input[type=range]{flex:1 1 220px;min-width:140px;accent-color:var(--accent)}
+.scrub select{background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:5px 8px}
+.scrub .clock{font-size:20px;font-weight:600;letter-spacing:-.01em;min-width:64px}
+.scrub .since{color:var(--muted);font-size:12.5px}
+.k{display:inline-block;font-size:11px;font-weight:600;padding:1px 7px;border-radius:10px;white-space:nowrap}
+.k.r{background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good)}
+.k.e{background:color-mix(in srgb,var(--warn) 20%,transparent);color:var(--warn)}
+.k.g{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
+.minis{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.mini-c{border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:var(--surface)}
+.mini-c .t{font-size:12px;font-weight:600;color:var(--fg2);margin-bottom:2px}
+.mini-c svg{display:block;width:100%;height:auto}
+.prose p{margin:0 0 10px;max-width:78ch} .prose h3{margin:18px 0 6px}
+.tile.g i{background:var(--accent)}
+.tiles.big{max-width:460px}
+.tile .pc{font-size:10px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="bar">
+      <div class="brand">Evolução da Apuração 2026<small>Presidente · 1º turno · 4 de outubro · horário de Brasília</small></div>
+      <div class="status" id="status"></div>
+      <div class="ctrl"><a class="ext" href="index.html" style="margin-right:12px">Painel em tempo real</a><a class="ext" href="atemporal.html" style="margin-right:12px">Cenário atemporal</a><a class="ext" href="mapa.html" style="margin-right:12px">Mapa</a><a class="ext" href="https://resultados.tse.jus.br/oficial/app/index.html" target="_blank" rel="noopener">Abrir site do TSE</a></div>
+    </div>
+    <nav class="tabs" id="tabs" role="tablist"></nav>
+    <div class="scrub">
+      <button id="play" type="button">Reproduzir</button>
+      <span class="clock num" id="clock">17:00</span>
+      <input type="range" id="slider" min="0" max="320" step="1" value="0" aria-label="Instante da apuração">
+      <label for="spd" class="since">Velocidade</label>
+      <select id="spd"><option value="2">2 min/s</option><option value="5" selected>5 min/s</option><option value="10">10 min/s</option><option value="25">25 min/s</option></select>
+      <span class="since" id="since"></span>
+    </div>
+  </div>
+</header>
+<main class="wrap" id="main"></main>
+<div class="tip" id="tip"></div>
+<script>
+'use strict';
+const SNAP_COUNTS={
+al:"0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,2,1,0,0,0,0,1,4,2,6,5,3,10,9,0,11,2,5,2,10,11,20,13,11,14,5,11,23,17,8,10,22,10,9,47,30,0,0,0,0,0,0,0,3,24,43,42,21,42,38,37,38,28,39,32,57,15,11,30,32,47,17,25,19,32,14,40,42,55,32,21,22,27,25,39,29,23,28,22,30,29,63,30,44,57,0,0,0,0,96,69,56,44,72,31,57,58,88,51,42,44,77,85,82,58,29,72,76,62,49,60,105,128,82,128,73,61,32,48,37,49,62,56,30,21,58,24,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,110,201,166,161,20,15,15,12,19,34,24,34,21,13,30,42,18,28,29,21,14,24,14,30,14,19,29,22,24,5,11,24,20,14,15,11,11,12,17,18,14,20,18,10,10,39,36,33,32,52,60,67,83,64,94,97,136,134,81,103,93,82,15,5,0,7,8,2,2,0,0,6,1,0,1,3,15,11,1,23,10,3,8,1,2,3,22,4,0,8,0,6,0,3,22,10,13,13,3,2,46,17,7,12,0,0,8,0,0,0,0,0,0,3,8,2,0,0,0,0,0,0,1",
+am:"0,0,0,0,0,0,2,2,4,10,8,15,11,16,17,21,19,31,15,19,18,16,10,15,31,18,18,33,31,21,18,26,31,61,39,76,66,39,36,81,57,68,53,60,53,68,51,88,62,64,70,44,84,49,82,70,82,60,57,63,52,0,0,0,0,0,0,0,45,70,141,75,79,97,74,46,60,51,87,73,82,63,44,86,61,50,40,61,79,65,36,91,53,48,49,55,64,71,56,70,62,52,62,69,55,48,76,48,50,49,0,0,0,0,63,51,35,83,50,49,58,66,57,57,68,49,56,50,65,72,61,87,64,40,47,62,81,65,65,83,60,38,11,24,17,16,23,28,56,30,22,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,77,94,103,51,13,8,7,12,3,11,8,10,6,6,9,8,6,3,4,4,7,8,6,5,9,10,11,4,14,16,9,12,8,6,3,17,13,4,6,2,6,2,10,6,7,22,21,16,25,26,36,23,23,18,47,34,61,34,30,22,14,12,5,2,1,3,5,13,2,3,1,1,3,1,1,19,1,3,12,4,0,1,1,1,0,10,1,0,2,0,3,1,0,1,3,0,1,5,0,1,0,0,0,0,0,5,10,0,3,2,8,0,0,9,6,0,1,3,1,0,1,3,0,4,2,1,0,1,2,1,2,2,0,1",
+ba:"0,0,0,0,0,0,0,0,1,0,0,5,4,5,7,3,1,6,2,14,8,3,6,6,4,8,10,16,15,36,22,17,11,61,21,7,37,23,25,61,66,60,58,52,38,52,36,70,111,64,62,31,101,107,84,139,76,85,88,117,123,0,0,0,0,0,0,0,87,101,244,165,126,177,214,178,245,171,293,209,257,182,183,369,269,280,238,252,210,283,196,368,267,217,221,319,329,370,228,288,224,183,322,324,282,262,435,333,341,186,0,0,0,0,344,340,222,380,254,236,316,261,226,331,330,222,499,417,342,349,276,385,337,387,443,444,407,472,373,421,364,271,242,110,139,173,127,164,208,203,135,170,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,539,654,602,477,84,90,86,68,48,57,87,58,53,48,68,67,78,59,61,57,73,86,41,87,50,85,78,54,52,56,85,84,61,68,50,72,58,67,56,50,62,55,45,59,64,118,93,119,201,296,249,227,229,280,276,331,308,348,403,409,361,256,129,49,39,57,29,48,70,71,82,52,42,29,16,42,13,32,50,26,20,23,31,27,48,92,38,13,25,16,14,24,45,28,23,14,13,14,19,12,10,12,16,22,10,22,24,6,10,17,7,16,34,8,10,8,11,42,29,13,3,9,13,3,21,11,49,51,9,8,3,0,2",
+ce:"0,0,0,0,0,0,0,0,0,0,0,0,2,1,1,1,7,0,1,0,1,0,1,1,3,1,2,4,4,5,5,9,7,13,11,10,6,14,13,47,17,12,42,33,35,50,46,46,81,80,71,33,88,92,75,80,42,96,82,93,103,0,0,0,0,0,0,0,44,114,129,109,128,189,158,107,103,91,176,95,137,145,150,170,117,112,143,156,133,154,76,163,209,183,120,127,207,203,101,213,171,109,180,165,174,164,321,194,178,127,0,0,0,0,296,231,152,215,241,181,191,183,169,249,242,131,318,285,271,312,265,324,262,253,325,318,219,245,335,450,288,352,156,108,109,133,167,156,86,124,129,99,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,342,419,553,311,36,36,48,41,57,58,41,44,37,29,47,27,47,39,39,34,57,59,31,66,32,63,70,66,68,61,65,37,38,34,55,67,43,51,67,41,28,47,64,46,41,121,87,83,154,202,188,178,233,211,203,193,169,200,208,188,183,113,62,44,11,11,18,51,13,16,14,11,10,3,15,15,33,24,7,21,16,14,15,6,2,1,11,4,7,10,12,19,5,7,42,21,2,17,10,14,36,38,4,12,3,3,3,11,15,13,10,1,4,1,1,0,3,7,4,9,7,0,7,13,12,9,0,2,0,0,1,1,3",
+go:"0,0,0,0,0,0,0,0,0,1,0,0,1,0,1,1,1,0,0,0,1,1,5,2,5,4,2,6,3,11,16,7,11,16,13,21,33,28,37,47,52,64,63,48,25,58,81,72,85,103,83,46,125,85,112,114,80,84,122,121,92,0,0,0,0,0,0,0,74,147,273,193,112,249,198,145,171,154,304,191,220,147,202,325,151,180,189,243,241,217,151,251,200,168,202,196,265,206,109,202,205,130,176,208,254,152,212,157,132,83,0,0,0,0,239,147,115,170,191,123,129,123,95,195,154,51,149,174,209,164,149,214,145,111,90,136,140,144,144,158,70,31,91,35,10,23,6,53,62,46,43,38,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,116,97,223,111,17,9,10,9,4,19,8,14,6,9,16,24,6,12,14,13,7,5,3,25,12,9,9,5,14,11,11,9,10,7,3,14,5,3,1,9,8,2,5,3,3,2,6,15,21,41,27,28,32,26,31,30,30,28,24,15,13,2,1,0,10,5,1,0,0,0,1,0,0,6,1,6,0,0,2,0,0,0,0,0,0,0,2,0,0,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,2",
+ma:"0,0,0,0,0,0,3,0,3,3,15,11,10,12,14,14,8,11,12,8,9,9,9,6,12,9,6,21,18,26,27,16,15,41,41,28,39,28,26,50,51,45,62,60,37,61,22,42,96,89,70,85,86,90,61,101,112,90,63,60,83,0,0,0,0,0,0,0,59,135,207,120,146,135,93,137,163,94,154,101,165,121,115,157,152,153,126,128,129,206,108,195,132,136,132,152,180,178,109,177,151,71,149,181,170,133,130,126,104,97,0,0,0,0,209,209,130,180,119,109,191,263,161,245,180,84,164,213,155,189,129,140,153,151,195,259,250,185,148,195,156,108,51,89,60,68,82,66,61,91,144,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,284,217,241,231,33,30,32,21,29,32,26,19,36,42,26,24,28,21,44,45,40,66,24,33,16,42,47,20,38,18,15,46,42,23,33,26,31,42,36,21,26,31,16,26,22,64,44,34,83,119,143,117,110,106,158,183,142,123,117,154,86,79,28,13,14,20,10,5,9,10,0,9,20,39,16,15,14,1,23,9,0,2,7,2,6,18,2,6,33,12,8,15,7,0,3,0,6,1,4,7,8,2,3,2,0,6,0,1,2,2,2,0,2,1,0,0,3,0,26,7,1,0,2,9,0,0,0,0,1,8,0,1,1",
+mg:"0,0,0,0,0,0,3,1,2,6,2,19,36,42,49,21,43,55,36,40,37,46,34,50,32,40,53,74,61,93,77,68,58,143,136,153,107,110,112,193,117,115,95,209,161,184,198,237,164,136,134,224,342,220,161,232,205,190,245,237,287,0,0,0,0,0,0,0,142,348,465,343,375,520,330,276,373,339,412,329,498,449,297,545,529,419,269,453,437,553,308,578,448,425,407,496,620,631,347,435,430,474,606,478,523,450,566,461,431,364,0,0,0,0,790,579,319,630,629,457,551,443,584,675,454,312,692,654,692,614,494,651,523,508,684,746,688,719,699,671,419,411,133,189,204,217,181,133,169,194,175,179,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,653,718,517,457,48,57,65,42,71,43,61,76,65,58,65,81,65,26,61,31,30,52,59,76,30,56,54,36,55,44,36,52,71,52,59,37,42,37,50,67,57,50,67,61,61,149,143,78,207,258,322,240,230,258,214,219,231,261,251,299,249,200,60,57,36,72,28,31,20,12,39,9,27,40,32,15,40,13,4,1,7,1,25,18,1,9,42,11,41,2,1,5,1,21,7,10,32,45,5,7,35,13,9,0,26,3,10,14,9,43,0,62,1,15,10,0,39,4,0,12,1,0,17,3,5,12,67,2,14,3,4,1,0,2",
+pb:"0,0,0,0,0,0,0,1,5,5,12,20,33,40,22,21,31,27,37,31,33,42,36,30,46,45,49,89,84,69,67,52,75,160,108,92,111,106,142,137,151,126,110,122,96,97,122,181,103,108,112,96,154,110,138,116,139,119,102,115,157,0,0,0,0,0,0,0,86,131,208,117,104,229,175,95,127,149,133,161,180,118,93,170,108,87,98,117,84,133,62,108,74,90,94,84,116,90,74,63,108,44,95,64,69,63,69,72,82,54,0,0,0,0,114,89,64,49,68,58,88,57,48,37,59,45,62,66,42,28,35,87,52,22,38,53,43,39,58,31,35,21,3,9,6,14,5,7,0,10,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,28,35,23,21,1,3,1,4,7,1,2,3,3,4,4,0,1,0,1,1,3,0,0,1,1,2,4,1,3,3,1,0,0,0,2,1,0,0,4,1,1,2,0,0,0,0,1,0,0,1,2,2,10,4,15,2,4,1,4,2,2,1,0,0,0,1,2,3,2,1,0,0,1,1,8,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1",
+pa:"0,0,0,0,3,1,3,10,20,22,46,56,79,89,55,47,57,49,57,45,59,54,61,59,60,65,55,76,84,76,70,78,64,155,109,127,109,115,91,146,96,149,141,93,124,89,117,134,128,144,120,121,133,133,111,144,99,105,109,128,107,0,0,0,0,0,0,0,84,151,272,134,131,183,143,135,219,147,207,132,171,150,139,214,183,172,126,204,188,212,106,196,94,134,118,97,153,185,115,205,185,120,213,149,148,133,177,185,200,128,0,0,0,0,235,199,110,196,130,116,184,148,107,178,175,169,188,121,156,185,159,238,199,152,205,216,175,187,191,290,178,98,60,74,54,92,89,59,69,84,67,39,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,194,219,173,183,19,15,14,17,20,11,17,14,13,10,23,15,12,35,25,21,10,19,17,35,28,15,22,23,36,18,19,34,27,23,21,26,18,19,27,29,29,22,31,18,19,56,43,56,61,101,84,85,99,78,92,83,108,93,107,96,94,89,34,7,12,22,21,10,17,6,8,6,0,5,7,34,11,10,26,15,4,14,2,2,28,2,6,7,10,3,5,5,0,0,3,11,13,8,1,4,6,10,1,4,4,4,1,15,1,3,1,1,9,9,1,11,11,2,24,11,5,4,4,3,4,1,2,1,1,2,2,2,1,1",
+pi:"0,0,0,0,0,0,0,0,0,0,1,2,1,5,3,3,0,1,3,2,0,1,3,4,3,6,5,9,1,6,9,6,11,20,22,19,28,27,35,55,47,23,41,46,46,46,40,42,59,44,47,87,84,102,112,83,44,96,116,95,95,0,0,0,0,0,0,0,58,99,238,103,106,136,138,101,162,100,143,89,116,94,91,167,107,103,73,140,84,104,73,101,107,121,111,130,98,79,49,87,95,55,91,89,82,67,99,100,68,54,0,0,0,0,95,136,80,87,70,54,99,67,72,108,98,47,112,84,76,95,72,73,59,60,82,104,75,67,83,138,97,56,25,33,37,36,34,18,48,33,23,34,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,60,98,115,70,11,14,14,15,11,20,11,15,16,10,5,5,7,4,3,13,7,2,13,14,6,16,19,9,10,11,18,14,6,10,10,15,10,13,10,13,8,9,16,11,15,25,17,21,18,42,40,30,39,37,50,46,28,49,39,33,39,13,10,7,3,4,7,0,2,6,10,0,0,6,3,14,5,0,0,1,3,21,2,2,3,2,3,8,2,0,5,2,2,3,5,0,1,0,0,0,0,1,2,0,0,1,5,3,1,0,3,0,0,0,1,0,0,0,0,0,1,0,1",
+pe:"0,0,0,0,0,0,0,0,0,0,1,2,2,2,2,0,2,2,4,10,3,4,2,2,3,4,1,12,11,3,6,14,3,18,49,26,27,21,39,58,34,35,29,30,44,91,49,85,66,47,84,54,78,58,84,77,88,80,76,76,71,0,0,0,0,0,0,0,47,93,197,103,104,161,162,111,112,151,227,157,147,193,116,231,205,138,139,168,165,213,115,188,143,141,162,139,220,270,144,204,209,124,269,165,135,109,227,147,127,129,0,0,0,0,255,266,170,221,150,153,239,247,246,225,166,149,311,214,242,254,271,282,180,246,331,297,285,239,240,295,243,243,63,123,135,79,121,78,99,165,144,103,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,344,445,426,410,58,57,50,56,53,37,47,25,33,22,36,27,21,32,62,24,27,47,30,60,22,28,62,36,28,28,38,32,43,47,44,37,34,45,33,49,57,45,52,45,40,84,70,79,119,120,124,105,108,96,104,110,105,95,102,100,106,72,60,2,4,1,11,4,2,3,1,1,0,2,21,22,7,23,2,10,2,9,4,1,1,14,0,0,0,4,3,1,0,1,1,2,1,3,2,2,0,0,1,0,1,0,0,0,0,8,13,0,0,0,0,0,0,0,1,1,1,0,16,0,2,2,0,0,4,0,1",
+rn:"0,0,0,0,0,0,0,0,0,1,1,3,3,6,7,1,1,1,5,6,14,9,1,4,4,11,12,12,14,10,14,10,9,39,22,11,17,16,10,43,23,28,15,29,28,25,29,34,50,24,29,39,57,39,58,59,56,44,60,69,37,0,0,0,0,0,0,0,18,54,98,80,74,55,53,47,69,88,53,40,57,70,52,97,62,55,60,77,73,103,53,91,57,33,48,81,71,129,72,109,95,65,67,51,58,63,74,110,93,40,0,0,0,0,112,135,77,73,56,46,70,42,72,91,64,62,125,69,55,79,66,143,87,70,87,133,114,88,88,147,106,44,20,27,43,34,45,68,30,37,20,28,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,131,114,88,126,7,14,12,11,6,5,11,9,17,23,12,6,7,20,17,9,6,11,19,3,3,3,0,3,9,3,10,15,8,3,3,7,9,9,10,7,3,11,6,4,8,18,10,14,12,41,42,23,8,16,24,20,24,19,44,47,34,5,12,0,7,2,0,0,0,0,0,0,0,0,0,4,3,0,0,0,0,0,0,5,0,5,0,0,0,0,0,0,4,0,0,5,0,0,0,0,0,0,1,3,1,0,0,0,0,4,17,6,0,0,0,0,2,1,2,1,6,0,0,2,1,2,0,2",
+rj:"0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,1,0,1,0,0,1,7,2,0,1,0,5,1,3,14,4,7,14,10,1,4,16,24,13,12,17,22,36,21,21,34,34,48,31,62,33,15,78,94,81,63,100,107,60,0,0,0,0,0,0,0,32,82,165,120,136,213,153,104,176,131,326,186,183,203,167,262,256,186,216,374,290,389,213,440,377,284,343,324,339,453,269,306,287,278,495,366,411,303,478,357,342,264,0,0,0,0,624,381,320,487,376,371,598,349,358,473,412,284,628,480,486,550,480,585,463,488,536,528,564,541,563,596,393,411,199,400,326,199,177,151,216,169,120,138,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,672,644,493,655,53,52,60,59,41,63,54,68,73,48,91,79,73,85,74,44,67,51,50,100,59,52,52,51,83,102,73,65,46,55,74,110,89,70,66,71,49,52,74,74,64,152,150,150,202,249,299,337,391,415,354,322,277,283,272,272,235,104,44,7,1,10,0,0,1,17,20,10,30,4,5,2,2,13,0,0,3,0,2,2,32,0,1,1,0,1,1,1,2,1,0,0,0,0,1,0,4,0,0,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2",
+pr:"0,0,0,0,0,0,1,3,13,42,98,110,159,166,112,142,131,106,99,134,135,107,115,125,112,90,103,232,172,192,171,176,161,413,236,161,222,187,172,413,317,284,249,260,348,242,194,270,252,270,352,366,425,457,382,294,430,343,378,321,331,0,0,0,0,0,0,0,192,437,817,310,342,514,418,268,447,254,471,375,374,427,256,527,327,360,288,405,303,382,251,392,276,282,210,227,262,256,133,225,259,181,193,178,216,124,144,155,91,75,0,0,0,0,171,161,131,192,183,112,193,112,86,90,87,80,101,45,57,59,36,53,64,36,55,88,70,37,26,30,22,18,30,8,10,12,11,16,12,7,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,22,61,20,42,8,5,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,1,0,0,1,1,0,1,0,0,0,0,2,1,0,0,2,1,0,4,1,10,1,1,1,3,0,6,7,9,5,12,2,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1",
+sp:"0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,5,1,3,0,3,3,2,8,4,3,2,3,0,17,14,10,4,19,25,23,30,43,31,41,100,83,112,81,117,82,44,84,104,113,188,183,228,280,284,255,314,313,366,318,315,366,0,0,0,0,0,0,0,224,600,963,619,639,865,830,458,877,774,1087,875,1116,1046,740,1442,1174,1119,1040,1334,1161,1365,754,1774,1281,1085,1243,1306,1408,1483,1194,1936,1686,1209,1661,1434,1540,1178,1623,1292,1150,844,0,0,0,0,1810,1990,1047,1668,1703,1020,1647,1712,1731,1510,1492,988,1676,1469,1244,1185,1127,1536,1226,1252,1420,1169,1037,1099,1052,1154,1009,725,329,466,348,316,385,349,464,437,347,273,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,861,964,789,555,73,73,63,103,110,79,77,84,62,68,102,103,82,79,94,76,101,163,61,70,67,103,73,55,100,77,40,63,76,93,86,61,72,94,80,89,125,117,80,94,112,254,193,172,232,244,266,285,207,155,173,126,199,140,136,139,130,96,34,1,1,19,1,35,23,25,2,2,14,6,17,17,11,7,7,16,7,11,10,9,1,18,1,20,22,1,12,0,0,0,12,0,0,2,0,0,0,0,1,0,0,4,0,0,0,2,0,1",
+zz:"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,4,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,1,1,0,0,0,0,0,0,0,0,1,7,3,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,1,2,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,2,3,0,0,3,1,14,7,9,0,6,5,1,0,0,0,0,0,10,7,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,55,12,3,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,5,0,0,15,0,10,5,0,0,0,6,4,3,5,11,3,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,1,1,3,2,2,15,20,42,16,14,26,2,0,0,0,0,0,0,0,0,0,53,26,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,4,0,1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,1,0,23"
+};
+const CAND=['22','55','13','27','21','16','70','30','80','35','14','29'];
+const NAMES={'22':['FLAVIO BOLSONARO','PL'],'55':['RONALDO CAIADO','PSD'],'13':['LULA','PT'],'27':['CLARIANA BARAO','DC'],'21':['EDMILSON COSTA','PCB'],'16':['HERTZ DIAS','PSTU'],'70':['AUGUSTO CURY','AVANTE'],'30':['ZEMA','NOVO'],'80':['SAMARA','UP'],'35':['WILSON GRASSI','DEMOCRATA'],'14':['RENAN SANTOS','MISSÃO'],'29':['RUI COSTA PIMENTA','PCO']};
+const SNAP_VOTES={
+df:{v:[909616,85076,675627,716,334,828,45979,4915,2297,324,46714,382],ts:6969,st:6969,and:'f',ht:'20:11:33',te:2258320},
+ro:{v:[652988,16929,250667,356,160,174,25280,1318,843,97,19187,60],ts:4698,st:4698,and:'f',ht:'19:49:42',te:1265893},
+pr:{v:[3945056,171284,2054418,2445,1195,2056,205082,17172,6731,962,177430,917],ts:27142,st:27140,and:'p',ht:'21:45:53',te:8613657},
+ap:{v:[212278,8304,212503,229,62,132,19057,341,508,49,11342,53],ts:1914,st:1914,and:'f',ht:'21:02:15',te:576988},
+am:{v:[974689,28198,1038134,929,264,456,77371,1780,1864,290,35351,161],ts:8157,st:8117,and:'p',ht:'21:14:00',te:2798611},
+mg:{v:[5772882,230253,5181065,3410,2294,4081,409543,98377,11021,1730,247111,1421],ts:52062,st:51995,and:'p',ht:'22:15:45',te:16372372},
+pi:{v:[516219,21594,1519397,504,318,441,47594,1356,1099,193,32219,146],ts:10225,st:10195,and:'p',ht:'22:17:17',te:2704758},
+rj:{v:[4966844,199844,3693021,4082,2854,3999,247397,21907,14186,1930,211843,1793],ts:37675,st:37675,and:'f',ht:'22:04:30',te:12857648},
+rs:{v:[3573783,158821,2294759,2066,1031,2146,195296,18988,6632,923,167558,1043],ts:27547,st:27547,and:'f',ht:'21:04:14',te:8522545},
+al:{v:[734575,14169,993736,633,267,431,42343,1164,1343,246,26812,110],ts:7101,st:7091,and:'p',ht:'22:15:21',te:2442126},
+ce:{v:[1751021,45424,3534308,1070,776,1489,139964,4294,3341,481,107326,497],ts:23765,st:23646,and:'p',ht:'22:16:42',te:6996545},
+es:{v:[1233194,39097,850028,974,388,638,65121,5873,1973,311,53236,245],ts:9844,st:9844,and:'f',ht:'20:55:34',te:2991650},
+ma:{v:[1237786,50082,2557753,895,475,1458,84750,4566,1794,307,60343,211],ts:18093,st:18045,and:'p',ht:'22:17:15',te:5183115},
+se:{v:[417839,26651,856019,457,204,331,38895,1158,991,138,21405,108],ts:5923,st:5923,and:'f',ht:'21:55:49',te:1740135},
+go:{v:[2051681,471978,1188731,559,468,668,53846,2672,2087,346,54105,260],ts:15686,st:15684,and:'p',ht:'21:51:53',te:5080590},
+sp:{v:[12920817,579528,9504540,10562,6129,15815,892321,94633,42530,5159,804284,4429],ts:103656,st:103646,and:'p',ht:'22:15:45',te:34122892},
+sc:{v:[3000020,79911,1127168,1429,828,1503,134273,16718,5049,560,132795,643],ts:17326,st:17326,and:'f',ht:'21:53:19',te:5734651},
+rn:{v:[720383,16405,1237802,405,315,572,57360,1525,1228,185,35257,177],ts:8115,st:8114,and:'p',ht:'22:06:59',te:2659825},
+rr:{v:[231322,3639,74420,168,42,60,8579,337,280,41,6623,34],ts:1519,st:1519,and:'f',ht:'20:05:17',te:401521},
+ms:{v:[873351,23291,516855,626,332,353,39148,2792,1291,209,31847,183],ts:7106,st:7106,and:'f',ht:'20:02:35',te:2024430},
+ba:{v:[2431039,122120,5613247,1668,1285,1782,194307,6477,4633,620,117021,722],ts:35476,st:35223,and:'p',ht:'22:17:30',te:11312752},
+pb:{v:[831205,19505,1540937,604,347,627,73821,1988,1593,221,42239,274],ts:10712,st:10710,and:'p',ht:'22:12:55',te:3248531},
+mt:{v:[1298581,33079,581681,1869,239,340,40019,2424,1584,172,33170,130],ts:8287,st:8287,and:'f',ht:'20:21:28',te:2637801},
+ac:{v:[302807,8594,134770,215,140,71,13523,573,314,39,7980,40],ts:2270,st:2270,and:'f',ht:'18:54:23',te:613742},
+pe:{v:[1737547,73118,3548871,869,705,1113,137884,6058,2387,456,85815,410],ts:21418,st:21397,and:'p',ht:'22:09:34',te:7223450},
+zz:{v:[142488,4660,155467,818,419,371,9645,3296,1049,369,8494,197],ts:1351,st:1330,and:'p',ht:'09:19:47',te:916534},
+pa:{v:[2162153,51940,2422432,1293,674,1045,125058,3064,3823,440,84113,307],ts:20827,st:20796,and:'p',ht:'22:15:55',te:6262397},
+to:{v:[469321,20189,404009,171,117,101,22434,595,395,67,12983,65],ts:4384,st:4384,and:'f',ht:'20:54:25',te:1182023}
+};
+const SNAP_PRE={zz:776};
+const SNAP_AT='22:20';
+for(const k of Object.keys(NAMES)){const [n,pt]=NAMES[k];NAMES[k]=n.toLowerCase().replace(/(^|\s)\S/g,c=>c.toUpperCase())+' ('+pt+')'}
+/* ================= Constantes ================= */
+const ALL27=['ac','al','ap','am','ba','ce','df','es','go','ma','mt','ms','mg','pa','pb','pr','pe','pi','rj','rn','rs','ro','rr','sc','sp','se','to'];
+const ALL=ALL27.concat('zz');
+const UFN={ac:'Acre',al:'Alagoas',ap:'Amapá',am:'Amazonas',ba:'Bahia',ce:'Ceará',df:'Distrito Federal',es:'Espírito Santo',go:'Goiás',ma:'Maranhão',mt:'Mato Grosso',ms:'Mato Grosso do Sul',mg:'Minas Gerais',pa:'Pará',pb:'Paraíba',pr:'Paraná',pe:'Pernambuco',pi:'Piauí',rj:'Rio de Janeiro',rn:'Rio Grande do Norte',rs:'Rio Grande do Sul',ro:'Rondônia',rr:'Roraima',sc:'Santa Catarina',sp:'São Paulo',se:'Sergipe',to:'Tocantins',zz:'Exterior'};
+const TILE={rr:[1,0],ap:[3,0],am:[1,1],pa:[2,1],ma:[3,1],ce:[4,1],rn:[5,1],ac:[0,2],ro:[1,2],mt:[2,2],to:[3,2],pi:[4,2],pb:[5,2],ms:[1,3],go:[2,3],df:[3,3],ba:[4,3],pe:[5,3],al:[6,3],sp:[2,4],mg:[3,4],es:[4,4],se:[5,4],pr:[2,5],rj:[3,5],sc:[2,6],rs:[2,7],zz:[5,7]};
+const T0=Date.parse('2026-10-04T20:00:00Z'); // 17:00 de Brasília
+const M=332, HZ=320, STEP=2;
+const BASE='https://resultados.tse.jus.br/oficial/ele2026/';
+const PCOL={13:'--c1',22:'--c2',55:'--c3',30:'--c4',70:'--c5',27:'--c6',14:'--c7',80:'--c8'};
+const presVar=n=>PCOL[n]||'--o';
+const cvar=v=>`var(${v})`;
+
+/* ================= Utilidades ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fi=n=>Math.round(n).toLocaleString('pt-BR');
+const fp=(x,d=2)=>(isFinite(x)?x:0).toFixed(d).replace('.',',')+'%';
+const fs=(x,d=2)=>(x>=0?'+':'')+x.toFixed(d).replace('.',',');
+const tfm=new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',hour:'2-digit',minute:'2-digit'});
+const fTimeM=ms=>tfm.format(new Date(ms));
+const fHM=m=>fTimeM(T0+m*60000);
+const fDurMin=m=>{const h=Math.floor(m/60),r=Math.round(m%60);return h?`${h}h${String(r).padStart(2,'0')}`:`${r} min`};
+const num=v=>{if(v==null||v==='')return 0;if(typeof v==='number')return v;const n=parseFloat(String(v).replace(/\./g,'').replace(',','.'));return isFinite(n)?n:0};
+const clampM=m=>Math.max(0,Math.min(M,m));
+function parseHT(ht,dt){ // minutos após 17h00
+  if(!ht)return null;const [h,m,s]=ht.split(':').map(Number);let x=h*60+m+(s||0)/60-17*60;if(dt&&dt.startsWith('05/'))x+=1440;return x;
+}
+
+/* ================= Dados ================= */
+const S={tab:'evo',m:0,play:false,spd:5,uf:'sp',exterior:false,swaps:[],sortKey:'g',sortDir:-1,live:{votes:'',cs:0,csTotal:0,note:''},recorded:0};
+const D={};
+for(const u of ALL){
+  const s=SNAP_VOTES[u],V={};CAND.forEach((n,i)=>V[n]=s.v[i]);
+  D[u]={uf:u,ts:s.ts,st:s.st,and:s.and,V,te:s.te,tEnd:parseHT(s.ht),counts:null,pre:0,nd:0,kind:'estimada',src:'',g:new Float64Array(M+1)};
+  if(SNAP_COUNTS[u]){const a=SNAP_COUNTS[u].split(',').map(Number);setCounts(D[u],a,SNAP_PRE[u]||0,'registro TSE '+SNAP_AT)}
+}
+D.zz.tEnd=null;
+function setCounts(d,arr,pre,src){d.counts=arr;d.pre=pre;d.nd=arr.reduce((a,b)=>a+b,0)+pre;d.kind='real';d.src=src}
+function cumOf(d){const c=new Float64Array(M+1);let a=d.pre;c[0]=a;for(let k=1;k<=M;k++){a+=(d.counts[k-1]||0);c[k]=a}return c}
+function buildCurves(){
+  // curva agregada dos estados com horários reais: molda os estados cujos horários foram regravados em lote
+  const G=new Float64Array(M+1);
+  for(const u of ALL27){const d=D[u];if(d.kind==='real'&&d.counts){const c=cumOf(d);for(let k=0;k<=M;k++)G[k]+=c[k]}}
+  const gmax=G[M]||1;for(let k=0;k<=M;k++)G[k]/=gmax;
+  const Gat=t=>{if(t<=0)return 0;if(t>=M)return 1;const k=Math.floor(t),f=t-k;return G[k]*(1-f)+G[k+1]*f};
+  for(const u of ALL){
+    const d=D[u];
+    if(d.kind==='real'&&d.counts){const c=cumOf(d);for(let k=0;k<=M;k++)d.g[k]=c[k]/d.nd}
+    else if(d.kind==='registrada'){/* g já preenchido */}
+    else{
+      d.kind='estimada';const te=d.tEnd==null?HZ:d.tEnd,ref=Gat(te)||1;
+      for(let k=0;k<=M;k++)d.g[k]=k>=te?1:Math.min(1,Gat(k)/ref);
+      d.src='curva dos estados com horário real, encerrada na hora de conclusão informada pelo TSE';
+    }
+  }
+}
+buildCurves();
+function selUFs(){return S.exterior?ALL:ALL27}
+function natTotals(){const t={};CAND.forEach(n=>t[n]=0);for(const u of selUFs())CAND.forEach(n=>t[n]+=D[u].V[n]);return t}
+function candOrder(){const t=natTotals();return CAND.slice().sort((a,b)=>t[b]-t[a])}
+function nat(m,sigma){
+  m=clampM(Math.round(m));const N={};CAND.forEach(n=>N[n]=0);let secs=0,secsT=0,vv=0;
+  for(const u of selUFs()){const s=(sigma&&sigma[u])||u,g=D[s].g[m],d=D[u];for(const n of CAND){N[n]+=g*d.V[n]}secs+=g*d.st;secsT+=d.ts}
+  for(const n of CAND)vv+=N[n];
+  return{N,vv,secs,secsT};
+}
+const sigmaOf=sw=>{const s={};for(const [a,b] of sw){s[a]=b;s[b]=a}return s};
+const cache={};
+function series(sigma,keys){
+  const key=JSON.stringify([sigma,keys,S.exterior,Object.values(D).map(d=>d.kind[0]+d.nd).join('')]);
+  if(cache[key])return cache[key];
+  const xs=[],ys={},sec=[];keys.forEach(k=>ys[k]=[]);
+  for(let m=0;m<=HZ;m+=STEP){const r=nat(m,sigma);xs.push(T0+m*60000);sec.push(r.secs/r.secsT*100);keys.forEach(k=>ys[k].push(r.vv>0?r.N[k]/r.vv*100:null))}
+  return cache[key]={xs,ys,sec};
+}
+function tAt(u,frac){const g=D[u].g;for(let k=1;k<=M;k++){if(g[k]>=frac){const a=g[k-1],b=g[k];return k-1+(b>a?(frac-a)/(b-a):1)}}return null}
+function peak(u){const d=D[u],g=d.g;let best=0,at=0;for(let k=5;k<=M;k++){const v=(g[k]-g[k-5])*d.st/5;if(v>best){best=v;at=k-2.5}}return{v:best,at}}
+const MAIN_T50=()=>ALL27.map(u=>({u,t:tAt(u,.5)})).sort((a,b)=>a.t-b.t);
+const kindBadge=d=>d.kind==='real'?'<span class="k r" title="'+esc(d.src)+'">horários reais</span>':d.kind==='registrada'?'<span class="k g" title="'+esc(d.src)+'">registro local</span>':'<span class="k e" title="'+esc(d.src)+'">estimada</span>';
+
+/* interrupção: maior sequência sem nenhuma seção totalizada nas UFs com horários reais */
+const GAP=(()=>{const tot=new Float64Array(M+1);for(const u of ALL27){const d=D[u];if(d.kind==='real')for(let k=0;k<=M;k++)tot[k]+=d.counts[k]||0}
+  let best=[0,-1],a=-1;for(let k=60;k<=M;k++){if(tot[k]===0){if(a<0)a=k;if(k-a>best[1]-best[0])best=[a,k]}else a=-1}
+  const b=best[1],n=b+1;let after=0;for(let k=b+1;k<=b+4&&k<=M;k++)after+=tot[k];
+  return{a:best[0],b,len:b-best[0]+1,after,tot}})();
+/* ================= Gráficos ================= */
+const CH={}; // geometria por id de gráfico, para cursor/click
+function lineChart(id,o){
+  const W=o.w||760,H=o.h||300,pl=o.mini?30:46,pr=o.mini?6:14,pt=o.mini?6:12,pb=o.mini?16:30,iw=W-pl-pr,ih=H-pt-pb;
+  const x0=0,x1=HZ;const X=m=>pl+(m-x0)/(x1-x0)*iw;
+  let lo=o.ymin,hi=o.ymax;
+  if(lo==null||hi==null){let a=1e9,b=-1e9;for(const s of o.series)for(const y of s.ys)if(y!=null){a=Math.min(a,y);b=Math.max(b,y)}for(const h of o.hl||[]){a=Math.min(a,h.y);b=Math.max(b,h.y)}if(a>b){a=0;b=1}const p=(b-a)*.08||1;lo=lo??a-p;hi=hi??b+p}
+  const Y=v=>pt+(1-(v-lo)/(hi-lo))*ih;
+  let g='';
+  const nt=o.mini?3:5;
+  for(let i=0;i<=nt;i++){const v=lo+(hi-lo)*i/nt,y=Y(v);g+=`<line x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}" stroke="var(--line)" stroke-width=".7"/><text x="${pl-5}" y="${y+3.5}" text-anchor="end" font-size="${o.mini?9:10.5}" fill="var(--muted)">${(o.yf?o.yf(v):v.toFixed(o.yd??0)).replace('.',',')}</text>`}
+  const step=o.mini?120:o.xstep||30;
+  for(let m=0;m<=HZ;m+=step){g+=`<text x="${X(m)}" y="${H-(o.mini?3:9)}" text-anchor="middle" font-size="${o.mini?9:10.5}" fill="var(--muted)">${fHM(m)}</text>`}
+  if(!o.noband){const x0=X(GAP.a),x1=X(GAP.b+1);g+=`<rect x="${x0}" y="${pt}" width="${x1-x0}" height="${ih}" fill="var(--warn)" opacity=".14"/>${o.mini?'':`<text x="${(x0+x1)/2}" y="${pt+11}" text-anchor="middle" font-size="9.5" fill="var(--warn)">interrupção</text>`}`}
+  for(const h of o.hl||[])g+=`<line x1="${pl}" x2="${W-pr}" y1="${Y(h.y)}" y2="${Y(h.y)}" stroke="${h.c||'var(--fg2)'}" stroke-width="${h.w||1}" stroke-dasharray="${h.d||'4 4'}" opacity=".8"/>${h.l&&!o.mini?`<text x="${W-pr-3}" y="${Y(h.y)-4}" text-anchor="end" font-size="10" fill="${h.c||'var(--fg2)'}">${esc(h.l)}</text>`:''}`;
+  for(const s of o.series){
+    let d='',pen=false;
+    s.xs.forEach((x,i)=>{const y=s.ys[i];if(y==null){pen=false;return}const m=(x-T0)/60000;d+=(pen?'L':'M')+X(m).toFixed(1)+' '+Y(y).toFixed(1);pen=true});
+    g+=`<path d="${d}" fill="none" stroke="${s.c}" stroke-width="${s.w||(o.mini?1.4:2)}" ${s.d?`stroke-dasharray="${s.d}"`:''} opacity="${s.op||1}" stroke-linejoin="round"/>`;
+  }
+  g+=`<line class="cur" x1="${X(S.m)}" x2="${X(S.m)}" y1="${pt}" y2="${pt+ih}" stroke="var(--fg)" stroke-width="1" opacity=".55"/>`;
+  g+=`<rect class="hit" x="${pl}" y="${pt}" width="${iw}" height="${ih}" fill="transparent" style="cursor:crosshair"/>`;
+  CH[id]={W,pl,iw,series:o.series,X,lo,hi,Y,tipf:o.tipf};
+  return `<div class="chart" data-ch="${id}"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.aria||'gráfico')}">${g}</svg></div>`;
+}
+function moveCursors(){
+  document.querySelectorAll('.chart[data-ch]').forEach(el=>{const c=CH[el.dataset.ch];if(!c)return;const l=el.querySelector('.cur');if(l){const x=c.X(S.m);l.setAttribute('x1',x);l.setAttribute('x2',x)}});
+}
+function chartM(el,ev){const c=CH[el.dataset.ch],r=el.querySelector('svg').getBoundingClientRect();const px=(ev.clientX-r.left)/r.width*c.W;return clampM(Math.round((px-c.pl)/c.iw*HZ))}
+const tip=$('#tip');
+document.addEventListener('mousemove',e=>{
+  const el=e.target.closest&&e.target.closest('.chart[data-ch]');
+  if(!el||!e.target.classList.contains('hit')){tip.style.display='none';return}
+  const c=CH[el.dataset.ch];if(!c||!c.tipf){tip.style.display='none';return}
+  const m=chartM(el,e);tip.innerHTML=c.tipf(m);tip.style.display='block';
+  tip.style.left=Math.min(innerWidth-270,e.clientX+14)+'px';tip.style.top=(e.clientY+14)+'px';
+});
+document.addEventListener('click',e=>{const el=e.target.closest&&e.target.closest('.chart[data-ch]');if(el&&e.target.classList.contains('hit'))setM(chartM(el,e))});
+document.addEventListener('mouseleave',()=>tip.style.display='none');
+
+/* ================= Instante ================= */
+function setM(m){S.m=clampM(Math.round(m));$('#slider').value=Math.min(HZ,S.m);renderInst();moveCursors()}
+function setHeader(){
+  const nreal=ALL27.filter(u=>D[u].kind==='real').length;
+  $('#status').innerHTML=`<span><i class="dot ${S.presLive?'live':'wait'}"></i>${S.presLive?`Votos finais do TSE (lidos às ${S.presLive})`:`Votos do registro das ${SNAP_AT}`} · horários capturados às ${SNAP_AT}</span><span>${nreal} de 27 UFs com horários reais · ${27-nreal} estimadas</span>`;
+  $('#tabs').innerHTML=[['evo','Evolução'],['uf','Por estado'],['vel','Velocidade'],['troca','Trocas'],['car','Outros cargos'],['met','Método e fontes']].map(([k,t])=>`<button role="tab" data-t="${k}" aria-selected="${S.tab===k}">${t}</button>`).join('');
+}
+const fmtM=m=>fHM(m);
+function tileHTML(sel){
+  let h='';const rows=7,cols=8;
+  for(let r=0;r<8;r++)for(let c=0;c<7;c++){
+    const u=Object.keys(TILE).find(k=>TILE[k][0]===c&&TILE[k][1]===r);
+    if(!u){h+='<div class="tile empty"></div>';continue}
+    const p=D[u].g[S.m]*100;
+    h+=`<button class="tile${sel===u?' sel':''}" data-u="${u}" title="${UFN[u]}: ${fp(p,1)} das seções"><b>${u.toUpperCase()}</b><small data-p="${u}">${p.toFixed(0)}%</small><i style="width:${p}%" data-b="${u}"></i></button>`;
+  }
+  return h;
+}
+function renderInst(){
+  const el=$('#inst');
+  $('#clock').textContent=fHM(S.m);
+  const sincem=S.m;$('#since').textContent=`${fDurMin(sincem)} após as 17h`;
+  const ufb0=$('#ufbox');if(ufb0)renderUFInst();
+  const vt0=$('#veltab');if(vt0)vt0.querySelectorAll('[data-g]').forEach(c=>{c.textContent=fp(D[c.dataset.g].g[S.m]*100,1)});
+  if(!el)return;
+  const r=nat(S.m),ord=candOrder(),tot=natTotals();
+  const fin=Object.values(tot).reduce((a,b)=>a+b,0);
+  const q=r.secs/r.secsT*100;
+  el.querySelector('[data-k=sec]').innerHTML=fp(q,1);
+  el.querySelector('[data-k=secd]').textContent=`${fi(r.secs)} de ${fi(r.secsT)} seções`;
+  el.querySelector('[data-k=bar]').style.width=q+'%';
+  el.querySelector('[data-k=vot]').textContent=fi(r.vv);
+  el.querySelector('[data-k=votd]').textContent=`${fp(r.vv/fin*100,1)} dos votos válidos finais`;
+  const a=ord[0],b=ord[1],sa=r.vv?r.N[a]/r.vv*100:0,sb=r.vv?r.N[b]/r.vv*100:0;
+  el.querySelector('[data-k=lead]').innerHTML=`${esc(NAMES[a])} ${sa>sb?'+':'−'}${Math.abs(sa-sb).toFixed(2).replace('.',',')} p.p.`;
+  el.querySelector('[data-k=leadd]').textContent=`final: ${fs(tot[a]/fin*100-tot[b]/fin*100)} p.p. · ${fi(r.N[a]-r.N[b])} votos agora`;
+  ord.forEach(n=>{
+    const sh=r.vv?r.N[n]/r.vv*100:0;
+    const row=el.querySelector(`[data-n="${n}"]`);if(!row)return;
+    row.querySelector('.p').textContent=fp(sh);row.querySelector('.v').textContent=fi(r.N[n]);
+    row.querySelector('i').style.width=Math.min(100,sh)+'%';
+  });
+  el.querySelectorAll('.tile').forEach(t=>{const u=t.dataset.u;if(!u)return;const p=D[u].g[S.m]*100;t.querySelector('small').textContent=p.toFixed(0)+'%';t.querySelector('i').style.width=p+'%'});
+  const ufb=$('#ufbox');if(ufb)renderUFInst();
+  const vt=$('#veltab');if(vt)vt.querySelectorAll('[data-g]').forEach(c=>{c.textContent=fp(D[c.dataset.g].g[S.m]*100,1)});
+}
+function tipNat(m){
+  const r=nat(m);return `<b>${fHM(m)}</b> · ${fp(r.secs/r.secsT*100,1)} das seções<br>`+candOrder().slice(0,3).map(n=>`${esc(NAMES[n])}: ${fp(r.vv?r.N[n]/r.vv*100:0)}`).join('<br>');
+}
+function cLine(keys,sigma,extra){
+  const s=series(sigma,keys);
+  return keys.map(k=>({name:NAMES[k],c:cvar(presVar(+k)),xs:s.xs,ys:s.ys[k]}));
+}
+/* ===== Aba Evolução ===== */
+function viewEvo(){
+  const ord=candOrder(),top=ord.slice(0,4),tot=natTotals(),fin=Object.values(tot).reduce((a,b)=>a+b,0);
+  const ss=series(null,top);
+  const hl=[{y:50,l:'50%',d:'2 4'}].concat(top.slice(0,2).map(n=>({y:tot[n]/fin*100,c:cvar(presVar(+n)),l:'final '+NAMES[n].split(' ')[0]})));
+  const chart=lineChart('nat',{series:cLine(top),hl,ymin:0,ymax:70,yf:v=>v.toFixed(0)+'%',tipf:tipNat,aria:'Percentual de votos válidos por candidato ao longo da apuração'});
+  const ss2=series(null,top);
+  const rows=ord.map(n=>`<div class="row p4" data-n="${n}"><div class="nm"><span class="sw" style="background:${cvar(presVar(+n))}"></span><span class="t">${esc(NAMES[n])}</span><small>${n}</small></div><div class="trk"><i style="background:${cvar(presVar(+n))};width:0"></i><b style="left:50%"></b></div><div class="v">0</div><div class="p">0%</div><div class="proj">${fp(tot[n]/fin*100)}</div></div>`).join('');
+  const nr=ALL27.filter(u=>D[u].kind==='real').length;
+  const intr=`<div class="callout" style="margin-bottom:14px"><b>Interrupção da totalização: ${fHM(GAP.a)} a ${fHM(GAP.b+1)} (${GAP.len} min).</b> Nenhuma seção foi totalizada nas ${nr} UFs com horários reais; ao retomar, ${fi(GAP.after)} seções entraram em 4 minutos. A mesma linha do tempo vale para todos os cargos (ver Método e fontes). Faixa amarela nos gráficos.</div>`;
+  return `${intr}<div id="inst"><div class="grid kpis">
+    <div class="card kpi"><div class="lab">Seções totalizadas</div><div class="big" data-k="sec"></div><div class="det" data-k="secd"></div><div class="prog"><i data-k="bar"></i></div></div>
+    <div class="card kpi"><div class="lab">Votos válidos apurados</div><div class="big num" data-k="vot"></div><div class="det" data-k="votd"></div></div>
+    <div class="card kpi"><div class="lab">Diferença entre os dois primeiros</div><div class="big" data-k="lead" style="font-size:20px"></div><div class="det" data-k="leadd"></div></div></div>
+    <div class="grid two" style="margin-top:14px">
+      <div class="card"><h2>Resultado no instante<span class="sub">${S.exterior?'com':'sem'} exterior · método do notebook</span></h2><div class="res"><div class="row p4 head"><div>Candidato</div><div></div><div class="n" style="text-align:right">Votos</div><div style="text-align:right">Parcial</div><div class="proj" style="text-align:right">Final</div></div>${rows}</div>
+      <div class="note">Cada UF vai somando seus votos finais na proporção de suas seções totalizadas no instante (suposição do notebook: votos homogêneos dentro da UF).</div></div>
+      <div class="card"><h2>Apuração por UF<span class="sub">clique para abrir</span></h2><div class="tiles big">${tileHTML(null)}</div></div></div>
+    <div class="card" style="margin-top:14px"><h2>Evolução do percentual de votos válidos<span class="sub">clique no gráfico para ir ao instante</span></h2>${chart}
+      <div class="legend">${top.map(n=>`<span><i class="sw" style="background:${cvar(presVar(+n))}"></i>${esc(NAMES[n])}</span>`).join('')}<span>linha tracejada horizontal: resultado final</span></div></div></div>`;
+}
+/* ===== Aba Por estado ===== */
+function viewUF(){
+  const opts=ALL.map(u=>`<option value="${u}"${u===S.uf?' selected':''}>${UFN[u]} (${u.toUpperCase()})</option>`).join('');
+  return `<div class="sim-ctrl"><label>Estado <select id="ufsel">${opts}</select></label><span class="since" style="color:var(--muted)">Selecione também pelo mapa na aba Evolução.</span></div><div id="ufbox"></div>`;
+}
+function renderUFBox(){
+  const u=S.uf,d=D[u],ord=candOrder();
+  const t=[.1,.5,.9,1].map(f=>tAt(u,f)),pk=peak(u);
+  const rank=MAIN_T50().findIndex(x=>x.u===u)+1;
+  const xs=[],ys=[],ysp=[];for(let m=0;m<=HZ;m+=STEP){xs.push(T0+m*60000);ys.push(d.g[m]*100)}
+  const ch=lineChart('uf1',{series:[{c:'var(--accent)',xs,ys}],hl:[{y:50,l:'50%',d:'2 4'}],ymin:0,ymax:100,yf:v=>v.toFixed(0)+'%',tipf:m=>`<b>${fHM(m)}</b><br>${fp(d.g[m]*100,1)} das seções · ${fi(d.g[m]*d.st)} de ${fi(d.st)}`,aria:'Seções totalizadas ao longo do tempo'});
+  const xs2=[],v2=[];for(let m=0;m<=HZ;m+=STEP){xs2.push(T0+m*60000);const k=Math.max(0,m-2),g=(d.g[Math.min(M,m+2)]-d.g[k])*d.st/4;v2.push(g)}
+  const ch2=lineChart('uf2',{series:[{c:'var(--c5)',xs:xs2,ys:v2}],ymin:0,yf:v=>v.toFixed(0),tipf:m=>`<b>${fHM(m)}</b><br>${(((d.g[Math.min(M,m+2)]-d.g[Math.max(0,m-2)])*d.st/4)||0).toFixed(0)} seções/min`,aria:'Velocidade de totalização em seções por minuto'});
+  const tv=ord.reduce((a,n)=>a+d.V[n],0),natv=ALL27.reduce((a,u)=>a+ord.reduce((b,n)=>b+D[u].V[n],0),0);
+  const lines=ord.slice(0,5).map(n=>`<div class="row" data-n="${n}"><div class="nm"><span class="sw" style="background:${cvar(presVar(+n))}"></span><span class="t">${esc(NAMES[n])}</span></div><div class="trk"><i style="background:${cvar(presVar(+n))};width:${d.V[n]/tv*100}%"></i><b style="left:50%"></b></div><div class="v" data-vc="${n}"></div><div class="p">${fp(d.V[n]/tv*100)}</div></div>`).join('');
+  $('#ufbox').innerHTML=`<div class="grid kpis"><div class="card kpi"><div class="lab">${UFN[u]} · ${kindBadge(d)}</div><div class="big" data-uk="g"></div><div class="det" data-uk="gd"></div><div class="prog"><i data-uk="bar"></i></div></div>
+   <div class="card kpi"><div class="lab">Metade das seções</div><div class="big">${t[1]!=null?fHM(t[1]):'–'}</div><div class="det">${rank?`${rank}º mais rápido entre os 27 estados`:'fora do ranking'} · 10%: ${t[0]!=null?fHM(t[0]):'–'} · 90%: ${t[2]!=null?fHM(t[2]):'–'}</div></div>
+   <div class="card kpi"><div class="lab">Concluída em</div><div class="big">${t[3]!=null?fHM(t[3]):'–'}</div><div class="det">pico: ${pk.v.toFixed(0)} seções/min às ${fHM(pk.at)} · ${fi(d.st)} seções</div></div>
+   <div class="card kpi"><div class="lab">Peso no total nacional</div><div class="big">${fp(tv/natv*100,1)}</div><div class="det">${fi(tv)} votos válidos</div></div></div>
+   <div class="grid two" style="margin-top:14px"><div class="card"><h2>Seções totalizadas<span class="sub">${esc(d.src)}</span></h2>${ch}</div>
+   <div class="card"><h2>Votos já apurados no estado</h2><div class="res">${lines}</div><div class="note">Parcial = resultado final do estado, repartido pela fração de seções contadas.</div></div></div>
+   <div class="card" style="margin-top:14px"><h2>Velocidade de totalização<span class="sub">seções por minuto (média móvel de 4 min)</span></h2>${ch2}</div>`;
+  renderUFInst();
+}
+function renderUFInst(){
+  const u=S.uf,d=D[u],b=$('#ufbox');if(!b||!b.querySelector('[data-uk=g]'))return;
+  const p=d.g[S.m]*100;
+  b.querySelector('[data-uk=g]').textContent=fp(p,1);
+  b.querySelector('[data-uk=gd]').textContent=`${fi(d.g[S.m]*d.st)} de ${fi(d.st)} seções às ${fHM(S.m)}`;
+  b.querySelector('[data-uk=bar]').style.width=p+'%';
+  b.querySelectorAll('[data-vc]').forEach(e=>e.textContent=fi(d.g[S.m]*d.V[e.dataset.vc]));
+}
+/* ===== Aba Velocidade ===== */
+function viewVel(){
+  const rk=MAIN_T50();
+  const rows=ALL27.concat('zz').map(u=>{const d=D[u],pk=peak(u),t=[.1,.5,.9,1].map(f=>tAt(u,f));const r=rk.findIndex(x=>x.u===u)+1;
+    return{u,rank:r||999,t10:t[0],t50:t[1],t90:t[2],t100:t[3],pk:pk.v,st:d.st,g:d.g[S.m]*100,name:UFN[u],kind:d.kind}});
+  const key=S.sortKey,dir=S.sortDir;
+  rows.sort((a,b)=>{const x=a[key]??1e9,y=b[key]??1e9;return (typeof x==='string'?x.localeCompare(y):x-y)*dir});
+  const cols=[['rank','#'],['name','UF'],['g','No instante'],['t10','10%'],['t50','50%'],['t90','90%'],['t100','100%'],['pk','Pico seç./min'],['st','Seções'],['kind','Curva']];
+  const head=cols.map(([k,t])=>`<th class="sortable${k==='name'||k==='kind'?'':' n'}" data-s="${k}">${t}${key===k?(dir>0?' ▲':' ▼'):''}</th>`).join('');
+  const f=m=>m==null?'–':fHM(m);
+  const body=rows.map(r=>`<tr class="click" data-u="${r.u}"><td class="n">${r.rank===999?'–':r.rank}</td><td><b>${r.u.toUpperCase()}</b> ${UFN[r.u]}</td><td class="n" data-g="${r.u}">${fp(r.g,1)}</td><td class="n">${f(r.t10)}</td><td class="n">${f(r.t50)}</td><td class="n">${f(r.t90)}</td><td class="n">${f(r.t100)}</td><td class="n">${r.pk.toFixed(0)}</td><td class="n">${fi(r.st)}</td><td>${kindBadge(D[r.u])}</td></tr>`).join('');
+  const all=ALL27.map(u=>{const xs=[],ys=[];for(let m=0;m<=HZ;m+=STEP){xs.push(T0+m*60000);ys.push(D[u].g[m]*100)}return{c:u===S.uf?'var(--accent)':'var(--o)',xs,ys,w:u===S.uf?2.6:1,op:u===S.uf?1:.55,d:D[u].kind==='estimada'?'4 3':''}});
+  const ch=lineChart('vel',{series:all,hl:[{y:50,l:'50%',d:'2 4'}],ymin:0,ymax:100,yf:v=>v.toFixed(0)+'%',tipf:m=>{const o=ALL27.map(u=>[u,D[u].g[m]*100]).sort((a,b)=>b[1]-a[1]);return `<b>${fHM(m)}</b><br>líder: ${o[0][0].toUpperCase()} ${o[0][1].toFixed(0)}%<br>último: ${o[26][0].toUpperCase()} ${o[26][1].toFixed(0)}%`},aria:'Curvas de totalização de todos os estados'});
+  const bars=rk.map((x,i)=>{const w=x.t/HZ*100;return `<div class="row" data-u="${x.u}" style="cursor:pointer"><div class="nm"><span class="t"><b>${i+1}.</b> ${x.u.toUpperCase()}</span><small>${UFN[x.u]}</small></div><div class="trk"><i style="background:${D[x.u].kind==='real'?'var(--c5)':'var(--warn)'};width:${w}%"></i></div><div class="v">${fHM(x.t)}</div><div class="p"></div></div>`}).join('');
+  return `<div class="grid two"><div class="card"><h2>Curvas de totalização<span class="sub">tracejado = estimada · cinza exceto ${S.uf.toUpperCase()}</span></h2>${ch}</div>
+   <div class="card"><h2>Ranking: hora em que cada UF passa de 50% das seções</h2><div class="res" style="max-height:420px;overflow:auto">${bars}</div><div class="note"><span class="sw" style="background:var(--c5)"></span>horários reais &nbsp; <span class="sw" style="background:var(--warn)"></span>estimada</div></div></div>
+   <div class="card" id="veltab" style="margin-top:14px"><h2>Velocidade por UF<span class="sub">clique no cabeçalho para ordenar, na linha para abrir</span></h2><div class="tw"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div></div>`;
+}
+/* ===== Aba Trocas ===== */
+function leadSeries(sigma){const o=candOrder(),a=o[0],b=o[1],s=series(sigma,[a,b]);return{xs:s.xs,ys:s.ys[a].map((v,i)=>v==null?null:v-s.ys[b][i])}}
+function viewTroca(){
+  const rk=MAIN_T50(),fast=rk[0].u,slow=rk[26].u,o=candOrder(),a=o[0],b=o[1];
+  const opts=ALL27.map(u=>`<option value="${u}">${UFN[u]}</option>`).join('');
+  const sg=sigmaOf(S.swaps),base=leadSeries(null),sw=leadSeries(sg);
+  const tot=natTotals(),fin=Object.values(tot).reduce((x,y)=>x+y,0),fl=(tot[a]-tot[b])/fin*100;
+  const chips=S.swaps.map((p,i)=>`<span class="chip">${p[0].toUpperCase()} ⇄ ${p[1].toUpperCase()}<button data-rm="${i}" aria-label="remover troca">×</button></span>`).join('')||'<span style="color:var(--muted)">nenhuma troca: curva real</span>';
+  const ch=lineChart('troca',{series:[{c:'var(--fg2)',xs:base.xs,ys:base.ys,d:'5 4',w:1.6},{c:'var(--accent)',xs:sw.xs,ys:sw.ys}],hl:[{y:0,l:'empate',d:'2 4'},{y:fl,c:'var(--good)',l:'resultado final'}],yd:0,yf:v=>(v>=0?'+':'')+v.toFixed(0),tipf:m=>{const i=Math.round(m/STEP),x=base.ys[i],y=sw.ys[i];return `<b>${fHM(m)}</b><br>real: ${fs(x)} p.p.<br>com trocas: ${fs(y)} p.p.`},aria:'Diferença entre os dois primeiros colocados, real e com trocas'});
+  const small=ALL27.map(u=>{
+    const mk=(v)=>{if(u===v)return '';const l=leadSeries(sigmaOf([[u,v]]));
+      return lineChart('sm_'+u+'_'+v,{w:230,h:110,mini:true,series:[{c:'var(--fg2)',xs:base.xs,ys:base.ys,d:'3 3',w:1},{c:v===fast?'var(--c5)':'var(--c1)',xs:l.xs,ys:l.ys}],hl:[{y:0,d:'2 3'},{y:fl,c:'var(--good)',d:'2 3'}],yd:0,tipf:null})};
+    return `<div class="mini-c"><div class="t">${u.toUpperCase()}${u===fast?' (mais rápido)':u===slow?' (mais lento)':''}</div>${u===fast?'<div class="note">—</div>':mk(fast)}${u===slow?'':mk(slow)}</div>`}).join('');
+  return `<div class="card prose"><h2>Trocas na dinâmica de apuração<span class="sub">como no notebook de 2022</span></h2>
+   <p>Cada troca faz o estado A apurar na velocidade do estado B (e vice-versa), mantendo seus votos finais. O gráfico mostra a diferença entre <b>${esc(NAMES[a])}</b> e <b>${esc(NAMES[b])}</b> em pontos percentuais dos votos válidos nacionais.</p>
+   <div class="sim-ctrl"><button class="btn" id="preset">Trocar mais rápido ⇄ mais lento (${fast.toUpperCase()} ⇄ ${slow.toUpperCase()})</button>
+   <select id="sa">${opts}</select> ⇄ <select id="sb">${opts.replace(`value="${ALL27[1]}"`,`value="${ALL27[1]}" selected`)}</select><button class="btn" id="add">Adicionar troca</button><button class="btn" id="clr">Limpar</button></div>
+   <div class="chips" style="margin-bottom:10px">${chips}</div>${ch}
+   <div class="legend"><span><i class="sw" style="background:var(--fg2)"></i>curva real (tracejada)</span><span><i class="sw" style="background:var(--accent)"></i>com trocas</span><span><i class="sw" style="background:var(--good)"></i>resultado final</span></div></div>
+   <div class="card" style="margin-top:14px"><h2>Cada estado trocado com o mais rápido (${fast.toUpperCase()}, verde) e com o mais lento (${slow.toUpperCase()}, vermelho)<span class="sub">diferença em p.p.</span></h2><div class="minis">${small}</div></div>`;
+}
+/* ===== Método ===== */
+function viewMet(){
+  const rows=ALL27.filter(u=>D[u].kind==='estimada').map(u=>u.toUpperCase()).join(', ');
+  return `<div class="card prose"><h2>Método</h2>
+  <p>Reprodução do notebook de 2022 (segundo turno): para cada UF, a velocidade de apuração é a fração <code>f_UF(t)</code> de seções totalizadas ao longo do tempo. O total nacional parcial é <code>Σ f_UF(t)·V_UF,k / Σ f_UF(t)·V_UF</code>, com <code>V</code> os votos válidos finais, isto é, cada UF contribui com seus votos finais proporcionalmente ao que já apurou.</p>
+  <p>As <b>trocas</b> atribuem a um estado a curva de velocidade de outro, e o <b>ranking</b> ordena os estados pelo horário em que alcançam 50% das seções. Como no notebook, o exterior fica de fora por padrão.</p>
+  <h3>Origem das curvas</h3>
+  <p>O TSE não publica o histórico minuto a minuto, mas cada seção carrega o horário de sua totalização nos arquivos de configuração de seções. Capturei esses horários às ${SNAP_AT} (horário de Brasília). Para estados já encerrados, o TSE regravou todos os horários de uma vez, perdendo a curva. Esses estados (<b>${rows}</b>) usam uma <b>curva estimada</b>: a curva média dos estados com horários reais, ajustada à hora de término informada pelo TSE. Os 16 demais têm <b>horários reais</b>.</p>
+  <div class="callout">Os votos usados são os valores finais por UF no momento da captura, e o resultado parcial supõe votos homogêneos dentro da UF. A reconstrução mostra a dinâmica da apuração, não uma série oficial publicada.</div>
+  <h3>Interrupção e demais cargos</h3>
+  <p>Nos horários de totalização das seções capturados, nenhuma seção foi totalizada entre ${fHM(GAP.a)} e ${fHM(GAP.b+1)} nas UFs com horários reais. Para saber se governador, senador e deputados sofreram a mesma interrupção, comparei os arquivos municipais das duas eleições do TSE (6257, presidente; 6259, demais cargos). Em 5.571 municípios, 94% têm horário de totalização das duas eleições com diferença de até 1 minuto (93% das seções), e 98,8% até 5 minutos. As duas eleições são totalizadas juntas: a interrupção atingiu todos os cargos.</p>
+  <p>Limite: o horário final por município e por UF dos arquivos agregados também registra reprocessamentos, então ele não serve como série de apuração. A série minuto a minuto vem apenas dos horários por seção, que só consegui capturar nas UFs listadas como "horários reais". O TSE não publica o resultado parcial por cargo ao longo do tempo, e por isso as abas de outros cargos usam a suposição homogênea do notebook.</p>
+  <h3>Fontes</h3><ul class="src"><li><a class="ext" href="https://resultados.tse.jus.br/oficial/app/index.html" target="_blank" rel="noopener">Resultados TSE (oficial)</a></li><li>Arquivos públicos em <code>resultados.tse.jus.br/oficial/ele2026</code> e <code>arquivo-urna/3220/config</code></li></ul></div>
+  <div class="card" style="margin-top:14px"><h2>Opções</h2><label><input type="checkbox" id="ext"${S.exterior?' checked':''}> Incluir o exterior no total nacional</label></div>`;
+}
+/* ===== Roteamento e eventos ===== */
+function render(){
+  setHeader();const m=$('#main');
+  m.innerHTML=S.tab==='evo'?viewEvo():S.tab==='uf'?viewUF():S.tab==='vel'?viewVel():S.tab==='troca'?viewTroca():S.tab==='car'?viewCar():viewMet();
+  if(S.tab==='uf')renderUFBox();
+  if(S.tab==='car')carAfter();
+  renderInst();moveCursors();
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-t]');if(t&&t.closest('#tabs')){S.tab=t.dataset.t;render();scrollTo(0,0);return}
+  const tl=e.target.closest('.tile[data-u]');if(tl){S.uf=tl.dataset.u;S.tab='uf';render();scrollTo(0,0);return}
+  const tr=e.target.closest('tr.click,.row[data-u]');if(tr&&tr.dataset.u){S.uf=tr.dataset.u;S.tab='uf';render();scrollTo(0,0);return}
+  const th=e.target.closest('th[data-s]');if(th){const k=th.dataset.s;if(S.sortKey===k)S.sortDir*=-1;else{S.sortKey=k;S.sortDir=1}render();return}
+  const rm=e.target.closest('[data-rm]');if(rm){S.swaps.splice(+rm.dataset.rm,1);render();return}
+  if(e.target.id==='preset'){const r=MAIN_T50();S.swaps=[[r[0].u,r[26].u]];render()}
+  if(e.target.id==='add'){const a=$('#sa').value,b=$('#sb').value;if(a!==b&&!S.swaps.some(p=>p.includes(a)||p.includes(b))){S.swaps.push([a,b]);render()}}
+  if(e.target.id==='clr'){S.swaps=[];render()}
+});
+document.addEventListener('change',e=>{
+  if(e.target.id==='ufsel'){S.uf=e.target.value;renderUFBox()}
+  if(e.target.id==='ext'){S.exterior=e.target.checked;render()}
+});
+$('#slider').addEventListener('input',e=>{setM(+e.target.value);S.mf=S.m});
+$('#spd').addEventListener('change',e=>S.spd=+e.target.value);
+let last=0;
+function tick(ts){if(!S.play)return;const dt=Math.min(.25,(ts-last)/1000);last=ts;S.mf+=dt*S.spd;if(S.mf>=HZ){setM(HZ);stop();return}const r=Math.round(S.mf);if(r!==S.m)setM(r);requestAnimationFrame(tick)}
+function stop(){S.play=false;$('#play').textContent='Reproduzir'}
+$('#play').addEventListener('click',()=>{if(S.play){stop();return}if(S.m>=HZ)setM(0);S.mf=S.m;S.play=true;$('#play').textContent='Pausar';last=performance.now();requestAnimationFrame(tick)});
+document.addEventListener('keydown',e=>{if(e.target.matches('input,select,textarea'))return;if(e.key==='ArrowRight')setM(S.m+1);if(e.key==='ArrowLeft')setM(S.m-1)});
+/* ================= Outros cargos: governador, senador, deputados ================= */
+const CARGOS={gov:{c:3,n:'Governador'},sen:{c:5,n:'Senador'},df:{c:6,n:'Deputado federal'},de:{c:7,n:'Deputado estadual'}};
+S.cargo='gov';S.cuf='sp';
+const CD={},CL={};
+const cargoCode=(k,uf)=>k==='de'&&uf==='df'?8:CARGOS[k].c;
+const urlC=(uf,c,e)=>`${BASE}${e}/dados/${uf}/${uf}-c${String(c).padStart(4,'0')}-e${String(e).padStart(6,'0')}-u.json`;
+async function getj(u){const r=await fetch(u,{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status+' '+u);return r.json()}
+async function pool(jobs,n){const out=[];let i=0;await Promise.all(Array.from({length:n},async()=>{while(i<jobs.length){const k=i++;try{out[k]=await jobs[k]()}catch(e){out[k]={error:String(e.message||e)}}}}));return out}
+function parseC(j,key){
+  const car=(j.carg||[])[0];if(!car)return null;
+  const maj=key==='gov'||key==='sen';const cands=[],agrs=[];
+  for(const a of car.agr||[]){
+    const ag={com:a.com||a.nm,votes:0,el:maj?0:num(a.vag),top:[]};
+    for(const p of a.par||[]){ag.votes+=num(p.tvtn)+num(p.tvtl);for(const c of p.cand||[]){
+      const o={n:String(c.n),nmu:c.nmu||c.nm,party:p.sg,vap:num(c.vap),e:c.e==='s'};
+      if(maj)cands.push(o);else ag.top.push(o);
+    }}
+    ag.top.sort((x,y)=>y.vap-x.vap);ag.top=ag.top.slice(0,3);
+    agrs.push(ag);
+  }
+  cands.sort((x,y)=>y.vap-x.vap);agrs.sort((x,y)=>y.votes-x.votes);
+  const vsum=maj?cands.reduce((s,c)=>s+c.vap,0):agrs.reduce((s,a)=>s+a.votes,0);
+  const vv=num(j.v&&j.v.vv)||vsum;
+  return{cands,agrs,vv:maj?(num(j.v&&j.v.vv)||vsum):vsum,vvFile:vv,nv:num(car.nv)||1,ts:num(j.s&&j.s.ts),st:num(j.s&&j.s.st)};
+}
+async function loadCargo(key){
+  if(CL[key]&&CL[key].busy)return;
+  CL[key]={busy:true,done:0,err:0,total:27};CD[key]=CD[key]||{};
+  const jobs=ALL27.map(u=>async()=>{
+    const j=await getj(urlC(u,cargoCode(key,u),6259));const p=parseC(j,key);if(p)CD[key][u]=p;
+    CL[key].done++;if(S.tab==='car'&&S.cargo===key)renderCar();
+  });
+  const res=await pool(jobs,5);
+  CL[key].err=res.filter(r=>r&&r.error).length;CL[key].lastErr=(res.find(r=>r&&r.error)||{}).error;CL[key].busy=false;CL[key].fin=true;
+  if(S.tab==='car'&&S.cargo===key)renderCar();
+}
+function viewCar(){
+  const co=Object.entries(CARGOS).map(([k,v])=>`<option value="${k}"${k===S.cargo?' selected':''}>${v.n}</option>`).join('');
+  const uo=ALL27.map(u=>`<option value="${u}"${u===S.cuf?' selected':''}>${UFN[u]} (${u.toUpperCase()})</option>`).join('');
+  return `<div class="sim-ctrl"><label>Cargo <select id="cargo">${co}</select></label><label>Estado <select id="cuf">${uo}</select></label><button class="btn" id="creload">Recarregar do TSE</button></div><div id="carbody"></div>`;
+}
+function carAfter(){if(!CD[S.cargo]&&!(CL[S.cargo]&&CL[S.cargo].busy))loadCargo(S.cargo);renderCar()}
+const labC=(k,o)=>k==='de'&&S.cuf==='df'?'Deputado distrital':CARGOS[k].n;
+function renderCar(){
+  const box=$('#carbody');if(!box)return;
+  const k=S.cargo,u=S.cuf,st=CL[k]||{},data=(CD[k]||{})[u],maj=k==='gov'||k==='sen';
+  if(!data){box.innerHTML=st.fin&&st.err?`<div class="callout">Não consegui ler os arquivos do TSE para este cargo (${esc(st.lastErr||'erro de rede')}). Abra a página com acesso à internet e use "Recarregar do TSE".</div>`:`<div class="card"><div class="empty-msg">Carregando resultados do TSE… ${st.done||0}/27 estados</div></div>`;return}
+  const d=D[u],g=d.g[S.m];
+  const items=maj?data.cands.slice(0,8).map(c=>({key:c.n,name:`${c.nmu} (${c.party})`,v:c.vap,sub:c.n,e:c.e})):data.agrs.slice(0,12).map(a=>({key:a.com,name:a.com,v:a.votes,sub:a.top.map(t=>t.nmu).slice(0,2).join(', '),e:a.el}));
+  const den=maj?data.vv:data.vv;
+  const colors=['--c1','--c2','--c3','--c4','--c5','--c6','--c7','--c8'];
+  const rows=items.map((it,i)=>`<tr><td><span class="sw" style="background:var(${colors[i%8]})"></span>${esc(it.name)}${it.sub&&!maj?` <small style="color:var(--muted)">${esc(it.sub)}</small>`:''}</td><td class="n num" data-cv="${i}">${fi(g*it.v)}</td><td class="n num">${fi(it.v)}</td><td class="n num">${fp(it.v/den*100)}</td><td class="n num">${maj?(it.e?'eleito':''):(it.e?it.e:'–')}</td></tr>`).join('');
+  const sers=items.slice(0,6).map((it,i)=>{const xs=[],ys=[];for(let m=0;m<=HZ;m+=STEP){xs.push(T0+m*60000);ys.push(d.g[m]*it.v)}return{c:`var(${colors[i%8]})`,xs,ys,name:it.name}});
+  const ch=lineChart('car1',{series:sers,ymin:0,yf:v=>v>=1e6?(v/1e6).toFixed(1)+' mi':v>=1e3?(v/1e3).toFixed(0)+' mil':v.toFixed(0),tipf:m=>`<b>${fHM(m)}</b> · ${fp(d.g[m]*100,1)} das seções<br>`+sers.slice(0,4).map((s,i)=>`${esc(items[i].name)}: ${fi(d.g[m]*items[i].v)}`).join('<br>'),aria:'Votos apurados ao longo do tempo'});
+  const natBlock=maj?carNatMaj(k):carNatDep(k);
+  box.innerHTML=`<div class="grid kpis"><div class="card kpi"><div class="lab">${labC(k)} · ${UFN[u]} · ${kindBadge(d)}</div><div class="big" data-ck="g">${fp(g*100,1)}</div><div class="det" data-ck="gd">${fi(g*d.st)} de ${fi(d.st)} seções às ${fHM(S.m)}</div><div class="prog"><i data-ck="bar" style="width:${g*100}%"></i></div></div>
+   <div class="card kpi"><div class="lab">Votos válidos finais</div><div class="big num">${fi(den)}</div><div class="det">${maj?(k==='sen'?'cada eleitor vota em duas vagas; % sobre votos válidos':'% sobre votos válidos'):'% sobre votos válidos de legenda e nominais'}</div></div>
+   <div class="card kpi"><div class="lab">Vagas</div><div class="big">${data.nv}</div><div class="det">${esc(CARGOS[k].n)} · ${UFN[u]}</div></div></div>
+   <div class="grid two" style="margin-top:14px"><div class="card"><h2>${maj?'Candidatos':'Partidos e federações'}<span class="sub">votos apurados no instante</span></h2><div class="tw"><table><thead><tr><th>${maj?'Candidato':'Agrupamento'}</th><th class="n">Apurados</th><th class="n">Final</th><th class="n">%</th><th class="n">${maj?'':'Eleitos'}</th></tr></thead><tbody>${rows}</tbody></table></div>
+   <div class="note">Os arquivos públicos do TSE não guardam a série parcial por cargo. Aqui os votos finais de cada candidato são distribuídos pela curva de seções totalizadas do estado (suposição do notebook: votos homogêneos dentro do estado), e a mesma linha do tempo vale para todos os cargos, inclusive a interrupção.</div></div>
+   <div class="card"><h2>Votos apurados ao longo do tempo<span class="sub">clique para ir ao instante</span></h2>${ch}</div></div>${natBlock}`;
+}
+function carNatMaj(k){
+  const rows=ALL27.map(u=>{const p=(CD[k]||{})[u];if(!p||!p.cands.length)return null;const a=p.cands[0],b=p.cands[1]||{vap:0,nmu:'–',party:''};return{u,a,b,den:p.vv,g:D[u].g[S.m]}}).filter(Boolean);
+  if(!rows.length)return '';
+  rows.sort((x,y)=>(y.a.vap-y.b.vap)/y.den-(x.a.vap-x.b.vap)/x.den);
+  const body=rows.map(r=>`<tr class="click" data-cu="${r.u}"><td><b>${r.u.toUpperCase()}</b> ${UFN[r.u]}</td><td>${esc(r.a.nmu)} (${esc(r.a.party)})</td><td class="n num">${fp(r.a.vap/r.den*100)}</td><td>${esc(r.b.nmu)} (${esc(r.b.party)})</td><td class="n num">${fp(r.b.vap/r.den*100)}</td><td class="n num">${fs((r.a.vap-r.b.vap)/r.den*100)} p.p.</td><td class="n num" data-cg="${r.u}">${fp(r.g*100,1)}</td></tr>`).join('');
+  return `<div class="card" style="margin-top:14px"><h2>${CARGOS[k].n} em todos os estados<span class="sub">resultado final, ordenado pela margem</span></h2><div class="tw"><table><thead><tr><th>UF</th><th>1º</th><th class="n">%</th><th>2º</th><th class="n">%</th><th class="n">Margem</th><th class="n">Seções no instante</th></tr></thead><tbody>${body}</tbody></table></div>${rows.length<27?`<div class="note">${27-rows.length} estados ainda sem leitura.</div>`:''}</div>`;
+}
+function carNatDep(k){
+  const ok=ALL27.filter(u=>(CD[k]||{})[u]);if(ok.length<27)return `<div class="card" style="margin-top:14px"><div class="empty-msg">Visão nacional por partido: ${ok.length}/27 estados lidos…</div></div>`;
+  const P={};for(const u of ok)for(const a of CD[k][u].agrs){const q=P[a.com]||(P[a.com]={com:a.com,v:0,el:0});q.v+=a.votes;q.el+=a.el}
+  const ord=Object.values(P).sort((a,b)=>b.v-a.v),tot=ord.reduce((s,x)=>s+x.v,0),top=ord.slice(0,8);
+  const xs=[],ys=top.map(()=>[]);
+  for(let m=0;m<=HZ;m+=STEP){xs.push(T0+m*60000);let den=0;const num=top.map(()=>0);
+    for(const u of ok){const g=D[u].g[m];for(const a of CD[k][u].agrs){den+=g*a.votes;const i=top.findIndex(t=>t.com===a.com);if(i>=0)num[i]+=g*a.votes}}
+    top.forEach((t,i)=>ys[i].push(den?num[i]/den*100:null))}
+  const colors=['--c1','--c2','--c3','--c4','--c5','--c6','--c7','--c8'];
+  const sers=top.map((t,i)=>({c:`var(${colors[i]})`,xs,ys:ys[i]}));
+  const hl=top.slice(0,3).map((t,i)=>({y:t.v/tot*100,c:`var(${colors[i]})`,l:'final'}));
+  const ch=lineChart('carn',{series:sers,hl,ymin:0,yf:v=>v.toFixed(0)+'%',tipf:m=>`<b>${fHM(m)}</b><br>`+top.slice(0,4).map((t,i)=>`${esc(t.com)}: ${fp(ys[i][Math.round(m/STEP)]||0)}`).join('<br>'),aria:'Percentual nacional de votos por partido'});
+  const body=ord.slice(0,20).map((x,i)=>`<tr><td>${i<8?`<span class="sw" style="background:var(${colors[i]})"></span>`:''}${esc(x.com)}</td><td class="n num">${fi(x.v)}</td><td class="n num">${fp(x.v/tot*100)}</td><td class="n num">${x.el}</td></tr>`).join('');
+  return `<div class="grid two" style="margin-top:14px"><div class="card"><h2>${CARGOS[k].n}: total nacional por partido<span class="sub">soma dos 27 estados, sem exterior</span></h2><div class="tw"><table><thead><tr><th>Agrupamento</th><th class="n">Votos</th><th class="n">%</th><th class="n">Eleitos</th></tr></thead><tbody>${body}</tbody></table></div></div>
+  <div class="card"><h2>Evolução do percentual nacional<span class="sub">método do notebook: cada estado soma seus votos na velocidade da sua apuração</span></h2>${ch}</div></div>`;
+}
+document.addEventListener('change',e=>{
+  if(e.target.id==='cargo'){S.cargo=e.target.value;carAfter()}
+  if(e.target.id==='cuf'){S.cuf=e.target.value;renderCar()}
+});
+document.addEventListener('click',e=>{
+  if(e.target.id==='creload'){delete CD[S.cargo];CL[S.cargo]=null;carAfter();return}
+  const r=e.target.closest('tr[data-cu]');if(r){S.cuf=r.dataset.cu;const s=$('#cuf');if(s)s.value=S.cuf;renderCar();scrollTo(0,0)}
+});
+/* atualização leve dentro da aba (cursor de tempo) */
+const _ri=renderInst;
+renderInst=function(){_ri();if(S.tab!=='car')return;const b=$('#carbody');if(!b)return;const u=S.cuf,k=S.cargo,data=(CD[k]||{})[u];if(!data)return;const g=D[u].g[S.m];
+  const maj=k==='gov'||k==='sen';const items=maj?data.cands.slice(0,8).map(c=>c.vap):data.agrs.slice(0,12).map(a=>a.votes);
+  const e1=b.querySelector('[data-ck=g]');if(e1)e1.textContent=fp(g*100,1);const e2=b.querySelector('[data-ck=gd]');if(e2)e2.textContent=`${fi(g*D[u].st)} de ${fi(D[u].st)} seções às ${fHM(S.m)}`;
+  const e3=b.querySelector('[data-ck=bar]');if(e3)e3.style.width=g*100+'%';
+  b.querySelectorAll('[data-cv]').forEach(c=>c.textContent=fi(g*items[+c.dataset.cv]));
+  b.querySelectorAll('[data-cg]').forEach(c=>c.textContent=fp(D[c.dataset.cg].g[S.m]*100,1));
+};
+/* ================= Atualização dos votos finais de presidente e partida ================= */
+async function refreshPres(){
+  const jobs=ALL.map(u=>async()=>{const j=await getj(urlC(u,1,6257));const car=(j.carg||[])[0];if(!car)return;const V={};for(const a of car.agr||[])for(const p of a.par||[])for(const c of p.cand||[])V[String(c.n)]=num(c.vap);return[u,V,num(j.s&&j.s.ts),num(j.s&&j.s.st)]});
+  const res=await pool(jobs,6);let ok=0;
+  for(const r of res){if(!r||r.error||!r.length)continue;const [u,V,ts,st]=r;const sum=Object.values(V).reduce((a,b)=>a+b,0);if(!sum)continue;CAND.forEach(n=>D[u].V[n]=V[n]||0);if(ts>0){D[u].ts=ts;D[u].st=st||ts}ok++}
+  if(ok>=27){S.presLive=fTimeM(Date.now());for(const k in cache)delete cache[k];render()}
+}
+S.m=HZ;render();setM(HZ);
+refreshPres().catch(()=>{});
+</script><script src="assets/nav.js"></script></body></html>
