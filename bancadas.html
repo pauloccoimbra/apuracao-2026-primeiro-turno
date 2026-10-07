@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bancadas e eleitos · Apuração 2026</title><meta name="description" content="Mapa de bancadas por estado, lista pesquisável de deputados e senadores eleitos, mais votados."><meta name="theme-color" content="#0b5cad"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b5cad'/%3E%3Cpath d='M5 26L27 6' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/base.css"><link rel="stylesheet" href="assets/page.css"><link rel="stylesheet" href="assets/cg.css">
+</head><body>
+<header class="top"><div class="wrap"><div class="bar"><div class="brand">Bancadas e eleitos<small>Por estado, espectro e partido · Congresso 2027</small></div>
+<div class="ctrl"><a class="ext" href="https://resultados.tse.jus.br/oficial/app/index.html" target="_blank" rel="noopener">Site do TSE</a></div></div></div></header>
+<main class="wrap">
+
+<div><h1 class="page-h">Bancadas por estado e lista de eleitos</h1>
+<p class="lead">Cada estado elege 8 a 70 deputados federais e tem 3 senadores (2 eleitos em 2026 e 1 eleito em 2022). Veja o espectro de cada bancada, a lista completa de eleitos, os mais votados e uma busca por nome, partido ou estado. A classificação por espectro é a da página Congresso.</p></div>
+<section class="card"><h2>Mapa de bancadas <span class="sub">clique em um estado</span></h2>
+ <div class="ctl"><div class="seg-b" id="hm"><button data-h="cam" aria-pressed="true">Deputados</button><button data-h="sen" aria-pressed="false">Senadores</button></div><div class="lg" id="lgm"></div></div>
+ <div class="cols2"><div class="tilemap" id="tm"></div><div id="dt"></div></div>
+ <p class="note">Cor do estado: bloco com mais cadeiras na bancada escolhida (cinza = empate). Cada quadrado é um estado, não a área real.</p></section>
+<section class="card"><h2>Todos os estados</h2><div class="tw"><table id="ut"></table></div></section>
+<section class="card"><h2>Os mais votados</h2><div class="cols2"><div><div class="hs2">Deputados federais</div><div class="tw"><table id="t1"></table></div></div><div><div class="hs2">Senadores eleitos em 2026</div><div class="tw"><table id="t2"></table></div></div></div>
+ <p class="note">Votos nominais no estado. Para o Senado em 2026, cada eleitor votou em até dois candidatos, por isso os totais passam do número de eleitores.</p></section>
+<section class="card"><h2>Lista de eleitos <span class="sub">594 parlamentares</span></h2>
+ <div class="ctl"><input id="q" type="search" placeholder="Buscar por nome" style="background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:6px 10px;min-width:200px">
+ <select id="fh" class="sp"><option value="">Câmara e Senado</option><option value="cam">Só Câmara</option><option value="sen">Só Senado</option></select>
+ <select id="fg" class="sp"><option value="">Todo espectro</option></select>
+ <select id="fp" class="sp"><option value="">Todos os partidos</option></select>
+ <select id="fu" class="sp"><option value="">Todos os estados</option></select><span class="rule" id="cn"></span></div>
+ <div class="tw"><table id="lt"></table></div><div class="ctl" style="margin-top:8px"><button class="btn" id="mo">Mostrar mais</button></div></section>
+<section class="card"><h2>Notas</h2><div class="prose"><p>Deputados e senadores de 2026: situação "Eleito", "Eleito por QP" ou "Eleito por média" no arquivo do TSE com 100% das seções. Senadores de 2022: lista de senadores em exercício do Senado Federal (partido atual; os que assumiram como suplentes são marcados). Os votos dos senadores de 2022 não constam desta lista.</p><p>Sergio Moro (PR) e Cleitinho (MG) deixam o Senado se tomarem posse como governadores, assim como Professora Dorinha (TO) se vencer o 2º turno; veja Maiorias.</p></div></section>
+
+</main>
+<footer class="site">Fonte: TSE, resultado final do 1º turno de 04/10/2026 (arquivos públicos, posição de 05/10/2026 12h51, 100% das seções) para os 54 senadores e 513 deputados federais eleitos; Senado Federal (dados abertos, lista de senadores em exercício) para os 27 senadores com mandato até 2031. Partido é o do registro da candidatura (eleitos em 2026) e o atual (senadores de 2022); trocas de partido posteriores não aparecem. A classificação por espectro é uma leitura de trabalho e pode ser alterada na página. Projeto independente, sem vínculo com o TSE nem com o Congresso.</footer>
+
+<script src="assets/congresso.js"></script><script src="assets/cg.js"></script><script src="assets/nav.js"></script>
+<script>
+
+const TILE={rr:[1,0],ap:[3,0],am:[1,1],pa:[2,1],ma:[3,1],ce:[4,1],rn:[5,1],ac:[0,2],ro:[1,2],mt:[2,2],to:[3,2],pi:[4,2],pb:[5,2],ms:[1,3],go:[2,3],df:[3,3],ba:[4,3],pe:[5,3],al:[6,3],sp:[2,4],mg:[3,4],es:[4,4],se:[5,4],pr:[2,5],rj:[3,5],sc:[2,6],rs:[2,7]};
+let H='cam',UF='SP';
+const ufs=Object.keys(UFN);
+function byUF(h,u){return HOUSE[h].m.filter(m=>m.u===u)}
+function cnt(ms){const o={D:0,C:0,E:0,X:0};ms.forEach(m=>o[gOf(m.p)]++);return o}
+function dom(o){const a=['D','C','E'].map(x=>[x,o[x]]).sort((p,q)=>q[1]-p[1]);return a[0][1]===a[1][1]?null:a[0][0]}
+function tiles(){const c=50,rh=46;let s=`<div style="position:relative;width:${7*c}px;height:${8*rh}px;max-width:100%">`;
+ Object.entries(TILE).forEach(([u,[x,y]])=>{const U=u.toUpperCase(),o=cnt(byUF(H,U)),d=dom(o),n=sumA(Object.values(o));const col=d?`var(${GN[d].v})`:'var(--o)';
+  const tip=`<b>${UFN[U]}</b><br>${H==='cam'?'Deputados':'Senadores'}: ${n}<br>Direita ${o.D} · Centro ${o.C} · Esquerda ${o.E}${o.X?' · s/ class. '+o.X:''}`;
+  s+=`<div class="tile${U===UF?' sel':''}" data-u="${U}" data-tip="${esc(tip)}" style="position:absolute;left:${x*c}px;top:${y*rh}px;background:${col}">${U}</div>`});
+ $('#tm').innerHTML=s+'</div>';$$('#tm .tile').forEach(t=>t.onclick=()=>{UF=t.dataset.u;draw()})}
+function mini(o,n){return `<div class="mini">${['D','C','E','X'].map(x=>o[x]?`<span style="width:${o[x]/n*100}%;background:var(${GN[x].v})"></span>`:'').join('')}</div>`}
+function detail(){const D=byUF('cam',UF).slice().sort((a,b)=>b.v-a.v),S=byUF('sen',UF),oD=cnt(D),oS=cnt(S);const sp={};D.forEach(m=>sp[m.p]=(sp[m.p]||0)+1);
+ const chips=Object.entries(sp).sort((a,b)=>b[1]-a[1]).map(([p,n])=>`<span class="pill" style="border-left:4px solid var(${GN[gOf(p)].v})">${esc(pl(p))} ${n}</span>`).join(' ');
+ const bl=o=>['D','C','E','X'].filter(x=>o[x]).map(x=>`<span class="g${x}"><b>${o[x]}</b> ${GN[x].n.toLowerCase()}</span>`).join(' · ');
+ $('#dt').innerHTML=`<h3 style="margin:0 0 6px">${esc(UFN[UF])} <span class="rule">${UF}</span></h3><div class="rule">Deputados federais (${D.length})</div>${mini(oD,D.length)}<div style="margin:4px 0 6px">${bl(oD)}</div><div class="pty">${chips}</div>
+ <div class="rule" style="margin-top:8px">Senadores (${S.length})</div>${mini(oS,S.length)}<div class="tw"><table><tbody>${S.map(m=>`<tr><td>${esc(m.n)}</td><td><i class="sw" style="background:var(${GN[gOf(m.p)].v})"></i>${esc(pl(m.p))}</td><td class="rule">${m.o==='2026'?'eleito em 2026 · '+fi(m.v)+' votos':'mandato até 2031 (eleito em 2022)'+(m.tit===false?' · suplente em exercício':'')}</td></tr>`).join('')}</tbody></table></div>
+ <div class="rule" style="margin-top:8px">Deputados mais votados</div><div class="tw" style="max-height:260px;overflow:auto"><table><tbody>${D.slice(0,10).map(m=>`<tr><td>${esc(m.n)}</td><td><i class="sw" style="background:var(${GN[gOf(m.p)].v})"></i>${esc(pl(m.p))}</td><td class="n">${fi(m.v)}</td></tr>`).join('')}</tbody></table></div>`}
+function tabela(){let r='<thead><tr><th>Estado</th><th class="n">Deputados</th><th>Espectro</th><th>Maior bancada</th><th>Mais votado</th><th>Senadores</th><th>Espectro</th></tr></thead><tbody>';
+ ufs.forEach(u=>{const D=byUF('cam',u),S=byUF('sen',u),oD=cnt(D),oS=cnt(S);const sp={};D.forEach(m=>sp[m.p]=(sp[m.p]||0)+1);const top=Object.entries(sp).sort((a,b)=>b[1]-a[1])[0];const mv=D.slice().sort((a,b)=>b.v-a.v)[0];
+  r+=`<tr data-u="${u}" style="cursor:pointer"><td><b>${u}</b> ${esc(UFN[u])}</td><td class="n">${D.length}</td><td style="min-width:110px">${mini(oD,D.length)}</td><td>${esc(pl(top[0]))} <span class="rule">${top[1]}</span></td><td>${esc(mv.n)} <span class="rule">${esc(pl(mv.p))} · ${fi(mv.v)}</span></td><td class="n">${S.length}</td><td style="min-width:70px">${mini(oS,S.length)}</td></tr>`});
+ $('#ut').innerHTML=r+'</tbody>';$$('#ut tr[data-u]').forEach(t=>t.onclick=()=>{UF=t.dataset.u;draw();$('#tm').scrollIntoView({behavior:'smooth',block:'center'})})}
+function tops(){const tr=(a,hd)=>`<thead><tr><th>#</th><th>Nome</th><th>Partido</th><th>UF</th><th class="n">Votos</th></tr></thead><tbody>${a.map((m,i)=>`<tr><td class="n">${i+1}</td><td>${esc(m.n)}</td><td><i class="sw" style="background:var(${GN[gOf(m.p)].v})"></i>${esc(pl(m.p))}</td><td>${m.u}</td><td class="n">${fi(m.v)}</td></tr>`).join('')}</tbody>`;
+ $('#t1').innerHTML=tr(DEP.slice().sort((a,b)=>b.v-a.v).slice(0,10));$('#t2').innerHTML=tr(SEN.filter(m=>m.o==='2026').sort((a,b)=>b.v-a.v).slice(0,10))}
+let N=100;
+function lista(){const q=$('#q').value.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''),fh=$('#fh').value,fg=$('#fg').value,fp=$('#fp').value,fu=$('#fu').value;
+ const all=DEP.concat(SEN).filter(m=>(!fh||m.h===fh)&&(!fg||gOf(m.p)===fg)&&(!fp||m.p===fp)&&(!fu||m.u===fu)&&(!q||m.n.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').includes(q))).sort((a,b)=>(b.v==null?-1:b.v)-(a.v==null?-1:a.v)||a.n.localeCompare(b.n));
+ $('#cn').textContent=all.length+' resultado(s)';const sh=all.slice(0,N);
+ $('#lt').innerHTML='<thead><tr><th>Nome</th><th>Casa</th><th>Partido</th><th>Espectro</th><th>UF</th><th class="n">Votos</th></tr></thead><tbody>'+sh.map(m=>`<tr><td>${esc(m.n)}</td><td>${m.h==='cam'?'Deputado(a)':'Senador(a)'+(m.o==='2022'?' <span class="rule">(2022)</span>':'')}</td><td>${esc(pl(m.p))}</td><td class="g${gOf(m.p)}">${GN[gOf(m.p)].n}</td><td>${m.u}</td><td class="n">${m.v==null?'—':fi(m.v)}</td></tr>`).join('')+'</tbody>';
+ $('#mo').style.display=all.length>N?'':'none'}
+function draw(){tiles();detail();lista();tabela();tops();$('#lgm').innerHTML=GR.filter(g=>g.id!=='X').map(g=>`<span><i class="sw" style="background:var(${g.v})"></i>${g.n}</span>`).join('')+'<span><i class="sw" style="background:var(--o)"></i>Empate</span>'}
+$$('#hm button').forEach(b=>b.onclick=()=>{H=b.dataset.h;$$('#hm button').forEach(x=>x.setAttribute('aria-pressed',x===b));tiles()});
+$('#fg').innerHTML+=GR.map(g=>`<option value="${g.id}">${g.n}</option>`).join('');
+$('#fp').innerHTML+=PARTIES.slice().sort((a,b)=>pl(a).localeCompare(pl(b))).map(p=>`<option value="${esc(p)}">${esc(pl(p))}</option>`).join('');
+$('#fu').innerHTML+=ufs.map(u=>`<option value="${u}">${u} · ${esc(UFN[u])}</option>`).join('');
+['q','fh','fg','fp','fu'].forEach(i=>$('#'+i).oninput=()=>{N=100;lista()});$('#mo').onclick=()=>{N+=200;lista()};
+draw();
+
+</script></body></html>
