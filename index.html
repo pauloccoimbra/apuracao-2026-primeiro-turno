@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Apuração 2026</title>
+<meta name="description" content="Painel em tempo real da apuração das eleições 2026: presidente, governador, senador e deputados, por estado, a partir dos arquivos oficiais de divulgação do TSE.">
+<meta name="theme-color" content="#0b5cad">
+<meta property="og:title" content="Apuração 2026">
+<meta property="og:description" content="Acompanhe a apuração das eleições 2026 em tempo real, com análise de ritmo e projeções. Dados do TSE.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b5cad'/%3E%3Cpath d='M7 22V14M13 22V8M19 22V12M25 22V17' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: painel de controle. Cabeçalho fixo com estado da apuração, abas, e blocos de leitura (KPIs, barras, gráficos, tabelas). */
+:root{
+  --bg:#f3f4f6; --surface:#ffffff; --surface2:#eef0f3; --fg:#161a22; --fg2:#4a5262; --muted:#7a8394; --line:#d9dde4; --accent:#0b5cad;
+  --good:#17803d; --warn:#b26a00; --bad:#b3261e;
+  --c1:#c23a2b; --c2:#2468b4; --c3:#d08a12; --c4:#7b5bc0; --c5:#1f8f78; --c6:#b0508f; --c7:#5b7a2e; --c8:#8a6a4a; --o:#8b93a1;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1116; --surface:#161b23; --surface2:#1d2330; --fg:#e8ebf0; --fg2:#aab2c0; --muted:#7f8899; --line:#2a3140; --accent:#5aa2f0;
+  --good:#4cc77a; --warn:#f0b13e; --bad:#ff7b70;
+  --c1:#ef6b5a; --c2:#5aa2f0; --c3:#f0b13e; --c4:#a58af0; --c5:#4cc5aa; --c6:#e083bb; --c7:#9cc457; --c8:#c9a07a; --o:#8b93a1; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1116; --surface:#161b23; --surface2:#1d2330; --fg:#e8ebf0; --fg2:#aab2c0; --muted:#7f8899; --line:#2a3140; --accent:#5aa2f0;
+  --good:#4cc77a; --warn:#f0b13e; --bad:#ff7b70;
+  --c1:#ef6b5a; --c2:#5aa2f0; --c3:#f0b13e; --c4:#a58af0; --c5:#4cc5aa; --c6:#e083bb; --c7:#9cc457; --c8:#c9a07a; --o:#8b93a1; color-scheme:dark}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 var(--sans);-webkit-font-smoothing:antialiased}
+.num,td.n,th.n{font-variant-numeric:tabular-nums}
+.mono{font-family:var(--mono)}
+button,select,input{font:inherit;color:inherit}
+header.top{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:16px}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding-block:10px}
+.brand{font-weight:600;font-size:17px;letter-spacing:-.01em;margin-right:4px}
+.brand small{display:block;font-weight:400;font-size:11px;color:var(--muted);letter-spacing:.02em}
+.status{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;color:var(--fg2);font-size:12.5px;min-width:0}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;margin-right:6px}
+.dot.live{background:var(--good);box-shadow:0 0 0 3px color-mix(in srgb,var(--good) 25%,transparent)}
+.dot.err{background:var(--bad)} .dot.wait{background:var(--warn)}
+.ctrl{margin-left:auto;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ctrl select,.ctrl button,.btn{background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer}
+.ctrl button:hover,.btn:hover{border-color:var(--accent)}
+a.ext{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--accent) 40%,transparent)}
+nav.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin}
+nav.tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:9px 14px;color:var(--fg2);cursor:pointer;white-space:nowrap;font-weight:500}
+nav.tabs button[aria-selected=true]{color:var(--fg);border-bottom-color:var(--accent)}
+main{padding-block:18px 60px}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.two{grid-template-columns:minmax(0,3fr) minmax(0,2fr);align-items:start}
+@media (max-width:900px){.two{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;min-width:0}
+.card h2{margin:0 0 10px;font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--fg2)}
+.card h2 .sub{text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted);margin-left:6px}
+.kpi .big{font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.15}
+.kpi .lab{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:4px}
+.kpi .det{font-size:12.5px;color:var(--fg2);margin-top:3px}
+.prog{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-top:8px}
+.prog>i{display:block;height:100%;background:var(--accent)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:7px;flex:none}
+.res{display:grid;gap:9px}
+.row{display:grid;grid-template-columns:minmax(170px,1.6fr) minmax(70px,2fr) 82px 62px;gap:10px;align-items:center}
+.row.p4{grid-template-columns:minmax(170px,1.6fr) minmax(70px,2fr) 82px 62px 62px}
+@media (max-width:620px){.row,.row.p4{grid-template-columns:minmax(110px,1.4fr) minmax(40px,.6fr) 70px 56px}.row.p4 .proj{display:none}}
+.row .nm{display:flex;align-items:center;min-width:0}
+.row .nm span.t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .nm small{color:var(--muted);margin-left:6px;font-size:11.5px;white-space:nowrap}
+.trk{height:14px;background:var(--surface2);border-radius:3px;position:relative}
+.trk>i{position:absolute;left:0;top:0;bottom:0;border-radius:3px 4px 4px 3px}
+.trk>b{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--fg);opacity:.55}
+.row .v,.row .p,.row .proj{text-align:right;font-variant-numeric:tabular-nums}
+.row .p{font-weight:600}.row .proj{color:var(--muted)}
+.row.head{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:1px 7px;border-radius:10px;background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good);margin-left:6px;white-space:nowrap}
+.badge.w{background:color-mix(in srgb,var(--warn) 20%,transparent);color:var(--warn)}
+.note{font-size:12px;color:var(--muted);margin-top:10px}
+.callout{border-left:3px solid var(--warn);background:color-mix(in srgb,var(--warn) 9%,var(--surface));padding:9px 12px;border-radius:0 6px 6px 0;font-size:13px;color:var(--fg2)}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;font-weight:500;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap;cursor:default}
+th.sortable{cursor:pointer} th.sortable:hover{color:var(--fg)}
+th.n,td.n{text-align:right}
+td{padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+tr.sel td{background:color-mix(in srgb,var(--accent) 9%,transparent)}
+tr.click{cursor:pointer} tr.click:hover td{background:var(--surface2)}
+.mini{display:inline-block;width:56px;height:5px;background:var(--surface2);border-radius:3px;vertical-align:middle;margin-right:6px;overflow:hidden}
+.mini>i{display:block;height:100%;background:var(--accent)}
+.tiles{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;max-width:420px}
+.tile{aspect-ratio:1.15;border:1px solid var(--line);border-radius:5px;background:var(--surface2);padding:3px 5px;text-align:left;cursor:pointer;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;font-size:11px}
+.tile b{font-size:12px;font-weight:600}
+.tile small{font-size:10px;color:var(--fg2);font-variant-numeric:tabular-nums}
+.tile i{position:absolute;left:0;bottom:0;height:3px;background:var(--accent)}
+.tile.sel{outline:2px solid var(--accent);outline-offset:1px}
+.tile.empty{visibility:hidden}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--fg2);margin-top:8px}
+.legend span{display:inline-flex;align-items:center}
+.sub-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.sub-tabs button{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:5px 14px;cursor:pointer;color:var(--fg2)}
+.sub-tabs button[aria-selected=true]{background:var(--accent);border-color:var(--accent);color:#fff}
+.chart{position:relative;width:100%}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.tip{position:fixed;z-index:50;pointer-events:none;background:var(--fg);color:var(--bg);padding:7px 10px;border-radius:6px;font-size:12px;line-height:1.5;box-shadow:0 4px 14px rgba(0,0,0,.25);max-width:260px;display:none}
+.tip b{font-weight:600}
+.empty-msg{padding:28px 10px;text-align:center;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:3px 6px 3px 10px;font-size:12.5px}
+.chip button{border:0;background:none;cursor:pointer;color:var(--muted);font-size:14px;line-height:1}
+.sim-ctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.sim-ctrl select{background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:5px 8px}
+h3{font-size:13px;margin:16px 0 6px;color:var(--fg2)}
+input[type=search]{background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:5px 10px;min-width:260px;max-width:100%}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){.prog>i,.trk>i{transition:width .5s ease}}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px 16px}
+.stat .lab{font-size:11.5px;color:var(--muted);line-height:1.3;min-height:30px;display:flex;align-items:flex-end}
+.stat .val{font-size:19px;font-weight:600;letter-spacing:-.01em}
+.stat .pc{font-size:12.5px;color:var(--fg2)}
+code{font-family:var(--mono);font-size:12px;background:var(--surface2);padding:1px 5px;border-radius:4px}
+ul.src{margin:6px 0;padding-left:18px} ul.src li{margin:3px 0}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="bar">
+      <div class="brand">Apuração 2026<small>1º turno · 4 de outubro · horário de Brasília</small></div>
+      <div class="status" id="status"></div>
+      <div class="ctrl">
+        <button id="btnpause" type="button">Pausar</button>
+        <button id="btnnow" type="button">Atualizar agora</button>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs" role="tablist"></nav>
+  </div>
+</header>
+<main class="wrap" id="main"></main>
+<div class="tip" id="tip"></div>
+<script>
+'use strict';
+/* ================= Constantes ================= */
+const UFS=['ac','al','ap','am','ba','ce','df','es','go','ma','mt','ms','mg','pa','pb','pr','pe','pi','rj','rn','rs','ro','rr','sc','sp','se','to'];
+const UFN={ac:'Acre',al:'Alagoas',ap:'Amapá',am:'Amazonas',ba:'Bahia',ce:'Ceará',df:'Distrito Federal',es:'Espírito Santo',go:'Goiás',ma:'Maranhão',mt:'Mato Grosso',ms:'Mato Grosso do Sul',mg:'Minas Gerais',pa:'Pará',pb:'Paraíba',pr:'Paraná',pe:'Pernambuco',pi:'Piauí',rj:'Rio de Janeiro',rn:'Rio Grande do Norte',rs:'Rio Grande do Sul',ro:'Rondônia',rr:'Roraima',sc:'Santa Catarina',sp:'São Paulo',se:'Sergipe',to:'Tocantins',zz:'Exterior',br:'Brasil'};
+const TILE={rr:[1,0],ap:[3,0],am:[1,1],pa:[2,1],ma:[3,1],ce:[4,1],rn:[5,1],ac:[0,2],ro:[1,2],mt:[2,2],to:[3,2],pi:[4,2],pb:[5,2],ms:[1,3],go:[2,3],df:[3,3],ba:[4,3],pe:[5,3],al:[6,3],sp:[2,4],mg:[3,4],es:[4,4],se:[5,4],pr:[2,5],rj:[3,5],sc:[2,6],rs:[2,7],zz:[5,7]};
+const FED={ac:8,al:9,ap:8,am:8,ba:39,ce:22,df:8,es:10,go:17,ma:18,mt:8,ms:8,mg:53,pa:17,pb:12,pr:30,pe:25,pi:10,rj:46,rn:8,rs:31,ro:8,rr:8,sc:16,sp:70,se:8,to:8};
+const T0=Date.parse('2026-10-04T20:00:00Z'); // 17:00 de Brasília
+const CARGO={pres:1,gov:3,sen:5,df:6,de:7};
+const CFG={
+  oficial:{root:'https://resultados.tse.jus.br/oficial/ele2026/',fed:6257,est:6259,label:'TSE oficial'}
+};
+const LINKS={
+  portal:'https://resultados.tse.jus.br/oficial/app/index.html',
+  pagina:'https://www.tse.jus.br/eleicoes/eleicoes-2026-content/divulgacao-dos-resultados-das-eleicoes-2026',
+  tecnico:'https://www.tse.jus.br/eleicoes/informacoes-tecnicas-sobre-a-divulgacao-de-resultados',
+  abertos:'https://dadosabertos.tse.jus.br/',
+  android:'https://play.google.com/store/apps/details?id=br.jus.tse.resultados&hl=pt_BR',
+  ios:'https://apps.apple.com/br/app/resultados/id1136359313'
+};
+const LS=(()=>{try{localStorage.setItem('_t','1');localStorage.removeItem('_t');return localStorage}catch(e){return null}})();
+const store={get(k,d){try{const v=LS&&LS.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{LS&&LS.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+/* ================= Estado ================= */
+const S={
+  env:'oficial',
+  tab:store.get('ap26.tab','pres'),
+  uf:store.get('ap26.uf','sp'),
+  sub:store.get('ap26.sub','gov'),
+  paused:false, pollMs:60000, tickN:0, lastOk:0, lastErr:'', busy:false, timer:null,
+  swaps:[], sortKey:'p', sortDir:-1, showAll:{}, q:'', fails:0
+};
+const D={pres:{},gov:{},sen:{},df:{},de:{},ab:{fed:{},est:{}},seen:{}};
+let H=newHist();
+function newHist(){return{t:[],p:{},nat:{},vv:[],events:[],leader:null}}
+const now=()=>Date.now();
+
+/* ================= Utilidades ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=v=>{if(v==null||v==='')return 0;if(typeof v==='number')return v;const n=parseFloat(String(v).replace(/\./g,'').replace(',','.'));return isFinite(n)?n:0};
+const fi=n=>Math.round(n).toLocaleString('pt-BR');
+const fp=(x,d=2)=>(isFinite(x)?x:0).toFixed(d).replace('.',',')+'%';
+const pad=(n,w)=>String(n).padStart(w,'0');
+const tf=new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+const tfm=new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',hour:'2-digit',minute:'2-digit'});
+const fTime=ms=>tf.format(new Date(ms)), fTimeM=ms=>tfm.format(new Date(ms));
+const fDur=ms=>{const s=Math.max(0,Math.round(ms/1000));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),r=s%60;return `${h?h+'h ':''}${pad(m,2)}min ${pad(r,2)}s`};
+
+/* ================= Leitura dos arquivos do TSE ================= */
+const parseS=s=>{s=s||{};const ts=num(s.ts),st=num(s.st);return{ts,st,p:ts?st/ts:0}};
+const parseE=e=>{e=e||{};return{te:num(e.te),est:num(e.est),esnt:num(e.esnt),c:num(e.c),a:num(e.a),pest:num(e.pest),pc:num(e.pc),pa:num(e.pa)}};
+const parseV=v=>{v=v||{};return{tv:num(v.tv),vv:num(v.vv),vnom:num(v.vnom),van:num(v.van),vansj:num(v.vansj),vb:num(v.vb),vn:num(v.vn),tvn:num(v.tvn),pvnom:num(v.pvnom),pvv:num(v.pvv),pvan:num(v.pvan),pvansj:num(v.pvansj),pvb:num(v.pvb),pvn:num(v.pvn)}};
+function parseCargo(j){
+  const car=(j.carg||[])[0]; if(!car)return null;
+  const cands=[],agrs=[];
+  for(const a of car.agr||[]){
+    const ag={n:a.n,nm:a.nm,com:a.com||a.nm,tp:a.tp,vag:num(a.vag),nom:0,leg:0,el:0,cands:[]};
+    for(const p of a.par||[]){
+      ag.leg+=num(p.tvtl);
+      for(const c of p.cand||[]){
+        const o={n:String(c.n),nm:c.nm,nmu:c.nmu||c.nm,seq:num(c.seq),party:p.sg,agr:ag.com,vap:num(c.vap),e:c.e==='s',st:c.st||'',vice:(c.vs||[]).map(x=>x.nmu||x.nm)};
+        cands.push(o);ag.cands.push(o);ag.nom+=o.vap;if(o.e)ag.el++;
+      }
+    }
+    agrs.push(ag);
+  }
+  const v=parseV(j.v),vsum=cands.reduce((a,c)=>a+c.vap,0);
+  if(!v.vv)v.vv=vsum;
+  cands.sort((a,b)=>b.vap-a.vap||a.seq-b.seq);
+  return{cd:num(car.cd),nv:num(car.nv),qe:num(car.qe),cands,agrs,s:parseS(j.s),e:parseE(j.e),v,hg:j.hg,dg:j.dg,tf:j.tf==='s'}
+}
+function parseAb(j){
+  const m={};
+  for(const a of j.abr||[]) m[a.cdabr]={s:parseS(a.s),e:parseE(a.e)};
+  return m;
+}
+const pad4=n=>pad(n,4),pad6=n=>pad(n,6);
+function eleOf(cargo){const c=CFG[S.env];return cargo===1?c.fed:c.est}
+function urlCargo(uf,cargo){const c=CFG[S.env],e=eleOf(cargo);return `${c.root}${e}/dados/${uf}/${uf}-c${pad4(cargo)}-e${pad6(e)}-u.json`}
+function urlAb(kind){const c=CFG[S.env],e=kind==='fed'?c.fed:c.est;return `${c.root}${e}/dados/br/br-e${pad6(e)}-ab.json`}
+const cool={}; // evita repetir 404 em sequência (o TSE bloqueia IP com muitos 404)
+async function getJSON(url){
+  if(cool[url]&&cool[url]>S.tickN)return null;
+  const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),25000);
+  try{
+    const r=await fetch(url,{cache:'no-cache',signal:ctl.signal});
+    if(r.status===404){cool[url]=S.tickN+5;return null}
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    return await r.json();
+  }finally{clearTimeout(to)}
+}
+async function pool(jobs,n=6){
+  const out=[];let i=0;
+  await Promise.all(Array.from({length:n},async()=>{while(i<jobs.length){const k=i++;try{out[k]=await jobs[k]()}catch(e){out[k]={error:e}}}}));
+  return out;
+}
+
+/* ================= Ciclo de atualização ================= */
+async function tick(force){
+  if(S.busy)return; S.busy=true; S.tickN++;
+  const errs=[];
+  try{
+    const [abF,abE]=await Promise.all([getJSON(urlAb('fed')).catch(e=>{errs.push(e);return null}),getJSON(urlAb('est')).catch(e=>{errs.push(e);return null})]);
+    if(abF)D.ab.fed=parseAb(abF); if(abE)D.ab.est=parseAb(abE);
+    const stOf=(kind,uf)=>{const a=D.ab[kind][uf];return a?a.s.st:-1};
+    const jobs=[];
+    const want=(bucket,kind,uf,cargo)=>{
+      const key=bucket+uf, st=stOf(kind,uf), prev=D.seen[key];
+      const stale=!D[bucket][uf]||st<0||prev===undefined||st!==prev||force||S.tickN%5===0;
+      if(!stale)return;
+      jobs.push(async()=>{
+        const j=await getJSON(urlCargo(uf,cargo)); if(!j)return;
+        const p=parseCargo(j); if(!p)return;
+        D[bucket][uf]=p; D.seen[key]=st;
+      });
+    };
+    jobs.push(async()=>{const j=await getJSON(urlCargo('br',1));if(j){const p=parseCargo(j);if(p)D.pres.br=p}});
+    for(const u of UFS.concat('zz'))want('pres','fed',u,1);
+    for(const u of UFS)want('gov','est',u,3);
+    for(const [b,c] of [['sen',5],['df',6],['de',7]])want(b,'est',S.uf,c);
+    const res=await pool(jobs);
+    res.forEach(r=>{if(r&&r.error)errs.push(r.error)});
+    recordHistory();
+    S.lastOk=Date.now(); S.lastErr=errs.length?String(errs[0].message||errs[0]):''; S.fails=errs.length&&!D.pres.br?S.fails+1:0;
+  }catch(e){S.lastErr=String(e.message||e);S.fails++}
+  finally{S.busy=false}
+  render();
+}
+function schedule(){
+  clearTimeout(S.timer);
+  if(S.paused)return;
+  const ms=S.pollMs;
+  S.timer=setTimeout(async()=>{await tick();schedule()},ms);
+}
+function histKey(){return 'ap26.hist.'+S.env}
+function loadHist(){const h=store.get(histKey(),null);H=h&&h.t?h:newHist()}
+function saveHist(){store.set(histKey(),H)}
+
+/* ================= Histórico (ritmo de apuração e série nacional) ================= */
+function recordHistory(){
+  const t=now(), a=D.ab.fed, last=H.t[H.t.length-1];
+  if(last&&t-last<5000)return;
+  const ufs=UFS.concat('zz'); let any=false;
+  const ps={};
+  for(const u of ufs){const p=a[u]?a[u].s.p:(D.pres[u]?D.pres[u].s.p:undefined); if(p!==undefined){ps[u]=p;any=true}}
+  const nb=D.pres.br; if(!any&&!nb)return;
+  H.t.push(t);
+  for(const u of ufs){(H.p[u]=H.p[u]||[]);H.p[u].push(ps[u]!==undefined?ps[u]:(H.p[u].length?H.p[u][H.p[u].length-1]:0))}
+  if(nb){
+    const vv=nb.v.vv;
+    for(const c of nb.cands){(H.nat[c.n]=H.nat[c.n]||[]);while(H.nat[c.n].length<H.t.length-1)H.nat[c.n].push(null);H.nat[c.n].push(vv?c.vap/vv*100:null)}
+    H.vv.push(vv);
+    const lead=nb.cands[0];
+    if(vv>0&&lead&&H.leader&&H.leader!==lead.n){H.events.push({t,from:H.leader,to:lead.n,name:lead.nmu,share:lead.vap/vv*100})}
+    if(vv>0&&lead)H.leader=lead.n;
+  }else H.vv.push(0);
+  for(const k in H.nat)while(H.nat[k].length<H.t.length)H.nat[k].push(null);
+  if(H.t.length>3000){const cut=H.t.length-3000;H.t.splice(0,cut);for(const u in H.p)H.p[u].splice(0,cut);for(const k in H.nat)H.nat[k].splice(0,cut);H.vv.splice(0,cut)}
+  saveHist();
+}
+function pctAt(u,t){
+  const ts=H.t,ps=H.p[u]; if(!ps||!ts.length||t<=T0)return 0;
+  const n=ts.length; if(t>=ts[n-1])return ps[n-1];
+  if(t<ts[0])return ps[0]*(t-T0)/Math.max(1,ts[0]-T0);
+  let lo=0,hi=n-1; while(hi-lo>1){const m=(lo+hi)>>1;if(ts[m]<=t)lo=m;else hi=m}
+  const f=(t-ts[lo])/(ts[hi]-ts[lo]||1); return ps[lo]+(ps[hi]-ps[lo])*f;
+}
+function timeTo(u,frac){
+  const ts=H.t,ps=H.p[u]; if(!ps||!ts.length)return null;
+  let pt=T0,pp=0;
+  for(let i=0;i<ts.length;i++){ if(ps[i]>=frac){ if(ps[i]===pp)return ts[i]; return pt+(ts[i]-pt)*(frac-pp)/(ps[i]-pp)} pt=ts[i];pp=ps[i]}
+  return null;
+}
+/* ================= Análises ================= */
+const PCOL={13:'--c1',22:'--c2',55:'--c3',30:'--c4',70:'--c5',27:'--c6',14:'--c7',80:'--c8'};
+const partyMap=new Map([['PT','--c1'],['PL','--c2'],['PSD','--c3']]);
+const presVar=n=>PCOL[n]||'--o';
+const partyVar=sg=>{if(!partyMap.has(sg))partyMap.set(sg,partyMap.size<8?'--c'+(partyMap.size+1):'--o');return partyMap.get(sg)};
+const cvar=v=>`var(${v})`;
+const shareOf=(c,d)=>d&&d.v.vv?c.vap/d.v.vv*100:0;
+function natShares(){const b=D.pres.br,o={};if(b&&b.v.vv>0)b.cands.forEach(c=>o[c.n]=c.vap/b.v.vv);return o}
+function ufFinal(u){
+  const d=D.pres[u]; if(!d)return null;
+  const p=d.s.p,vv=d.v.vv;
+  return{d,has:vv>0,est:(p>=.03&&vv>0)?vv/p:d.e.te*.72};
+}
+function presProj(){
+  const ns=natShares();let tot=0,cov=0,n=0;const acc={};
+  for(const u of UFS.concat('zz')){const f=ufFinal(u);if(!f)continue;
+    for(const c of f.d.cands){const sh=f.has?c.vap/f.d.v.vv:(ns[c.n]||0);acc[c.n]=(acc[c.n]||0)+sh*f.est}
+    tot+=f.est;if(f.has){cov+=f.est;n++}}
+  if(!n)return null;
+  const share={};for(const k in acc)share[k]=acc[k]/tot*100;
+  return{share,cov:cov/tot,n};
+}
+function simulate(swaps){
+  const t1=H.t[H.t.length-1]; if(!t1||t1<=T0+120000)return null;
+  const pr=presProj(); if(!pr)return null;
+  const keys=Object.keys(pr.share).sort((a,b)=>pr.share[b]-pr.share[a]).slice(0,3);
+  const sig={};for(const [a,b] of swaps){sig[a]=b;sig[b]=a}
+  const ns=natShares(),F={},SH={},ufs=[];
+  for(const u of UFS.concat('zz')){const f=ufFinal(u);if(!f)continue;ufs.push(u);F[u]=f.est;SH[u]={};for(const k of keys){const c=f.d.cands.find(x=>x.n===k);SH[u][k]=c?(f.has?c.vap/f.d.v.vv:(ns[k]||0)):0}}
+  const steps=80,xs=[],base={},alt={};keys.forEach(k=>{base[k]=[];alt[k]=[]});
+  for(let i=0;i<=steps;i++){
+    const t=T0+(t1-T0)*i/steps;xs.push(t);
+    for(const [out,mode] of [[base,0],[alt,1]]){
+      let den=0;const nu={};keys.forEach(k=>nu[k]=0);
+      for(const u of ufs){const f=pctAt(mode?(sig[u]||u):u,t)*F[u];den+=f;keys.forEach(k=>nu[k]+=f*SH[u][k])}
+      keys.forEach(k=>out[k].push(den>0?nu[k]/den*100:null));
+    }
+  }
+  return{xs,keys,base,alt};
+}
+function ufRanking(){
+  const rows=UFS.concat('zz').map(u=>({u,t:timeTo(u,.5)})).filter(r=>r.t!=null).sort((a,b)=>a.t-b.t);
+  return rows;
+}
+function presPhase(d,proj){
+  if(!d)return{k:'wait',t:'Aguardando'};
+  const lead=d.cands[0];
+  if(d.cands.some(c=>c.e))return{k:'ok',t:'Eleito no 1º turno'};
+  if(d.cands.some(c=>/2/.test(c.st)))return{k:'w',t:'Vai ao 2º turno'};
+  if(!d.v.vv)return{k:'wait',t:'Sem votos apurados'};
+  const sh=shareOf(lead,d);
+  if(d.s.p>=.999)return{k:sh>50?'ok':'w',t:sh>50?'Maioria absoluta':'2º turno em 25/10'};
+  if(proj&&proj.share[lead.n]!==undefined){const ps=proj.share[lead.n];return{k:'w',t:ps>50?'Projeção: acima de 50%':'Projeção: 2º turno'}}
+  return{k:'w',t:'Em apuração'};
+}
+
+/* ================= Gráficos ================= */
+const tip=$('#tip');
+function showTip(html,x,y){tip.innerHTML=html;tip.style.display='block';const r=tip.getBoundingClientRect();let l=x+14,t=y+14;if(l+r.width>innerWidth-8)l=x-r.width-14;if(t+r.height>innerHeight-8)t=y-r.height-14;tip.style.left=Math.max(4,l)+'px';tip.style.top=Math.max(4,t)+'px'}
+const hideTip=()=>{tip.style.display='none'};
+function niceStep(raw){const e=Math.pow(10,Math.floor(Math.log10(raw))),f=raw/e;return(f<=1?1:f<=2?2:f<=5?5:10)*e}
+function lineChart(host,o){
+  const W=Math.max(320,host.clientWidth||600),Ht=o.height||260,m={l:40,r:o.rpad??8,t:10,b:24};
+  const xs=o.xs;
+  if(!xs||xs.length<2){host.innerHTML=`<div class="empty-msg">${esc(o.empty||'Aguardando dados.')}</div>`;return}
+  const x0=xs[0],x1=xs[xs.length-1];
+  let ymax=o.ymax;if(ymax==null){let mx=0;o.series.forEach(s=>s.ys.forEach(y=>{if(y!=null&&y>mx)mx=y}));ymax=Math.max(1,Math.ceil(mx/niceStep(mx/4||1))*niceStep(mx/4||1))}
+  const ymin=o.ymin??0,X=t=>m.l+(t-x0)/(x1-x0||1)*(W-m.l-m.r),Y=v=>m.t+(1-(v-ymin)/(ymax-ymin||1))*(Ht-m.t-m.b);
+  const ystep=niceStep((ymax-ymin)/4);let g='';
+  for(let v=ymin;v<=ymax+1e-9;v+=ystep)g+=`<line x1="${m.l}" x2="${W-m.r}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(--line)" stroke-width="1" ${v===ymin?'':'stroke-dasharray="2 3"'}/><text x="${m.l-6}" y="${Y(v)+4}" text-anchor="end" font-size="10.5" style="fill:var(--muted)">${(o.yfmt||(x=>x))(v)}</text>`;
+  const span=(x1-x0)/60000,step=[5,10,15,30,60,120,240].find(s=>span/s<=7)||240,sm=step*60000;
+  for(let t=Math.ceil(x0/sm)*sm;t<=x1;t+=sm)g+=`<text x="${X(t)}" y="${Ht-6}" text-anchor="middle" font-size="10.5" style="fill:var(--muted)">${fTimeM(t)}</text>`;
+  if(o.hline!=null&&o.hline<=ymax)g+=`<line x1="${m.l}" x2="${W-m.l+m.l-m.r}" y1="${Y(o.hline)}" y2="${Y(o.hline)}" style="stroke:var(--fg2)" stroke-width="1" stroke-dasharray="5 4" opacity=".6"/><text x="${W-m.r-4}" y="${Y(o.hline)-4}" text-anchor="end" font-size="10.5" style="fill:var(--fg2)">${esc(o.hlabel||'')}</text>`;
+  const lab=[];
+  for(const s of o.series){
+    let d='',pen=false;
+    s.ys.forEach((y,i)=>{if(y==null){pen=false;return}d+=(pen?'L':'M')+X(xs[i]).toFixed(1)+' '+Y(y).toFixed(1);pen=true});
+    g+=`<path d="${d}" fill="none" style="stroke:${s.color}" stroke-width="${s.w||(s.faint?1.2:2)}" ${s.dash?`stroke-dasharray="${s.dash}"`:''} opacity="${s.faint?.45:1}" stroke-linejoin="round" stroke-linecap="round"/>`;
+    if(s.label&&!s.faint&&o.rpad){let k=s.ys.length-1;while(k>0&&s.ys[k]==null)k--;if(s.ys[k]!=null)lab.push({y:Y(s.ys[k]),t:s.label,c:s.color})}
+  }
+  lab.sort((a,b)=>a.y-b.y);for(let i=1;i<lab.length;i++)if(lab[i].y-lab[i-1].y<12)lab[i].y=lab[i-1].y+12;
+  lab.forEach(l=>g+=`<text x="${W-m.r+5}" y="${l.y+4}" font-size="11" style="fill:var(--fg2)"><tspan style="fill:${l.c}">●</tspan> ${esc(l.t)}</text>`);
+  host.innerHTML=`<svg viewBox="0 0 ${W} ${Ht}" width="${W}" height="${Ht}" role="img" aria-label="${esc(o.aria||'Gráfico de linhas')}">${g}<line class="cx" y1="${m.t}" y2="${Ht-m.b}" style="stroke:var(--fg2)" stroke-width="1" visibility="hidden"/><rect class="ov" x="${m.l}" y="${m.t}" width="${W-m.l-m.r}" height="${Ht-m.t-m.b}" fill="transparent"/></svg>`;
+  const svg=host.firstChild,ov=svg.querySelector('.ov'),cx=svg.querySelector('.cx');
+  ov.addEventListener('pointermove',ev=>{
+    const r=svg.getBoundingClientRect(),px=(ev.clientX-r.left)*W/r.width,py=(ev.clientY-r.top)*Ht/r.height;
+    const tt=x0+(px-m.l)/(W-m.l-m.r)*(x1-x0);let lo=0,hi=xs.length-1;while(hi-lo>1){const k=(lo+hi)>>1;if(xs[k]<=tt)lo=k;else hi=k}
+    const i=Math.abs(xs[lo]-tt)<Math.abs(xs[hi]-tt)?lo:hi;
+    cx.setAttribute('x1',X(xs[i]));cx.setAttribute('x2',X(xs[i]));cx.setAttribute('visibility','visible');
+    let list=o.series.filter(s=>s.ys[i]!=null);
+    if(list.length>8){const yv=ymin+(1-(py-m.t)/(Ht-m.t-m.b))*(ymax-ymin);list=[list.reduce((a,b)=>Math.abs(a.ys[i]-yv)<Math.abs(b.ys[i]-yv)?a:b)]}
+    else list.sort((a,b)=>b.ys[i]-a.ys[i]);
+    showTip(`<b>${fTimeM(xs[i])}</b><br>`+list.map(s=>`<span style="color:${s.color}">●</span> ${esc(s.tip||s.label)}: <b>${(o.tfmt||o.yfmt||(x=>x))(s.ys[i])}</b>`).join('<br>'),ev.clientX,ev.clientY);
+  });
+  ov.addEventListener('pointerleave',()=>{cx.setAttribute('visibility','hidden');hideTip()});
+}
+/* ================= Componentes de tela ================= */
+const sw=v=>`<i class="sw" style="background:${cvar(v)}"></i>`;
+function badge(c){return c.e?`<span class="badge">${esc(c.st&&c.st!=='Eleito'?c.st:'Eleito')}</span>`:(c.st?`<span class="badge w">${esc(c.st)}</span>`:'')}
+function bars(cands,d,o={}){
+  const max=Math.max(1,...cands.map(c=>c.vap)),vv=d.v.vv,top=o.limit||cands.length,proj=o.proj;
+  const rows=cands.slice(0,top).map((c,i)=>{
+    const sh=vv?c.vap/vv*100:0,col=o.pres?presVar(c.n):partyVar(c.party);
+    const pj=proj&&proj.share[c.n]!==undefined?proj.share[c.n]:null;
+    const inside=o.seats&&i<o.seats&&vv>0?'<span class="badge w">dentro das vagas</span>':'';
+    return `<div class="row ${proj?'p4':''}"><div class="nm">${sw(col)}<span class="t" title="${esc(c.nm)}">${esc(c.nmu)}</span><small>${esc(c.party)} ${esc(c.n)}</small>${badge(c)}${inside}</div>
+      <div class="trk"><i style="width:${(c.vap/max*100).toFixed(2)}%;background:${cvar(col)}"></i>${pj!==null&&pj>0?`<b style="left:${Math.min(99.5,pj/(max/vv*100)*100).toFixed(2)}%"></b>`:''}</div>
+      <div class="v">${fi(c.vap)}</div><div class="p">${fp(sh)}</div>${proj?`<div class="proj">${pj!==null?fp(pj):'-'}</div>`:''}</div>`}).join('');
+  const head=`<div class="row head ${proj?'p4':''}"><div>Candidato</div><div></div><div class="v">Votos</div><div class="p">% válidos</div>${proj?'<div class="proj">Proj.</div>':''}</div>`;
+  return `<div class="res">${head}${rows}</div>`;
+}
+function tiles(by,sel,act){
+  let h='';
+  for(let r=0;r<8;r++)for(let c=0;c<7;c++){
+    const u=Object.keys(TILE).find(k=>TILE[k][0]===c&&TILE[k][1]===r);
+    if(!u){h+='<div class="tile empty"></div>';continue}
+    if(by==='gov'&&u==='zz'){h+='<div class="tile empty"></div>';continue}
+    const d=(by==='gov'?D.gov:D.pres)[u],lead=d&&d.v.vv>0?d.cands[0]:null;
+    const col=lead?(by==='gov'?partyVar(lead.party):presVar(lead.n)):null;
+    const st=d?d.s.p:0;
+    h+=`<button class="tile ${sel===u?'sel':''}" data-go-uf="${u}" title="${esc(UFN[u])}${lead?': '+esc(lead.nmu)+' '+fp(shareOf(lead,d),1):''}" style="${col?`background:color-mix(in srgb,${cvar(col)} 38%,var(--surface))`:''}"><b>${u.toUpperCase()}</b><small>${lead?fp(shareOf(lead,d),0):'-'}</small><i style="width:${(st*100).toFixed(0)}%"></i></button>`;
+  }
+  return `<div class="tiles">${h}</div>`;
+}
+function tileLegend(by){
+  const seen=new Map();
+  for(const u of UFS.concat('zz')){const d=(by==='gov'?D.gov:D.pres)[u];if(!d||!d.v.vv||!d.cands.length)continue;const l=d.cands[0];const k=by==='gov'?l.party:l.nmu;seen.set(k,by==='gov'?partyVar(l.party):presVar(l.n))}
+  return `<div class="legend">${[...seen].map(([k,v])=>`<span>${sw(v)}${esc(k)}</span>`).join('')||'<span>A cor mostra quem lidera. A barra inferior mostra as seções totalizadas.</span>'}</div>`;
+}
+const kpi=(lab,big,det,prog)=>`<div class="card kpi"><div class="lab">${lab}</div><div class="big num">${big}</div><div class="det">${det||''}</div>${prog!=null?`<div class="prog"><i style="width:${Math.min(100,prog*100).toFixed(2)}%"></i></div>`:''}</div>`;
+
+
+/* ================= Painel de votação e eleitorado (igual ao do TSE) ================= */
+function votacaoCard(d,titulo){
+  if(!d)return '';
+  const v=d.v,e=d.e;
+  const pct=(off,n,base)=>off>0?off:(base>0?n/base*100:0);
+  const stat=(lab,n,p)=>`<div class="stat"><div class="lab">${lab}</div><div class="val num">${fi(n)}</div>${p==null?'':`<div class="pc num">${fp(p)}</div>`}</div>`;
+  return `<div class="card" style="margin-bottom:14px"><h2>${titulo||'Votação'}<span class="sub">${fp(d.s.p*100)} das seções totalizadas</span></h2>
+   <div class="stats">${stat('Votos nominais',v.vnom,pct(v.pvnom,v.vnom,v.tv))}${stat('Válidos',v.vv,pct(v.pvv,v.vv,v.tv))}${stat('Anulados',v.van,pct(v.pvan,v.van,v.tv))}${stat('Anulados sub judice',v.vansj,pct(v.pvansj,v.vansj,v.tv))}${stat('Em branco',v.vb,pct(v.pvb,v.vb,v.tv))}${stat('Nulos',v.vn,pct(v.pvn,v.vn,v.tv))}</div>
+   <div class="stats" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line)">${stat('Eleitorado apto',e.te,null)}${stat('Eleitorado apto das seções totalizadas',e.est,pct(e.pest,e.est,e.te))}${stat('Comparecimento',e.c,pct(e.pc,e.c,e.est))}${stat('Abstenção',e.a,pct(e.pa,e.a,e.est))}</div>
+   <div class="note">Mesmos campos do painel "Votação" do sistema Resultados do TSE. Percentuais conforme divulgados pelo TSE.</div></div>`;
+}
+
+/* ================= Aba: Presidente ================= */
+function viewPres(){
+  const d=D.pres.br,pr=presProj(),waiting=!d||!d.v.vv;
+  let h='';
+  if(waiting){
+    const left=T0-now();
+    h+=`<div class="callout" style="margin-bottom:14px">${left>0?`A apuração começa às 17h (Brasília), em <b class="num">${fDur(left)}</b>. A página já está lendo os arquivos do TSE e preenche sozinha.`:'Os arquivos já estão no ar, mas ainda sem votos totalizados. A página atualiza a cada minuto.'}</div>`;
+  }
+  const lead=d&&d.cands[0],sec=d&&d.cands[1],ph=presPhase(d,pr);
+  const margin=lead&&sec?shareOf(lead,d)-shareOf(sec,d):0,mv=lead&&sec?lead.vap-sec.vap:0;
+  h+=`<div class="grid kpis" style="margin-bottom:14px">
+    ${kpi('Seções totalizadas',d?fp(d.s.p*100):'0,00%',d?`${fi(d.s.st)} de ${fi(d.s.ts)}`:'',d?d.s.p:0)}
+    ${kpi('Votos válidos apurados',d?fi(d.v.vv):'0',d&&d.v.tv?`Brancos ${fp(d.v.vb/d.v.tv*100,1)} · Nulos ${fp(d.v.vn/d.v.tv*100,1)}`:'')}
+    ${kpi('Líder',lead&&d.v.vv?esc(lead.nmu):'-',lead&&d.v.vv?`${fp(shareOf(lead,d))} dos válidos · ${margin>=0?'+':''}${margin.toFixed(2).replace('.',',')} p.p. (${fi(mv)} votos) sobre ${esc(sec.nmu)}`:'')}
+    ${kpi('Situação',`<span style="font-size:19px">${esc(ph.t)}</span>`,pr&&lead&&pr.share[lead.n]!==undefined?`Projeção de ${esc(lead.nmu)}: ${fp(pr.share[lead.n])} (${pr.n} UFs com votos)`:'Vitória no 1º turno exige mais de 50% dos válidos.')}
+  </div>`;
+  h+=votacaoCard(d,'Votação nacional');
+  h+=`<div class="grid two" style="margin-bottom:14px">
+    <div class="card"><h2>Resultado nacional<span class="sub">votos válidos</span></h2>${d?bars(d.cands,d,{pres:true,proj:pr}):'<div class="empty-msg">Aguardando dados.</div>'}
+      <div class="note">A marca vertical e a coluna "Proj." são a projeção nacional: cada UF é extrapolada para 100% das seções mantendo o percentual atual de cada candidato. Votos de seções lentas costumam ter perfil diferente, então a projeção muda ao longo da noite.</div></div>
+    <div class="card"><h2>Estados<span class="sub">líder por UF</span></h2>${tiles('pres',null)}${tileLegend('pres')}<div class="note">Clique em uma UF para ver governador, senado e deputados.</div></div>
+  </div>`;
+  h+=`<div class="card" style="margin-bottom:14px"><h2>Evolução do percentual de votos válidos<span class="sub">candidatos mais votados</span></h2><div class="chart" id="ch-nat"></div><div id="events"></div></div>`;
+  h+=`<div class="card"><h2>Presidente por estado</h2><div class="tw">${ufTable()}</div></div>`;
+  return h;
+}
+function ufTable(){
+  const rows=UFS.concat('zz').map(u=>{
+    const d=D.pres[u];if(!d)return{u,p:0,share:0,margin:0,vv:0,name:'',d};
+    const l=d.cands[0],s=d.cands[1],has=d.v.vv>0;
+    return{u,d,p:d.s.p,vv:d.v.vv,l,s,has,share:has?shareOf(l,d):0,share2:has?shareOf(s,d):0,margin:has?shareOf(l,d)-shareOf(s,d):0,name:has?l.nmu:''};
+  });
+  const k=S.sortKey,dir=S.sortDir;
+  rows.sort((a,b)=>k==='u'?dir*(a.u<b.u?-1:1):k==='name'?dir*String(a.name).localeCompare(b.name):dir*((a[k]||0)-(b[k]||0)));
+  const th=(key,lab,cls='')=>`<th class="sortable ${cls}" data-sort="${key}">${lab}${S.sortKey===key?(S.sortDir>0?' ▲':' ▼'):''}</th>`;
+  return `<table><thead><tr>${th('u','UF')}${th('p','Seções')}${th('name','Líder')}${th('share','% líder','n')}<th>2º colocado</th>${th('margin','Margem (p.p.)','n')}${th('vv','Votos válidos','n')}</tr></thead><tbody>${rows.map(r=>{
+    if(!r.d)return `<tr><td>${r.u.toUpperCase()}</td><td colspan="6" style="color:var(--muted)">sem dados</td></tr>`;
+    return `<tr class="click" data-go-uf="${r.u}"><td><b>${r.u.toUpperCase()}</b> <span style="color:var(--muted)">${esc(UFN[r.u])}</span></td>
+    <td><span class="mini"><i style="width:${(r.p*100).toFixed(0)}%"></i></span><span class="num">${fp(r.p*100,1)}</span></td>
+    <td>${r.has?sw(presVar(r.l.n))+esc(r.l.nmu):'-'}</td><td class="n">${r.has?fp(r.share):'-'}</td><td>${r.has?esc(r.s.nmu)+' '+fp(r.share2,1):'-'}</td><td class="n">${r.has?r.margin.toFixed(2).replace('.',','):'-'}</td><td class="n">${fi(r.vv)}</td></tr>`}).join('')}</tbody></table>`;
+}
+function drawPres(){
+  const host=$('#ch-nat');if(!host)return;
+  const b=D.pres.br;
+  if(!b||H.t.length<2){lineChart(host,{xs:null,empty:'O gráfico aparece quando houver pelo menos duas leituras com votos.'});return}
+  const keys=b.cands.slice(0,5).map(c=>c.n);
+  const series=keys.map(k=>{const c=b.cands.find(x=>x.n===k);return{label:c.nmu,color:cvar(presVar(k)),ys:H.nat[k]||[]}});
+  lineChart(host,{xs:H.t,series,rpad:130,height:280,ymin:0,yfmt:v=>v.toFixed(0)+'%',tfmt:v=>fp(v),hline:50,hlabel:'50%',aria:'Percentual de votos válidos dos candidatos ao longo do tempo'});
+  const ev=$('#events');
+  ev.innerHTML=H.events.length?`<h3>Viradas de liderança</h3><div class="chips">${H.events.slice(-8).map(e=>`<span class="chip">${fTime(e.t)} · ${esc(e.name)} assume a frente com ${fp(e.share)}</span>`).join('')}</div>`:'';
+}
+
+/* ================= Aba: Por estado ================= */
+const SUBS=[['gov','Governador'],['sen','Senador'],['df','Deputado federal'],['de','Deputado estadual'],['pres','Presidente na UF']];
+function viewUF(){
+  const u=S.uf,d=D.gov[u],a=D.ab.est[u];
+  const sec=a?a.s:(d?d.s:{p:0,st:0,ts:0});
+  let h=`<div class="grid two" style="margin-bottom:14px;grid-template-columns:minmax(0,3fr) minmax(0,2fr)">
+   <div class="card"><h2>${esc(UFN[u])}<span class="sub">eleições estaduais</span></h2>
+    <div class="sim-ctrl"><label for="ufsel">Estado</label><select id="ufsel">${UFS.concat('zz').map(x=>`<option value="${x}" ${x===u?'selected':''}>${x.toUpperCase()} · ${esc(UFN[x])}</option>`).join('')}</select></div>
+    <div class="grid kpis" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
+     ${kpi('Seções totalizadas',fp(sec.p*100),`${fi(sec.st)} de ${fi(sec.ts)}`,sec.p)}
+     ${d?kpi('Comparecimento',d.e.est?fp(d.e.c/Math.max(1,d.e.est)*100,1):'-',d.e.est?`Abstenção ${fp(d.e.a/Math.max(1,d.e.est)*100,1)}`:''):''}
+    </div></div>
+   <div class="card"><h2>Mapa<span class="sub">líder para governador</span></h2>${tiles('gov',u)}${tileLegend('gov')}</div></div>`;
+  h+=`<div class="sub-tabs" role="tablist">${SUBS.filter(s=>!(u==='zz'&&s[0]!=='pres')).map(s=>`<button type="button" role="tab" data-sub="${s[0]}" aria-selected="${S.sub===s[0]}">${s[1]}</button>`).join('')}</div>`;
+  const sub=u==='zz'?'pres':S.sub;
+  h+=sub==='pres'?viewUFPres():sub==='gov'?viewGov():sub==='sen'?viewSen():viewDep(sub);
+  return h;
+}
+function viewUFPres(){
+  const d=D.pres[S.uf];if(!d)return '<div class="card"><div class="empty-msg">Sem dados.</div></div>';
+  return votacaoCard(d,'Votação para presidente')+`<div class="card"><h2>Presidente em ${esc(UFN[S.uf])}<span class="sub">${fp(d.s.p*100,1)} das seções · ${fi(d.v.vv)} votos válidos</span></h2>${bars(d.cands,d,{pres:true})}</div>`;
+}
+function viewGov(){
+  const d=D.gov[S.uf];if(!d)return '<div class="card"><div class="empty-msg">Aguardando dados.</div></div>';
+  const lead=d.cands[0],sh=shareOf(lead,d);
+  return votacaoCard(d,'Votação para governador')+`<div class="card"><h2>Governador<span class="sub">${fi(d.v.vv)} votos válidos · ${fp(d.s.p*100,1)} das seções</span></h2>${bars(d.cands,d,{})}
+   <div class="note">${d.v.vv>0?(sh>50?`${esc(lead.nmu)} está acima de 50% dos válidos.`:`Nenhum candidato passa de 50% dos válidos por enquanto. Sem maioria absoluta no fim, os dois mais votados disputam o 2º turno em 25/10.`):'Aguardando votos.'}</div></div>`;
+}
+function viewSen(){
+  const d=D.sen[S.uf];if(!d)return '<div class="card"><div class="empty-msg">Aguardando dados.</div></div>';
+  return votacaoCard(d,'Votação para senador')+`<div class="card"><h2>Senador<span class="sub">${d.nv} vagas em disputa (1 voto por vaga) · ${fi(d.v.vv)} votos válidos</span></h2>${bars(d.cands,d,{seats:d.nv})}
+   <div class="note">Vencem os ${d.nv} mais votados, em turno único. O percentual considera os votos válidos para senador.</div></div>`;
+}
+function viewDep(sub){
+  const d=D[sub][S.uf],name=sub==='df'?'Deputado federal':'Deputado estadual';
+  if(!d)return '<div class="card"><div class="empty-msg">Aguardando dados.</div></div>';
+  const vv=d.v.vv,p=d.s.p,qe=d.qe>0?d.qe:(p>.02&&vv>0?vv/p/d.nv:0),qeEst=!(d.qe>0);
+  const ag=d.agrs.map(a=>({...a,tot:a.nom+a.leg})).sort((x,y)=>y.tot-x.tot);
+  let h=votacaoCard(d,'Votação para '+name.toLowerCase())+`<div class="grid kpis" style="margin-bottom:14px">${kpi('Vagas',fi(d.nv),`${name} em ${esc(UFN[S.uf])}`)}${kpi(qeEst?'Quociente eleitoral (estimado)':'Quociente eleitoral',qe?fi(qe):'-',qeEst?'Votos válidos projetados dividido pelas vagas':'Divulgado pelo TSE')}${kpi('Votos válidos',fi(vv),`${fp(p*100,1)} das seções`,p)}${kpi('Eleitos já definidos',fi(d.cands.filter(c=>c.e).length),'Marcados pelo TSE com a apuração final')}</div>`;
+  h+=`<div class="card" style="margin-bottom:14px"><h2>Partidos e federações</h2><div class="tw"><table><thead><tr><th>Agremiação</th><th class="n">Votos nominais</th><th class="n">Legenda</th><th class="n">Total</th><th class="n">% válidos</th><th class="n">Vagas por QP (est.)</th><th class="n">Vagas (TSE)</th></tr></thead><tbody>${ag.filter(a=>a.tot>0||p===0).map(a=>`<tr><td>${sw(partyVar(a.cands[0]?a.cands[0].party:a.com))}${esc(a.com)}</td><td class="n">${fi(a.nom)}</td><td class="n">${fi(a.leg)}</td><td class="n">${fi(a.tot)}</td><td class="n">${vv?fp(a.tot/vv*100):'-'}</td><td class="n">${qe?Math.floor(a.tot/qe):'-'}</td><td class="n">${a.vag||a.el||'-'}</td></tr>`).join('')}</tbody></table></div>
+   <div class="note">Vagas por QP é só o quociente partidário (votos da agremiação dividido pelo quociente eleitoral). Sobras, a exigência de 80% e 20% do quociente e a cláusula de desempenho entram na apuração final do TSE.</div></div>`;
+  const q=S.q.trim().toLowerCase(),all=!!S.showAll[sub];
+  let list=d.cands;if(q)list=list.filter(c=>(c.nm+' '+c.nmu+' '+c.party+' '+c.n).toLowerCase().includes(q));
+  const shown=all||q?list:list.slice(0,30);
+  h+=`<div class="card"><h2>Candidatos<span class="sub">${fi(list.length)} ${q?'encontrados':'no total'}</span></h2><div class="sim-ctrl"><input type="search" id="q" placeholder="Buscar por nome, partido ou número" value="${esc(S.q)}" aria-label="Buscar candidato"><button class="btn" type="button" data-act="show-all" data-key="${sub}">${all?'Mostrar só os 30 primeiros':'Mostrar todos'}</button></div>
+   <div class="tw"><table><thead><tr><th class="n">#</th><th>Candidato</th><th>Partido</th><th class="n">Nº</th><th class="n">Votos</th><th class="n">% válidos</th><th>Situação</th></tr></thead><tbody>${shown.map((c,i)=>`<tr><td class="n">${d.cands.indexOf(c)+1}</td><td>${esc(c.nmu)}</td><td>${sw(partyVar(c.party))}${esc(c.party)}</td><td class="n">${esc(c.n)}</td><td class="n">${fi(c.vap)}</td><td class="n">${vv?fp(c.vap/vv*100):'-'}</td><td>${c.e?`<span class="badge">${esc(c.st||'Eleito')}</span>`:esc(c.st)}</td></tr>`).join('')}</tbody></table></div></div>`;
+  return h;
+}
+
+/* ================= Aba: Ritmo e trocas ================= */
+function viewRitmo(){
+  const ufs=UFS.concat('zz'),rank=ufRanking(),pr=presProj();
+  const opts=ufs.map(u=>`<option value="${u}">${u.toUpperCase()} · ${esc(UFN[u])}</option>`).join('');
+  let h=`<div class="callout" style="margin-bottom:14px">Esta aba reproduz a análise do notebook de 2022: o ritmo de totalização de cada UF define como a contagem nacional se move. Aqui o ritmo é medido em tempo real, a cada leitura, a partir das 17h. Quanto mais tempo a página ficar aberta, mais completa fica a curva. O histórico fica salvo neste navegador.</div>`;
+  h+=`<div class="card" style="margin-bottom:14px"><h2>Seções totalizadas por UF<span class="sub">passe o mouse para identificar a linha</span></h2><div class="chart" id="ch-speed"></div></div>`;
+  h+=`<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-bottom:14px">
+   <div class="card"><h2>Mais rápidas<span class="sub">tempo até 50% das seções</span></h2>${rankTable(rank.slice(0,8))}</div>
+   <div class="card"><h2>Mais lentas<span class="sub">tempo até 50% das seções</span></h2>${rankTable(rank.slice(-8).reverse(),true)}</div></div>`;
+  h+=`<div class="card"><h2>Simulador de trocas<span class="sub">e se a UF A apurasse na velocidade da UF B?</span></h2>
+    <div class="sim-ctrl"><select id="swa" aria-label="UF A">${opts}</select><span>⇆</span><select id="swb" aria-label="UF B">${opts.replace('value="'+ufs[1]+'"','value="'+ufs[1]+'" selected')}</select>
+     <button class="btn" type="button" data-act="swap-add">Adicionar troca</button>
+     <button class="btn" type="button" data-act="swap-preset">Mais rápidas ⇆ mais lentas</button>
+     <button class="btn" type="button" data-act="swap-clear">Limpar</button></div>
+    <div class="chips" style="margin-bottom:10px">${S.swaps.map((s,i)=>`<span class="chip">${s[0].toUpperCase()} ⇆ ${s[1].toUpperCase()}<button type="button" data-swap-rm="${i}" aria-label="Remover troca">×</button></span>`).join('')||'<span style="color:var(--muted)">Nenhuma troca. A linha tracejada coincide com a sólida.</span>'}</div>
+    <div class="chart" id="ch-sim"></div>
+    <div class="note">Como no notebook: o voto final de cada UF é mantido e só a velocidade muda. O voto final de cada UF é a projeção atual (votos apurados divididos pela fração de seções), e a curva sólida é o modelo sem trocas, que reproduz a contagem nacional se cada município apurasse no ritmo médio do seu estado. ${pr?`Projeção usa ${pr.n} UFs com votos.`:''}</div></div>`;
+  return h;
+}
+function rankTable(rows,slow){
+  if(!rows.length)return '<div class="empty-msg">Nenhuma UF chegou a 50% ainda.</div>';
+  return `<table><thead><tr><th>UF</th><th class="n">Hora</th><th class="n">Desde 17h</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${sw('--accent')}<b>${r.u.toUpperCase()}</b> ${esc(UFN[r.u])}</td><td class="n">${fTimeM(r.t)}</td><td class="n">${Math.round((r.t-T0)/60000)} min</td></tr>`).join('')}</tbody></table>`;
+}
+function drawRitmo(){
+  const host=$('#ch-speed');if(!host)return;
+  const ufs=UFS.concat('zz'),hi=new Set();S.swaps.forEach(s=>{hi.add(s[0]);hi.add(s[1])});
+  if(H.t.length<2){lineChart(host,{xs:null,empty:'Aguardando duas leituras com seções totalizadas.'});}
+  else{
+    const xs=[T0].concat(H.t);
+    const series=ufs.map(u=>({label:u.toUpperCase(),color:hi.has(u)?cvar('--c'+(1+[...hi].indexOf(u)%8)):'var(--fg2)',faint:!hi.has(u),w:hi.has(u)?2.4:1.2,ys:[0].concat((H.p[u]||[]).map(x=>x*100))}));
+    lineChart(host,{xs,series,ymin:0,ymax:100,height:280,rpad:30,yfmt:v=>v+'%',tfmt:v=>v.toFixed(1).replace('.',',')+'%',aria:'Percentual de seções totalizadas por UF ao longo do tempo'});
+  }
+  const sh=$('#ch-sim');if(!sh)return;
+  const sim=simulate(S.swaps);
+  if(!sim){lineChart(sh,{xs:null,empty:'A simulação aparece quando houver votos apurados e pelo menos duas leituras.'});return}
+  const b=D.pres.br,series=[];
+  sim.keys.forEach(k=>{const c=b.cands.find(x=>x.n===k),col=cvar(presVar(k));
+    series.push({label:c.nmu,tip:c.nmu+' (modelo)',color:col,ys:sim.base[k]});
+    if(S.swaps.length)series.push({label:c.nmu+' (com trocas)',tip:c.nmu+' (com trocas)',color:col,ys:sim.alt[k],dash:'6 4'})});
+  lineChart(sh,{xs:sim.xs,series,height:280,ymin:0,rpad:0,yfmt:v=>v.toFixed(0)+'%',tfmt:v=>fp(v),hline:50,hlabel:'50%',aria:'Simulação da apuração nacional com trocas de velocidade entre UFs'});
+}
+
+/* ================= Aba: Fonte ================= */
+function viewFonte(){
+  const c=CFG[S.env];
+  return `<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+  <div class="card"><h2>Link oficial</h2>
+   <p style="margin:0 0 8px"><a class="ext" href="${LINKS.portal}" target="_blank" rel="noopener"><b>resultados.tse.jus.br</b></a>: sistema Resultados do TSE, no ar a partir das 17h de Brasília (horário unificado em todo o país).</p>
+   <ul class="src"><li><a class="ext" href="${LINKS.pagina}" target="_blank" rel="noopener">Página do TSE sobre a divulgação dos resultados</a></li>
+   <li><a class="ext" href="${LINKS.tecnico}" target="_blank" rel="noopener">Informações técnicas dos arquivos de divulgação</a></li>
+   <li><a class="ext" href="${LINKS.abertos}" target="_blank" rel="noopener">Portal de dados abertos do TSE</a></li>
+   <li>Aplicativo Resultados: <a class="ext" href="${LINKS.android}" target="_blank" rel="noopener">Android</a> · <a class="ext" href="${LINKS.ios}" target="_blank" rel="noopener">iOS</a></li></ul></div>
+  <div class="card"><h2>De onde vêm os números</h2>
+   <p style="margin:0 0 8px">A página lê os mesmos arquivos JSON que alimentam o site oficial. Fonte atual: <b>${esc(c.label)}</b>.</p>
+   <ul class="src"><li>Eleição federal (presidente): código <code>${c.fed}</code></li><li>Eleição estadual (governador, senador, deputados): código <code>${c.est}</code></li>
+   <li>Exemplo: <code class="mono" style="word-break:break-all">${esc(urlCargo('sp',3))}</code></li></ul>
+   <p class="note">O TSE limita a 100 requisições por segundo por IP e bloqueia IPs com muitos erros 404. A página lê no máximo 60 arquivos por minuto, só baixa de novo o que mudou e espera cinco ciclos antes de repetir um arquivo que respondeu 404.</p></div>
+  <div class="card"><h2>Histórico desta sessão</h2>
+   <p style="margin:0 0 8px">${H.t.length} leituras guardadas${H.t.length?`, de ${fTime(H.t[0])} a ${fTime(H.t[H.t.length-1])}`:''}. O ritmo de apuração só existe a partir do momento em que esta página está aberta, então vale deixá-la aberta desde as 17h.</p>
+   <div class="sim-ctrl"><button class="btn" type="button" data-act="export">Exportar histórico (JSON)</button><button class="btn" type="button" data-act="import">Importar histórico</button><button class="btn" type="button" data-act="reset">Apagar histórico</button><input type="file" id="fileimp" accept="application/json" hidden></div></div>
+  <div class="card"><h2>Limites da análise</h2><ul class="src"><li>Projeções extrapolam a apuração parcial e não são resultado oficial.</li><li>Eleitos e 2º turno só valem quando o TSE marca. Os rótulos "dentro das vagas" e "Vagas por QP (est.)" são leituras parciais.</li><li>Seções de uma mesma UF não apuram na mesma ordem, e o notebook de 2022 também assume ritmo igual para todos os municípios do estado.</li></ul></div>
+  </div>`;
+}
+
+/* ================= Render geral ================= */
+const TABS=[['pres','Presidente · Brasil'],['uf','Estados'],['ritmo','Ritmo e trocas'],['fonte','Fonte e dados']];
+function renderStatus(){
+  const d=D.pres.br,left=T0-now();let cls='wait',txt;
+  if(S.paused){txt='Pausado'}
+  else if(S.fails>2&&!d){cls='err';txt='Sem acesso aos arquivos do TSE'}
+  else if(left>0&&(!d||!d.v.vv)){txt=`Aguardando 17h00 (faltam ${fDur(left)})`}
+  else if(d&&d.v.vv>0){cls='live';txt='Ao vivo'}
+  else txt='Arquivos no ar, sem votos ainda';
+  const upd=S.lastOk?`Atualizado às ${fTime(S.lastOk)}`:'Carregando…';
+  $('#status').innerHTML=`<span><i class="dot ${cls}"></i>${esc(txt)}</span><span>${esc(CFG[S.env].label)}</span><span>${upd}${S.lastErr?` · <span style="color:var(--bad)" title="${esc(S.lastErr)}">falha parcial</span>`:''}</span>${d?`<span class="num">Seções: ${fp(d.s.p*100)}</span>`:''}<a class="ext" href="${LINKS.portal}" target="_blank" rel="noopener">Abrir site do TSE</a>`;
+  $('#btnpause').textContent=S.paused?'Retomar':'Pausar';
+}
+function render(){
+  const ae=document.activeElement,aid=ae&&ae.id,pos=ae&&ae.selectionStart;
+  renderStatus();
+  $('#tabs').innerHTML=TABS.map(t=>`<button type="button" role="tab" data-tab="${t[0]}" aria-selected="${S.tab===t[0]}">${t[1]}</button>`).join('');
+  if(ae&&ae.tagName==='SELECT'&&$('#main').contains(ae))return;
+  const v={pres:viewPres,uf:viewUF,ritmo:viewRitmo,fonte:viewFonte}[S.tab]||viewPres;
+  const y=scrollY;$('#main').innerHTML=v();scrollTo(0,y);
+  if(S.tab==='pres')drawPres(); if(S.tab==='ritmo')drawRitmo();
+  if(aid){const n=document.getElementById(aid);if(n&&n!==document.activeElement){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}}
+}
+function setUF(u){S.uf=u;store.set('ap26.uf',u);S.q='';S.showAll={};S.tab='uf';store.set('ap26.tab','uf');if(u==='zz'){S.sub='pres'}render();scrollTo(0,0);tick(true)}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-tab],[data-sub],[data-go-uf],[data-sort],[data-act],[data-swap-rm]');if(!t)return;
+  if(t.dataset.tab){S.tab=t.dataset.tab;store.set('ap26.tab',S.tab);render();scrollTo(0,0)}
+  else if(t.dataset.sub){S.sub=t.dataset.sub;store.set('ap26.sub',S.sub);S.q='';render()}
+  else if(t.dataset.goUf)setUF(t.dataset.goUf);
+  else if(t.dataset.sort){const k=t.dataset.sort;if(S.sortKey===k)S.sortDir*=-1;else{S.sortKey=k;S.sortDir=k==='u'||k==='name'?1:-1}render()}
+  else if(t.dataset.swapRm!==undefined){S.swaps.splice(+t.dataset.swapRm,1);render()}
+  else if(t.dataset.act){
+    const a=t.dataset.act;
+    if(a==='show-all'){S.showAll[t.dataset.key]=!S.showAll[t.dataset.key];render()}
+    else if(a==='swap-add'){const x=$('#swa').value,y=$('#swb').value;if(x!==y&&!S.swaps.some(s=>s.includes(x)||s.includes(y)))S.swaps.push([x,y]);render()}
+    else if(a==='swap-clear'){S.swaps=[];render()}
+    else if(a==='swap-preset'){const r=ufRanking().map(x=>x.u);S.swaps=[];const n=Math.floor(r.length/2);for(let i=0;i<Math.min(n,6);i++)S.swaps.push([r[i],r[r.length-1-i]]);render()}
+    else if(a==='export'){const blob=new Blob([JSON.stringify({env:S.env,H})],{type:'application/json'}),l=document.createElement('a');l.href=URL.createObjectURL(blob);l.download='apuracao2026-historico.json';l.click();setTimeout(()=>URL.revokeObjectURL(l.href),2000)}
+    else if(a==='import')$('#fileimp').click();
+    else if(a==='reset'){H=newHist();saveHist();render()}
+  }
+});
+document.addEventListener('change',e=>{
+  if(e.target.id==='ufsel')setUF(e.target.value);
+  else if(e.target.id==='fileimp'){const f=e.target.files[0];if(!f)return;f.text().then(tx=>{const j=JSON.parse(tx);if(j.H&&j.H.t){H=j.H;saveHist();render()}}).catch(()=>{})}
+});
+document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value;render()}});
+$('#btnpause').addEventListener('click',()=>{S.paused=!S.paused;if(!S.paused){tick(true).then(schedule)}else clearTimeout(S.timer);render()});
+$('#btnnow').addEventListener('click',()=>tick(true));
+let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{if(S.tab==='pres')drawPres();if(S.tab==='ritmo')drawRitmo()},150)});
+setInterval(renderStatus,1000);
+loadHist();render();tick(true).then(schedule);
+</script>
+<script src="assets/nav.js"></script></body>
+</html>
