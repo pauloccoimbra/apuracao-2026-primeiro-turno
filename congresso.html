@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Congresso 2027 · Apuração 2026</title><meta name="description" content="Composição do Senado e da Câmara em 2027: hemiciclos por espectro, bancadas por partido, fragmentação."><meta name="theme-color" content="#0b5cad"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b5cad'/%3E%3Cpath d='M5 26L27 6' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/base.css"><link rel="stylesheet" href="assets/page.css"><link rel="stylesheet" href="assets/cg.css">
+</head><body>
+<header class="top"><div class="wrap"><div class="bar"><div class="brand">Congresso Nacional 2027<small>Senado e Câmara por espectro e por partido · eleição de 2026</small></div>
+<div class="ctrl"><a class="ext" href="https://resultados.tse.jus.br/oficial/app/index.html" target="_blank" rel="noopener">Site do TSE</a></div></div></div></header>
+<main class="wrap">
+
+<div><h1 class="page-h">Congresso Nacional 2027</h1>
+<p class="lead">Composição do Senado (81 cadeiras) e da Câmara (513) a partir dos eleitos em 2026 e, no Senado, dos 27 senadores eleitos em 2022 cujo mandato vai até 2031. Cada parlamentar está agrupado por espectro (direita, centro, esquerda) segundo a classificação do partido, que você pode alterar. O painel mostra números e proporções, não previsões de votação.</p></div>
+<section class="card"><h2>Resumo</h2><div class="stats" id="kp"></div><p class="note" id="kpn"></p></section>
+<section class="card"><h2>Hemiciclos por espectro <span class="sub">passe o mouse (ou toque) em uma cadeira</span></h2>
+ <div class="ctl"><div class="seg-b" id="md"><button data-m="spec" aria-pressed="true">Por espectro</button><button data-m="party" aria-pressed="false">Por partido</button></div>
+ <label class="chk"><input type="checkbox" id="h22"> Destacar no Senado os 54 eleitos em 2026 (os 27 de 2022 ficam esmaecidos)</label></div>
+ <div class="lg" id="lgd"></div>
+ <div class="hemi-g">
+  <div class="hemi"><h3>Senado Federal 2027</h3><div class="hs">81 cadeiras</div><div id="hs"></div><div class="gnums" id="ns"></div></div>
+  <div class="hemi"><h3>Câmara dos Deputados 2027</h3><div class="hs">513 cadeiras</div><div id="hc"></div><div class="gnums" id="nc"></div></div>
+ </div>
+ <p class="note">Disposição: da esquerda para a direita do desenho, direita, centro e esquerda. Dentro de cada bloco, os partidos mais à direita ficam mais à esquerda do desenho. A posição do assento dentro do bloco é só visual.</p></section>
+<section class="card"><h2>Cadeiras e limiares <span class="sub">1/3, maioria absoluta, 3/5 e 2/3 de cada Casa</span></h2>
+ <div class="cols2"><div><div class="hs2">Senado</div><div id="bs"></div></div><div><div class="hs2">Câmara</div><div id="bc"></div></div></div>
+ <p class="note">Os marcadores mostram quantos votos cada limiar exige; detalhes e as regras de cada votação estão na página Maiorias.</p></section>
+<section class="card"><h2>Classificação dos partidos <span class="sub">altere o espectro e tudo é recalculado (vale também nas outras páginas)</span></h2>
+ <div class="ctl"><button class="btn" id="rs">Restaurar classificação padrão</button></div>
+ <div class="tw"><table id="cl"></table></div>
+ <p class="note">A classificação padrão é uma leitura de trabalho sobre o partido, não sobre cada parlamentar: direita (PL, PP, União, Republicanos, Novo, PRD, Missão), centro (PSD, MDB, Podemos, PSDB, Avante, Solidariedade) e esquerda (PT, PSB, PSOL, PCdoB, PV, PDT, Rede). Fontes diferentes classificam alguns partidos de modo diverso (PSDB, PDT, PSB, PSD, MDB, Avante); por isso o seletor. O único senador sem partido (Romário, RJ) fica sem classificação. A escolha é gravada no seu navegador.</p></section>
+<section class="card"><h2>Bancadas por partido</h2><div class="ctl"><div class="seg-b" id="so"><button data-o="cam" aria-pressed="true">Ordenar pela Câmara</button><button data-o="sen" aria-pressed="false">Ordenar pelo Senado</button><button data-o="sp" aria-pressed="false">Ordenar por espectro</button></div></div>
+ <div class="tw"><table id="pt"></table></div>
+ <p class="note">Votos: soma dos votos nominais e de legenda dos candidatos a deputado federal de cada partido no país (TSE). Votos por cadeira = votos do partido ÷ cadeiras. Senado: 2026 = eleitos no 1º turno; 2022 = mandato até 2031, com o partido atual na lista do Senado.</p></section>
+<section class="card"><h2>Fragmentação e proporcionalidade</h2><div class="stats" id="fr"></div>
+ <div class="prose" style="margin-top:10px" id="frt"></div></section>
+<section class="card"><h2>Notas e limites</h2><div class="prose">
+<p>Os eleitos de 2026 vêm do arquivo de resultados do TSE (situação "Eleito", "Eleito por QP" e "Eleito por média") com 100% das seções totalizadas. Diplomação, recursos, substituições, afastamentos e a posse de suplentes podem mudar a composição.</p>
+<p>O partido é o da candidatura. A janela de troca partidária e eventuais desfiliações alteram as bancadas ao longo da legislatura. Os senadores de 2022 aparecem com o partido atual da lista do Senado. As federações partidárias (que valem para o cálculo do quociente) não são modeladas aqui.</p>
+<p>Senadores eleitos governadores em 2026 deixam o Senado: Sergio Moro (PL) no Paraná e Cleitinho (Republicanos) em Minas Gerais já estão eleitos no 1º turno; se o governador de Tocantins, no 2º turno, for Professora Dorinha (União), sua cadeira também passará ao suplente. O partido do suplente não consta destes dados e a composição acima os mantém como estão hoje.</p>
+<p>O agrupamento por espectro simplifica: dentro de cada partido há parlamentares em posições distintas, e o comportamento em votações específicas pode diferir da posição geral do partido.</p></div></section>
+
+</main>
+<footer class="site">Fonte: TSE, resultado final do 1º turno de 04/10/2026 (arquivos públicos, posição de 05/10/2026 12h51, 100% das seções) para os 54 senadores e 513 deputados federais eleitos; Senado Federal (dados abertos, lista de senadores em exercício) para os 27 senadores com mandato até 2031. Partido é o do registro da candidatura (eleitos em 2026) e o atual (senadores de 2022); trocas de partido posteriores não aparecem. A classificação por espectro é uma leitura de trabalho e pode ser alterada na página. Projeto independente, sem vínculo com o TSE nem com o Congresso.</footer>
+
+<script src="assets/congresso.js"></script><script src="assets/cg.js"></script><script src="assets/nav.js"></script>
+<script>
+
+let mode='spec',ord='cam';
+const sp0=seatsParty('cam'),ss0=seatsParty('sen');
+const pvTot=sumA(Object.values(CGD.pv));
+function render(){
+ const gC=seatsGroup('cam'),gS=seatsGroup('sen');
+ const hi=$('#h22').checked;
+ $('#hs').innerHTML=hemicycle('sen',mode,{hi22:hi,rr:9.6,W:420,H:244});$('#hc').innerHTML=hemicycle('cam',mode,{rr:3.9});
+ const nums=(g,n,x)=>`<div><div class="v g${x}">${g[x]}</div><div class="p">${fd(g[x]/n*100,1)}%</div><div class="l g${x}">${GN[x].n}</div></div>`;
+ const nn=(g,n)=>['D','C','E'].map(x=>nums(g,n,x)).join('')+(g.X?nums(g,n,'X'):'');
+ $('#ns').className='gnums'+(gS.X?'':' three');$('#nc').className='gnums'+(gC.X?'':' three');
+ $('#ns').innerHTML=nn(gS,81);$('#nc').innerHTML=nn(gC,513);
+ let lg='';if(mode==='spec')lg=GR.filter(g=>g.id!=='X'||gS.X||gC.X).map(g=>`<span><i class="sw" style="background:var(${g.v})"></i>${g.n}</span>`).join('');
+ else{const sh1=partyShades('cam'),sh2=partyShades('sen'),all={...sh2,...sh1};lg=Object.keys(all).sort((a,b)=>GR.findIndex(g=>g.id===gOf(a))-GR.findIndex(g=>g.id===gOf(b))||(RANK[b]||0)-(RANK[a]||0)).map(p=>`<span><i class="sw" style="background:${all[p]}"></i>${pl(p)}</span>`).join('')}
+ $('#lgd').innerHTML=lg;
+ $('#bs').innerHTML=bloc('sen');$('#bc').innerHTML=bloc('cam');
+ /* tabela de classificação */
+ const cs={};PARTIES.forEach(p=>cs[p]={c:sp0[p]||0,s:ss0[p]||0});
+ const ps=PARTIES.slice().sort((a,b)=>(cs[b].c+cs[b].s)-(cs[a].c+cs[a].s));
+ $('#cl').innerHTML='<thead><tr><th>Partido</th><th>Nome</th><th class="n">Câmara</th><th class="n">Senado</th><th>Espectro</th></tr></thead><tbody>'+ps.map(p=>`<tr><td><b>${esc(pl(p))}</b></td><td>${esc(PNAME[p]||'')}</td><td class="n">${cs[p].c}</td><td class="n">${cs[p].s}</td><td><select class="sp" data-p="${esc(p)}">${GR.map(g=>`<option value="${g.id}"${gOf(p)===g.id?' selected':''}>${g.n}</option>`).join('')}</select></td></tr>`).join('')+'</tbody>';
+ $$('#cl select').forEach(s=>s.onchange=()=>{SPEC[s.dataset.p]=s.value;saveSpec();render()});
+ /* bancadas por partido */
+ const s22={};SEN.filter(m=>m.o==='2022').forEach(m=>s22[m.p]=(s22[m.p]||0)+1);const s26={};SEN.filter(m=>m.o==='2026').forEach(m=>s26[m.p]=(s26[m.p]||0)+1);
+ let list=PARTIES.slice();
+ if(ord==='cam')list.sort((a,b)=>(cs[b].c-cs[a].c)||(cs[b].s-cs[a].s));else if(ord==='sen')list.sort((a,b)=>(cs[b].s-cs[a].s)||(cs[b].c-cs[a].c));else list.sort((a,b)=>GR.findIndex(g=>g.id===gOf(a))-GR.findIndex(g=>g.id===gOf(b))||(RANK[b]||0)-(RANK[a]||0));
+ const mx=Math.max(...list.map(p=>cs[p].c));
+ $('#pt').innerHTML='<thead><tr><th>Partido</th><th>Espectro</th><th class="n">Câmara</th><th></th><th class="n">% cadeiras</th><th class="n">% votos</th><th class="n">Dif. (p.p.)</th><th class="n">Votos por cadeira</th><th class="n">Senado 2026</th><th class="n">Senado 2022</th><th class="n">Senado total</th></tr></thead><tbody>'+list.map(p=>{const c=cs[p].c,v=CGD.pv[p]||0,sh=c/513,vs=v/pvTot,g=gOf(p);return`<tr><td><b>${esc(pl(p))}</b></td><td class="g${g}">${GN[g].n}</td><td class="n">${c}</td><td><span class="bar-in" style="width:${c/mx*110}px;background:var(${GN[g].v})"></span></td><td class="n">${fd(sh*100,1)}%</td><td class="n">${v?fd(vs*100,1)+'%':'—'}</td><td class="n ${sh-vs>0.0005?'up':sh-vs<-0.0005?'dn':''}">${v?(sh-vs>0?'+':sh-vs<0?'−':'')+fd(Math.abs(sh-vs)*100,1):'—'}</td><td class="n">${c&&v?fi(v/c):'—'}</td><td class="n">${s26[p]||0}</td><td class="n">${s22[p]||0}</td><td class="n"><b>${cs[p].s}</b></td></tr>`}).join('')+'</tbody>';
+ const tot=list.reduce((a,p)=>a+cs[p].c,0);
+ /* resumo */
+ const top=list.slice().sort((a,b)=>cs[b].c-cs[a].c)[0],tops=PARTIES.slice().sort((a,b)=>cs[b].s-cs[a].s)[0];
+ const nC=PARTIES.filter(p=>cs[p].c>0).length,nS=PARTIES.filter(p=>cs[p].s>0).length;
+ const enp=a=>1/sumA(a.map(x=>x*x));
+ const shC=PARTIES.map(p=>cs[p].c/513),shS=PARTIES.map(p=>cs[p].s/81);
+ $('#kp').innerHTML=[['Parlamentares','594','81 senadores e 513 deputados'],['Senado','81','54 eleitos em 2026 e 27 em 2022'],['Partidos na Câmara',nC,'maior: '+pl(top)+' com '+cs[top].c+' ('+fd(cs[top].c/513*100,1)+'%)'],['Partidos no Senado',nS,'maior: '+pl(tops)+' com '+cs[tops].s+' ('+fd(cs[tops].s/81*100,1)+'%)'],['Nº efetivo de partidos',fd(enp(shC),1)+' <small>Câmara</small>',fd(enp(shS),1)+' no Senado']].map(a=>`<div class="stat"><div class="lab">${a[0]}</div><div class="val">${a[1]}</div><div class="pc">${a[2]}</div></div>`).join('');
+ $('#kpn').textContent='Número efetivo de partidos = 1 ÷ Σ (fração de cadeiras)², de Laakso e Taagepera.';
+ /* fragmentação */
+ const vsh=PARTIES.concat(Object.keys(CGD.pv).filter(p=>!PARTIES.includes(p))).map(p=>(CGD.pv[p]||0)/pvTot);
+ const allP=PARTIES.concat(Object.keys(CGD.pv).filter(p=>!PARTIES.includes(p)));
+ let gal=0;allP.forEach(p=>{const s=(cs[p]?cs[p].c:0)/513,v=(CGD.pv[p]||0)/pvTot;gal+=(v-s)**2});gal=Math.sqrt(gal/2)*100;
+ const t3=list.slice().sort((a,b)=>cs[b].c-cs[a].c).slice(0,3),t3s=sumA(t3.map(p=>cs[p].c))/513;
+ $('#fr').innerHTML=[['Nº efetivo de partidos (cadeiras)',fd(enp(shC),2),'Câmara'],['Nº efetivo de partidos (votos)',fd(enp(vsh),2),'votos para deputado federal'],['Índice de Gallagher',fd(gal,2),'distância entre % de votos e % de cadeiras'],['3 maiores bancadas',fd(t3s*100,1)+'%',t3.map(pl).join(', ')],['Partidos com até 5 cadeiras',PARTIES.filter(p=>cs[p].c>0&&cs[p].c<=5).length,'na Câmara']].map(a=>`<div class="stat"><div class="lab">${a[0]}</div><div class="val">${a[1]}</div><div class="pc">${a[2]}</div></div>`).join('');
+ $('#frt').innerHTML=`<p>O número efetivo de partidos mede quantos partidos de tamanho igual dariam a mesma concentração: com ${fd(enp(shC),1)} na Câmara, o sistema é fragmentado mesmo com ${t3.map(pl).join(', ')} somando ${fd(t3s*100,1)}% das cadeiras. O índice de Gallagher resume o quanto a distribuição de cadeiras se afasta da de votos: ${fd(gal,2)} p.p. A tabela de bancadas mostra onde está a diferença; a regra proporcional de lista aberta com sobras favorece partidos que combinam muitos votos em candidatos e legenda.</p>`;
+}
+$$('#md button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;$$('#md button').forEach(x=>x.setAttribute('aria-pressed',x===b));render()});
+$$('#so button').forEach(b=>b.onclick=()=>{ord=b.dataset.o;$$('#so button').forEach(x=>x.setAttribute('aria-pressed',x===b));render()});
+$('#h22').onchange=render;$('#rs').onclick=()=>{resetSpec();render()};
+render();
+
+</script></body></html>
