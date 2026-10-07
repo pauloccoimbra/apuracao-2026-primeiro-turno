@@ -476,7 +476,7 @@ function viewPres(){
     ${kpi('Seções totalizadas',d?fp(d.s.p*100):'0,00%',d?`${fi(d.s.st)} de ${fi(d.s.ts)}`:'',d?d.s.p:0)}
     ${kpi('Votos válidos apurados',d?fi(d.v.vv):'0',d&&d.v.tv?`Brancos ${fp(d.v.vb/d.v.tv*100,1)} · Nulos ${fp(d.v.vn/d.v.tv*100,1)}`:'')}
     ${kpi('Líder',lead&&d.v.vv?esc(lead.nmu):'-',lead&&d.v.vv?`${fp(shareOf(lead,d))} dos válidos · ${margin>=0?'+':''}${margin.toFixed(2).replace('.',',')} p.p. (${fi(mv)} votos) sobre ${esc(sec.nmu)}`:'')}
-    ${kpi('Situação',`<span style="font-size:19px">${esc(ph.t)}</span>`,pr&&lead&&pr.share[lead.n]!==undefined?`Projeção de ${esc(lead.nmu)}: ${fp(pr.share[lead.n])} (${pr.n} UFs com votos)`:'Vitória no 1º turno exige mais de 50% dos válidos.')}
+    ${kpi('Situação',`<span style="font-size:19px">${esc(ph.t==='Eleito no 1º turno'?'Líder em votos válidos':ph.t)}</span>`,pr&&lead&&pr.share[lead.n]!==undefined?`Projeção de ${esc(lead.nmu)}: ${fp(pr.share[lead.n])} (${pr.n} UFs com votos)`:'Vitória no 1º turno exige mais de 50% dos válidos.')}
   </div>`;
   h+=votacaoCard(d,'Votação nacional');
   h+=`<div class="grid two" style="margin-bottom:14px">
