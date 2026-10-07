@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Assembleias Legislativas 2027</title><meta name="description" content="Composição das 27 assembleias legislativas eleitas em 2026 por partido e espectro, relação com o governador e quóruns."><meta name="theme-color" content="#0b5cad"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b5cad'/%3E%3Cpath d='M5 26L27 6' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/base.css"><link rel="stylesheet" href="assets/page.css"><link rel="stylesheet" href="assets/cg.css">
+</head><body>
+<header class="top"><div class="wrap"><div class="bar"><div class="brand">Assembleias Legislativas 2027<small>Deputados estaduais e distritais por espectro · governadores · eleição de 2026</small></div>
+<div class="ctrl"><a class="ext" href="https://resultados.tse.jus.br/oficial/app/index.html" target="_blank" rel="noopener">Site do TSE</a></div></div></div></header>
+<main class="wrap">
+
+<div><h1 class="page-h">Assembleias Legislativas 2027</h1>
+<p class="lead">Os 1.059 deputados estaduais e distritais eleitos em 2026, a composição de cada assembleia por espectro, a relação com o governador eleito (ou com os dois candidatos do segundo turno) e o que cada quórum exige. A classificação direita, centro e esquerda é a mesma das páginas do Congresso e pode ser alterada em <a href="congresso.html">Congresso</a>. É aritmética de cadeiras: não prevê votações.</p></div>
+<section class="card"><h2>Resumo</h2><div class="stats" id="kp"></div><p class="note" id="kpn"></p></section>
+<section class="card"><h2>Todas as assembleias somadas</h2>
+ <div id="tot"></div><div class="gnums three" id="totn"></div>
+ <div class="tw" style="margin-top:12px"><table id="ptb"></table></div></section>
+<section class="card"><h2>Composição de cada assembleia <span class="sub">a linha tracejada marca a maioria absoluta</span></h2>
+ <div class="ctl"><label>Ordenar por <select id="so" class="sp"><option value="uf">Estado</option><option value="n">Número de cadeiras</option><option value="D">% direita</option><option value="C">% centro</option><option value="E">% esquerda</option></select></label></div>
+ <div class="lg" id="lg"></div><div id="rows"></div>
+ <p class="note">O ponto ao lado do estado mostra o partido do governador (eleito, ou líder do segundo turno, marcado com *), colorido pelo espectro do partido.</p></section>
+<section class="card"><h2>Governador e assembleia <span class="sub">quanto o governador tem de base própria</span></h2>
+ <div class="ctl"><label class="chk"><input type="checkbox" id="inc"> Contar o centro como base quando o partido do governador não é de centro</label></div>
+ <div class="stats" id="gk"></div>
+ <div class="tw"><table id="gt"></table></div>
+ <p class="note">"Base" são as cadeiras dos partidos do mesmo espectro do partido do governador (e, se marcado, do centro). É uma aproximação: a coligação real do governador inclui partidos de outros blocos e partidos do mesmo bloco podem ficar na oposição. "Bloqueia" indica que a base tem cadeiras suficientes para impedir, sozinha, que a oposição chegue a 3/5 (PEC) ou a 2/3 (processo contra o governador). Nos estados em segundo turno, escolha o candidato na própria tabela. Os sete segundos turnos estaduais são em 25/10.</p></section>
+<section class="card"><h2>Assembleia em detalhe</h2>
+ <div class="ctl"><label>Estado <select id="us" class="sp"></select></label><div class="seg-b" id="md"><button data-m="spec" aria-pressed="true">Por espectro</button><button data-m="party" aria-pressed="false">Por partido</button></div></div>
+ <div class="cols2"><div class="hemi" id="hm"></div><div id="dt"></div></div></section>
+<section class="card"><h2>O que cada votação exige nesta assembleia <span class="sub" id="qs"></span></h2>
+ <div class="tw"><table id="qt"></table></div>
+ <p class="note">Os quóruns seguem a Constituição Federal por simetria e a lei dos crimes de responsabilidade; várias constituições estaduais fixam números próprios (por exemplo, quórum de PEC ou de derrubada de veto). Confira o texto estadual antes de usar um número em análise formal.</p></section>
+<section class="card"><h2>O papel da assembleia</h2><div class="prose">
+<p><b>Legislar sobre o que é do estado.</b> A assembleia aprova as leis estaduais e a constituição do estado, incluindo emendas a ela. Parte das matérias só pode ser proposta pelo governador: organização administrativa, regime e remuneração dos servidores, criação de cargos e o orçamento. Cabe aos deputados emendar essas propostas e votá-las.</p>
+<p><b>Aprovar o orçamento.</b> O governador envia o plano plurianual, a lei de diretrizes e o orçamento anual; a assembleia pode alterá-los por emendas. O governador executa, e o quanto das emendas dos deputados é de fato pago costuma pesar mais na relação entre os dois do que o voto formal.</p>
+<p><b>Fiscalizar o Executivo.</b> Convocar secretários, pedir informações, instalar comissões parlamentares de inquérito (um terço das assinaturas basta) e julgar as contas do governador com o parecer do Tribunal de Contas do Estado. A assembleia também escolhe parte dos conselheiros do tribunal de contas, em geral quatro de sete, e participa da escolha de outras autoridades conforme a constituição estadual.</p>
+<p><b>Responsabilizar o governador.</b> Em crimes de responsabilidade, a assembleia decide se admite o processo, em geral por dois terços; o julgamento cabe a um tribunal misto com cinco deputados e cinco desembargadores, presidido pelo presidente do Tribunal de Justiça, e a condenação exige dois terços dos membros (Lei 1.079/1950). Em crimes comuns, o Supremo Tribunal Federal admitiu que as constituições estaduais condicionem o processo no Superior Tribunal de Justiça à autorização da assembleia (ADI 5540). Se o cargo de governador e o de vice vagarem nos dois últimos anos do mandato, a eleição para o restante do mandato é indireta e feita pela assembleia, como regra geral por simetria.</p>
+<p><b>O que o governador tem em mãos.</b> Veto total ou parcial (a assembleia o derruba, em geral, por maioria absoluta), pedido de urgência para projetos de sua iniciativa, nomeações, a execução do orçamento e a liberação das emendas. Por isso a base na assembleia não é só um número de cadeiras: um governador com bancada própria pequena governa pela composição de maioria, e o centro costuma ser o fiel da balança.</p>
+</div></section>
+<section class="card"><h2>Assembleia e bancada federal do estado</h2>
+ <div class="tw"><table id="fe"></table></div>
+ <p class="note">Compara a participação de cada espectro na assembleia com a da bancada de deputados federais do mesmo estado (mesma eleição, mesmos eleitores, listas e regras de coligação diferentes). Diferenças grandes indicam partidos mais fortes na eleição federal do que na estadual, ou o contrário.</p></section>
+<section class="card"><h2>Todos os deputados estaduais</h2>
+ <div class="ctl"><input type="search" id="q" placeholder="Buscar nome" class="sp" style="min-width:170px"><label>Estado <select id="fu" class="sp"></select></label><label>Espectro <select id="fg" class="sp"><option value="">Todos</option><option value="D">Direita</option><option value="C">Centro</option><option value="E">Esquerda</option></select></label><label>Partido <select id="fp" class="sp"></select></label></div>
+ <div class="tw"><table id="ls"></table></div><div style="text-align:center;margin:10px"><button id="mr" class="btn">Mostrar mais</button></div></section>
+<section class="card"><h2>Notas e limites</h2><div class="prose">
+<p>Os eleitos são os que o TSE registra como eleitos por quociente ou por média na apuração de 100% das seções; a diplomação e eventuais recursos podem mudar nomes. O partido é o da candidatura; trocas posteriores não aparecem. No Distrito Federal os deputados são distritais (Câmara Legislativa) e entram aqui como uma assembleia.</p>
+<p>A classificação por espectro é por partido, uma simplificação: dentro de um mesmo partido há deputados de linhas diferentes e, nas assembleias, partidos de bloco diferente governam juntos. Partidos que só aparecem nos estados (Agir, Cidadania, Democracia Cristã, Democrata e Mobiliza) foram classificados de forma provisória e podem ser ajustados na página Congresso.</p>
+<p>Os governadores dos sete segundos turnos aparecem pelos dois candidatos; a página não faz previsão sobre quem vence. A relação entre governador e assembleia usa o espectro do partido, não as coligações completas, que não foram incorporadas.</p>
+</div></section>
+
+</main>
+<footer class="site">Fonte: TSE, resultado do 1º turno de 04/10/2026 (arquivos públicos, 100% das seções) para deputados estaduais e distritais eleitos, governadores eleitos e dois candidatos mais votados nos segundos turnos estaduais; deputados federais e senadores da página Congresso. Partido é o da candidatura. Quóruns pela Constituição Federal e Lei 1.079/1950, por simetria; as constituições estaduais podem diferir. A classificação por espectro é uma leitura de trabalho e pode ser alterada em Congresso. Projeto independente, sem vínculo com o TSE nem com as assembleias.</footer>
+
+<script src="assets/congresso.js"></script><script src="assets/assembleias.js"></script><script src="assets/cg.js"></script><script src="assets/nav.js"></script>
+<script>
+
+const AD=window.AE_DATA,UFS=Object.keys(AD.dep).sort();
+const NT=u=>AD.dep[u].length;
+const gsU=u=>{const o={D:0,C:0,E:0,X:0};AD.dep[u].forEach(m=>o[gOf(m[1])]++);return o};
+const psU=u=>{const o={};AD.dep[u].forEach(m=>o[m[0+1]]=(o[m[1]]||0)+1);return o};
+const CH={};
+const gv=u=>{const g=AD.gov[u];return CH[u]==='b'?{n:g.b[0],p:g.b[1],pct:g.b[2],run:g.st==='r'}:{n:g.a[0],p:g.a[1],pct:g.a[2],run:g.st==='r'}};
+const Q=n=>({abs:maj(n),um3:frac(n,1,3),tres5:frac(n,3,5),dois3:frac(n,2,3),min:maj(maj(n))});
+const GRP=['D','C','E','X'];
+const gcol=g=>`var(${GN[g].v})`;
+const ALLN=sumA(UFS.map(NT));
+function gb(u,inc){const s=gsU(u),g=gOf(gv(u).p);let b=s[g];if(inc&&g!=='C'&&g!=='X')b+=s.C;return b}
+function legend(){$('#lg').innerHTML=GR.map(g=>`<span><i class="sw" style="background:${gcol(g.id)}"></i>${g.n}</span>`).join('')}
+function stackBar(s,n,h){const mk=`<span style="position:absolute;left:50%;top:-2px;bottom:-2px;border-left:1.5px dashed var(--fg)"></span>`;return `<div style="position:relative;display:flex;height:${h||16}px;border-radius:3px;overflow:hidden;background:var(--surface2)">${GRP.map(g=>s[g]?`<div style="width:${s[g]/n*100}%;background:${gcol(g)}" data-tip="${GN[g].n}: ${s[g]} de ${n} (${fpc(s[g]/n)})"></div>`:'').join('')}${mk}</div>`}
+function render(){
+ legend();
+ const G=Object.fromEntries(GRP.map(g=>[g,0]));UFS.forEach(u=>{const s=gsU(u);GRP.forEach(g=>G[g]+=s[g])});
+ const pc={};AM_ALL().forEach(m=>pc[m.p]=(pc[m.p]||0)+1);
+ const top=Object.entries(pc).sort((a,b)=>b[1]-a[1]);
+ let sameP=0,sameG=0,own=0;
+ UFS.forEach(u=>{const s=gsU(u),g=gv(u),ps=psU(u),mx=Math.max(...Object.values(ps));if(ps[g.p]===mx)sameP++;const gg=gOf(g.p),mg=Math.max(s.D,s.C,s.E);if(s[gg]===mg)sameG++;if(s[gg]>=maj(NT(u)))own++});
+ $('#kp').innerHTML=[['Deputados estaduais',fi(ALLN),'em 27 assembleias (inclui os distritais do DF)'],['Maior partido',pl(top[0][0]),fi(top[0][1])+' deputados ('+fpc(top[0][1]/ALLN)+')'],['Partidos representados',Object.keys(pc).length,'com ao menos um deputado eleito'],['Governador no partido da maior bancada',sameP,'de 27 assembleias'],['Espectro do governador é o maior da casa',sameG,'de 27 (aproximação por partido)'],['Espectro do governador tem maioria absoluta',own,'de 27, sem contar o centro']].map(a=>`<div class="stat"><div class="lab">${a[0]}</div><div class="val">${a[1]}</div><div class="pc">${a[2]}</div></div>`).join('');
+ $('#kpn').textContent='Governador: eleito no 1º turno em 20 estados; nos sete estados com segundo turno vale o líder da apuração (troque na tabela abaixo).';
+ $('#tot').innerHTML=stackBar(G,ALLN,26);
+ $('#totn').innerHTML=GRP.filter(g=>G[g]||g!=='X').map(g=>`<div><div class="v g${g}">${fi(G[g])}</div><div class="p">${fpc(G[g]/ALLN)}</div><div class="l g${g}">${GN[g].n}</div></div>`).join('');
+ $('#ptb').innerHTML='<thead><tr><th>Partido</th><th>Espectro</th><th class="r">Deputados</th><th class="r">% do total</th><th class="r">Estados</th><th>Maior em</th></tr></thead><tbody>'+top.map(([p,c])=>{const ufs=UFS.filter(u=>psU(u)[p]);const lead=UFS.filter(u=>{const ps=psU(u);return ps[p]===Math.max(...Object.values(ps))});return `<tr><td>${pl(p)}</td><td class="g${gOf(p)}">${GN[gOf(p)].n}</td><td class="r">${c}</td><td class="r">${fpc(c/ALLN)}</td><td class="r">${ufs.length}</td><td>${lead.join(', ')||'–'}</td></tr>`}).join('')+'</tbody>';
+ rows();gtab();feTab();
+}
+function AM_ALL(){const a=[];UFS.forEach(u=>AD.dep[u].forEach(([n,p,v])=>a.push({n,p,v,u})));return a}
+function rows(){
+ const k=$('#so').value;
+ const L=UFS.slice().sort((a,b)=>k==='uf'?a.localeCompare(b):k==='n'?NT(b)-NT(a)||a.localeCompare(b):gsU(b)[k]/NT(b)-gsU(a)[k]/NT(a));
+ $('#rows').innerHTML=L.map(u=>{const s=gsU(u),n=NT(u),g=gv(u);return `<div style="display:grid;grid-template-columns:150px 1fr 120px;gap:8px;align-items:center;margin:5px 0"><div><b>${u}</b> <span class="rule">${n} cad.</span></div>${stackBar(s,n)}<div class="rule" style="white-space:nowrap"><i class="sw" style="background:${gcol(gOf(g.p))};border-radius:50%"></i> ${pl(g.p)}${g.run?'*':''}</div></div>`}).join('');
+}
+function gtab(){
+ const inc=$('#inc').checked;let ok=0,b35=0,b23=0,opp=0;
+ const rowsH=UFS.map(u=>{const n=NT(u),q=Q(n),g=gv(u),G0=AD.gov[u],s=gsU(u),gg=gOf(g.p),b=gb(u,inc),own=psU(u)[g.p]||0,mxp=Object.entries(psU(u)).sort((a,c)=>c[1]-a[1])[0];
+  const abs=b>=q.abs,bl35=b>=n-q.tres5+1,bl23=b>=n-q.dois3+1,op=(n-b)>=q.um3;if(abs)ok++;if(bl35)b35++;if(bl23)b23++;if(op)opp++;
+  const sel=G0.st==='r'?`<select class="sp ch" data-u="${u}"><option value="a"${CH[u]!=='b'?' selected':''}>${esc(G0.a[0])} (${pl(G0.a[1])}) ${fd(G0.a[2])}%</option><option value="b"${CH[u]==='b'?' selected':''}>${esc(G0.b[0])} (${pl(G0.b[1])}) ${fd(G0.b[2])}%</option></select>`:`${esc(g.n)} (${pl(g.p)})`;
+  return `<tr><td><b>${u}</b><br><span class="rule">${n} cad.</span></td><td>${sel}${G0.st==='r'?'<br><span class="rule">2º turno</span>':''}</td><td class="g${gg}">${GN[gg].n}</td><td class="r">${own}<br><span class="rule">${fpc(own/n)}</span></td><td class="r">${b}<br><span class="rule">${fpc(b/n)}</span></td><td class="${abs?'ok':'no'}">${abs?'✓ tem '+q.abs:'−'+(q.abs-b)+' (faltam)'}</td><td class="${bl35?'ok':'no'}">${bl35?'sim':'não'}</td><td class="${bl23?'ok':'no'}">${bl23?'sim':'não'}</td><td>${pl(mxp[0])}<br><span class="rule">${mxp[1]} cad.</span></td></tr>`}).join('');
+ $('#gt').innerHTML='<thead><tr><th>UF</th><th>Governador</th><th>Espectro</th><th class="r">Bancada do partido</th><th class="r">Base (espectro)</th><th>Maioria absoluta</th><th>Bloqueia 3/5</th><th>Bloqueia 2/3</th><th>Maior bancada</th></tr></thead><tbody>'+rowsH+'</tbody>';
+ $('#gk').innerHTML=[['Base com maioria absoluta',ok,'de 27'],['Base bloqueia 3/5 (PEC)',b35,'de 27'],['Base bloqueia 2/3 (impeachment)',b23,'de 27'],['Oposição alcança 1/3 (CPI)',opp,'de 27']].map(a=>`<div class="stat"><div class="lab">${a[0]}</div><div class="val">${a[1]}</div><div class="pc">${a[2]}</div></div>`).join('');
+ $$('.ch').forEach(e=>e.onchange=()=>{CH[e.dataset.u]=e.value;gtab();rows();detail()});
+}
+let MODE='spec';
+function detail(){
+ const u=$('#us').value,n=NT(u),mem=AD.dep[u].map(([nm,p,v])=>({n:nm,p,v,u})),s=gsU(u),g=gv(u),G0=AD.gov[u];
+ const ord=mem.slice().sort((a,b)=>GRP.indexOf(gOf(a.p))-GRP.indexOf(gOf(b.p))||(RANK[b.p]||0)-(RANK[a.p]||0)||b.v-a.v);
+ const rows=n>60?6:n>36?5:4,W=520,H=280,L=seatLayout(n,rows,W,H,.36),r=Math.min(L.gap*.38,12);
+ const byP={};mem.forEach(m=>byP[m.p]=(byP[m.p]||0)+1);
+ const ps=Object.keys(byP).sort((a,b)=>GRP.indexOf(gOf(a))-GRP.indexOf(gOf(b))||(RANK[b]||0)-(RANK[a]||0));
+ const shd={};GRP.forEach(gg=>{const l=ps.filter(p=>gOf(p)===gg);l.forEach((p,i)=>shd[p]=shade(gg,i,l.length))});
+ let svg=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${n} cadeiras da assembleia de ${u}">`;
+ L.seats.forEach((p,i)=>{const m=ord[i];const fill=MODE==='party'?shd[m.p]:gcol(gOf(m.p));svg+=`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r.toFixed(1)}" fill="${fill}" data-tip="${esc('<b>'+m.n+'</b><br>'+pl(m.p)+' · '+fi(m.v)+' votos<br>'+GN[gOf(m.p)].n)}"/>`});
+ svg+='</svg>';
+ $('#hm').innerHTML=`<h3 style="text-align:center;margin:0">${UFN[u]}</h3><div class="hs">${n} cadeiras${u==='DF'?' (Câmara Legislativa)':''}</div>${svg}<div class="gnums ${s.X?'':'three'}">${GRP.filter(x=>x!=='X'||s.X).map(x=>`<div><div class="v g${x}">${s[x]}</div><div class="p">${fpc(s[x]/n)}</div><div class="l g${x}">${GN[x].n}</div></div>`).join('')}</div>`;
+ const gg=gOf(g.p),tot=ps.map(p=>`<span class="chip" style="border-left:6px solid ${shd[p]}">${pl(p)} <b>${byP[p]}</b></span>`).join(' ');
+ const top=mem.slice().sort((a,b)=>b.v-a.v).slice(0,5);
+ const gl=G0.st==='r'?`Segundo turno em 25/10: ${esc(G0.a[0])} (${pl(G0.a[1])}, ${fd(G0.a[2])}%) × ${esc(G0.b[0])} (${pl(G0.b[1])}, ${fd(G0.b[2])}%)`:`Governador eleito: ${esc(G0.a[0])} (${pl(G0.a[1])}, ${fd(G0.a[2])}%)`;
+ const b=gb(u,$('#inc').checked),q=Q(n);
+ $('#dt').innerHTML=`<div class="hs2">${gl}</div><p class="rule" style="margin:2px 0 8px">Espectro do partido: <b class="g${gg}">${GN[gg].n}</b>. Base própria (espectro${$('#inc').checked&&gg!=='C'?' + centro':''}): <b>${b}</b> de ${n} cadeiras (${fpc(b/n)}); maioria absoluta: ${q.abs}.</p><div class="pty" style="gap:6px">${tot}</div><div class="hs2" style="margin-top:10px">Mais votados</div><table><tbody>${top.map(m=>`<tr><td>${esc(m.n)}</td><td>${pl(m.p)}</td><td class="r">${fi(m.v)}</td></tr>`).join('')}</tbody></table>`;
+ const f=(l,a,b2,c)=>`<tr><td>${l}</td><td class="r"><b>${a}</b></td><td>${b2}</td></tr>`;
+ $('#qs').textContent=UFN[u]+' · '+n+' deputados';
+ $('#qt').innerHTML=`<thead><tr><th>Votação</th><th class="r">Votos</th><th>Regra</th></tr></thead><tbody>`+
+ f('Lei ordinária (maioria simples)',q.min+' a '+q.abs,'maioria dos presentes; com quórum mínimo de presença ('+q.abs+') bastam '+q.min)
+ +f('Lei complementar, veto, alteração de regimento (maioria absoluta)',q.abs,'metade mais um dos membros')
+ +f('Instalar CPI (1/3 das assinaturas)',q.um3,'um terço dos membros')
+ +f('Emenda à constituição estadual (3/5)',q.tres5,'três quintos, em dois turnos (regra geral; varia por estado)')
+ +f('Admitir processo contra o governador (2/3)',q.dois3,'dois terços (regra geral; tribunal misto julga)')
+ +f('Bloquear 3/5 (oposição não chega a PEC)',n-q.tres5+1,'cadeiras necessárias para impedir 3/5')
+ +f('Bloquear 2/3 (impedir o processo)',n-q.dois3+1,'cadeiras necessárias para impedir 2/3')+'</tbody>';
+}
+function feTab(){
+ const sp=h=>{const o={D:0,C:0,E:0,X:0};h.forEach(p=>o[gOf(p)]++);return o};
+ const fed=u=>DEP.filter(m=>m.u===u).map(m=>m.p);
+ $('#fe').innerHTML='<thead><tr><th>UF</th><th class="r">Assembleia: dir.</th><th class="r">centro</th><th class="r">esq.</th><th class="r">Bancada federal: dir.</th><th class="r">centro</th><th class="r">esq.</th><th class="r">Dif. direita (p.p.)</th></tr></thead><tbody>'+UFS.map(u=>{const a=gsU(u),n=NT(u),fl=fed(u),f=sp(fl),m=fl.length;const d=(a.D/n-f.D/m)*100;return `<tr><td><b>${u}</b></td><td class="r gD">${fpc(a.D/n,0)}</td><td class="r gC">${fpc(a.C/n,0)}</td><td class="r gE">${fpc(a.E/n,0)}</td><td class="r gD">${fpc(f.D/m,0)}</td><td class="r gC">${fpc(f.C/m,0)}</td><td class="r gE">${fpc(f.E/m,0)}</td><td class="r ${d>0?'up':'dn'}">${d>0?'+':d<0?'−':''}${fd(Math.abs(d),1)}</td></tr>`}).join('')+'</tbody>';
+}
+let LN=40;
+function lista(){
+ const t=$('#q').value.trim().toLowerCase(),u=$('#fu').value,g=$('#fg').value,p=$('#fp').value;
+ let L=AM_ALL().filter(m=>(!t||m.n.toLowerCase().includes(t))&&(!u||m.u===u)&&(!g||gOf(m.p)===g)&&(!p||m.p===p));
+ L.sort((a,b)=>b.v-a.v);
+ $('#ls').innerHTML='<thead><tr><th>Nome</th><th>Partido</th><th>UF</th><th>Espectro</th><th class="r">Votos</th></tr></thead><tbody>'+L.slice(0,LN).map(m=>`<tr><td>${esc(m.n)}</td><td>${pl(m.p)}</td><td>${m.u}</td><td class="g${gOf(m.p)}">${GN[gOf(m.p)].n}</td><td class="r">${fi(m.v)}</td></tr>`).join('')+'</tbody>'+(L.length?'':'<tfoot><tr><td colspan="5">Nenhum resultado.</td></tr></tfoot>');
+ $('#mr').style.display=L.length>LN?'':'none';$('#mr').textContent=`Mostrar mais (${L.length-LN} restantes)`;
+}
+$('#us').innerHTML=UFS.map(u=>`<option value="${u}">${UFN[u]}</option>`).join('');$('#us').value='SP';
+$('#fu').innerHTML='<option value="">Todos</option>'+UFS.map(u=>`<option>${u}</option>`).join('');
+$('#fp').innerHTML='<option value="">Todos</option>'+[...new Set(AM_ALL().map(m=>m.p))].sort().map(p=>`<option value="${p}">${pl(p)}</option>`).join('');
+$('#so').onchange=rows;$('#inc').onchange=()=>{gtab();detail()};$('#us').onchange=detail;
+$$('#md button').forEach(b=>b.onclick=()=>{MODE=b.dataset.m;$$('#md button').forEach(x=>x.setAttribute('aria-pressed',x===b));detail()});
+['#q','#fu','#fg','#fp'].forEach(s=>$(s).addEventListener('input',()=>{LN=40;lista()}));$('#mr').onclick=()=>{LN+=60;lista()};
+render();detail();lista();
+
+</script></body></html>
