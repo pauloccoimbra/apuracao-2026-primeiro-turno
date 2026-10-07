@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Participação e voto cruzado 2026</title><meta name="description" content="Abstenção por estado, valor de mobilizar eleitores e voto cruzado entre presidente e governador no 1º turno de 2026."><meta name="theme-color" content="#0b5cad"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b5cad'/%3E%3Cpath d='M5 26L27 6' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/base.css"><link rel="stylesheet" href="assets/page.css">
+</head><body>
+<header class="top"><div class="wrap"><div class="bar"><div class="brand">Participação e voto cruzado<small>Abstenção, brancos, nulos e coerência presidente × governador · 1º turno 2026</small></div>
+<div class="ctrl"><a class="ext" href="https://resultados.tse.jus.br/oficial/app/index.html" target="_blank" rel="noopener">Site do TSE</a></div></div></div></header>
+<main class="wrap">
+
+<div><h1 class="page-h">Participação, brancos, nulos e voto cruzado</h1>
+<p class="lead">Quem não compareceu, onde está concentrado e quanto valeria trazê-lo de volta nas urnas; e o quanto o voto para presidente acompanha o voto para governador. Os dados descrevem o 1º turno e não indicam como os abstencionistas votariam.</p></div>
+<section class="card"><h2>Comparecimento no país</h2><div class="stats" id="kp"></div><p class="note" id="kpn"></p></section>
+<section class="card"><h2>Abstenção por estado <span class="sub">cor = candidato líder no estado</span></h2>
+ <div class="ctl"><div class="seg-b" id="ord"><button data-o="p" aria-pressed="true">Por % de abstenção</button><button data-o="n" aria-pressed="false">Por nº de abstentos</button></div></div>
+ <div class="lg"><span><i class="sw" style="background:var(--c1)"></i>Lula na frente</span><span><i class="sw" style="background:var(--c2)"></i>Flávio na frente</span><span><i class="sw" style="background:transparent;border-top:2px dashed var(--muted);height:0;width:16px;margin-top:5px"></i>Brasil</span></div>
+ <div class="chart" id="ab"></div></section>
+<div class="cols2">
+<section class="card"><h2>Abstenção × voto em Lula <span class="sub">cada ponto é um estado</span></h2><div class="chart" id="sc"></div><p class="note" id="scn"></p></section>
+<section class="card"><h2>Regiões</h2><div class="tw"><table id="rg"></table></div><p class="note">Brancos+nulos, % do comparecimento na eleição presidencial.</p></section></div>
+<section class="card"><h2>Quanto vale trazer mais eleitores às urnas</h2>
+ <p>Hipótese de trabalho: os novos votantes de cada estado se distribuem entre Lula e Flávio como os votantes atuais do mesmo estado (proporção de cada um no <i>comparecimento</i>), mais um desvio opcional. O saldo é Lula − Flávio em votos; todos os demais ficam fora do cálculo.</p>
+ <div class="ctl"><label>Aumento do comparecimento <input type="range" id="dp" min="0" max="5" step="0.25" value="1"><output id="dpo"></output></label>
+ <label>Desvio a favor de Lula (p.p. do total de novos votantes) <input type="range" id="bi" min="-10" max="10" step="1" value="0"><output id="bio"></output></label></div>
+ <div class="stats" id="sim"></div><div class="chart" id="simc"></div>
+ <h3>Convergência da abstenção</h3>
+ <div class="ctl"><label>Estados acima de <input type="range" id="cv" min="14" max="22" step="0.5" value="18"><output id="cvo"></output> de abstenção caem até esse patamar</label></div>
+ <div class="stats" id="cvs"></div><p class="note" id="cvn"></p></section>
+<section class="card"><h2>Voto cruzado: presidente × governador</h2>
+ <p id="cxn"></p><div class="ctl"><div class="seg-b" id="cxs"><button data-k="pt" aria-pressed="true">Lula × governadores com PT na coligação</button><button data-k="pl" aria-pressed="false">Flávio × governadores com PL na coligação</button></div></div>
+ <div class="lg"><span><i class="sw" style="background:var(--c3)"></i>soma dos governadores acima do voto presidencial</span><span><i class="sw" style="background:var(--o)"></i>abaixo</span></div><div class="chart" id="cx"></div>
+ <div class="tw"><table id="cxt"></table></div>
+ <p class="note">Soma dos votos válidos dos candidatos a governador cuja coligação registrada inclui o partido (dado do TSE); não mede apoio declarado nem política real. Onde nenhum candidato tem o partido, a soma é 0,0.</p></section>
+<section class="card"><h2>Notas</h2><div class="prose"><p><b>Eleitorado e abstenção por estado</b> foram reconstituídos a partir do percentual de abstenção publicado e do comparecimento (votos nominais, brancos e nulos), com erro inferior a mil votos por estado; a soma dos estados difere do comparecimento oficial em 5,2 mil votos (0,004%). O exterior (eleitorado calculado por diferença) entra só nos totais nacionais.</p><p>Brancos e nulos têm leitura distinta: o voto em branco ou nulo é uma escolha de quem compareceu; não é comparável à abstenção.</p></div></section>
+
+</main>
+<footer class="site">Fonte dos números: TSE, resultado final do 1º turno de 04/10/2026 (arquivos públicos, posição de 05/10/2026 12h51, 100% das seções), embutidos nesta página. Cálculos próprios; projeções e cenários são hipóteses de trabalho, não previsões nem resultado oficial. Projeto independente, sem vínculo com o TSE.</footer>
+<script src="assets/dados.js"></script><script src="assets/common.js"></script><script src="assets/nav.js"></script>
+<script>
+
+const off={comp:R.COMP,el:R.ELEIT};off.ab=off.el-off.comp;
+const rows=UFS.map(u=>{const o=U(u),t=vv(u),L=o.v[IL],F=o.v[IF],ab=o.el-o.comp;return{u,n:o.n,r:o.r,el:o.el,comp:o.comp,ab,abp:ab/o.el,L,F,Lp:L/t,Fp:F/t,lead:L>F?'L':'F',bn:(o.vb+o.vn)/o.comp,net:(L-F)/o.comp}});
+const ex=U('zz');
+$('#kp').innerHTML=[['Eleitorado',fi(off.el),'aptos a votar'],['Comparecimento',fi(off.comp),fp(off.comp/off.el,2)],['Abstenção',fi(off.ab),fp(off.ab/off.el,2)],['Votos em branco',fi(NAT.vb),fp(NAT.vb/off.comp,2)+' do comparec.'],['Votos nulos',fi(NAT.vn),fp(NAT.vn/off.comp,2)+' do comparec.'],['Estados com abstenção acima da média',rows.filter(r=>r.abp>off.ab/off.el).length+' de 27','']].map(a=>`<div class="stat"><div class="lab">${a[0]}</div><div class="val">${a[1]}</div><div class="pc">${a[2]}</div></div>`).join('');
+const mx=rows.reduce((a,b)=>a.abp>b.abp?a:b),mn=rows.reduce((a,b)=>a.abp<b.abp?a:b);
+$('#kpn').textContent=`A abstenção vai de ${fp(mn.abp,1)} (${up(mn.u)}) a ${fp(mx.abp,1)} (${up(mx.u)}). Em média, estados em que Flávio lidera têm abstenção de ${fp(sum(rows.filter(r=>r.lead==='F').map(r=>r.ab))/sum(rows.filter(r=>r.lead==='F').map(r=>r.el)),1)}; onde Lula lidera, ${fp(sum(rows.filter(r=>r.lead==='L').map(r=>r.ab))/sum(rows.filter(r=>r.lead==='L').map(r=>r.el)),1)} (médias ponderadas pelo eleitorado).`;
+let ord='p';
+function ab(){const rs=rows.slice().sort((a,b)=>ord==='p'?b.abp-a.abp:b.ab-a.ab);const nat=off.ab/off.el;
+ if(ord==='p')$('#ab').innerHTML=barsV(rs.map(r=>({k:up(r.u),v:r.abp*100,c:r.lead==='L'?'f1':'f2',tip:`<b>${esc(r.n)}</b><br>abstenção ${fp(r.abp,2)}<br>${fi(r.ab)} eleitores<br>líder: ${r.lead==='L'?'Lula':'Flávio'}`,lab:(r===rs[0]||r===rs[26])?fd(r.abp*100,1)+'%':''})),{ymax:25,ref:nat*100,reflab:'Brasil '+fp(nat,1),aria:'Abstenção por UF'});
+ else $('#ab').innerHTML=barsV(rs.map(r=>({k:up(r.u),v:r.ab/1e6,c:r.lead==='L'?'f1':'f2',tip:`<b>${esc(r.n)}</b><br>${fi(r.ab)} abstentos<br>${fp(r.abp,2)} do eleitorado`})),{ymax:8,gridn:4,fmt:v=>fd(v,0)+' mi',aria:'Abstentos por UF'})}
+ab();$$('#ord button').forEach(b=>b.onclick=()=>{ord=b.dataset.o;$$('#ord button').forEach(x=>x.setAttribute('aria-pressed',x===b));ab()});
+const c=corr(rows.map(r=>r.abp),rows.map(r=>r.Lp));
+const n=rows.length,mxm=sum(rows.map(r=>r.abp*100))/n,myy=sum(rows.map(r=>r.Lp*100))/n;let sxy=0,sxx=0;rows.forEach(r=>{sxy+=(r.abp*100-mxm)*(r.Lp*100-myy);sxx+=(r.abp*100-mxm)**2});const sl=sxy/sxx,ic=myy-sl*mxm;
+$('#sc').innerHTML=scatter(rows.map(r=>({x:r.abp*100,y:r.Lp*100,z:r.el,k:up(r.u),c:r.lead==='L'?'f1':'f2',tip:`<b>${esc(r.n)}</b><br>abstenção ${fp(r.abp,1)}<br>Lula ${fp(r.Lp,1)} dos válidos`})),{xmin:14,xmax:26,ymin:20,ymax:75,sx:2,sy:10,xl:'Abstenção, % do eleitorado',yl:'Lula, % dos votos válidos',fit:[ic,sl],rmax:22,aria:'Abstenção x Lula'});
+$('#scn').textContent=`Correlação entre os 27 estados: ${fd(c,2)}. Reta de mínimos quadrados: cada ponto percentual a mais de abstenção se associa a ${fd(Math.abs(sl),1)} p.p. ${sl<0?'a menos':'a mais'} de Lula, em média. É uma associação entre estados, não evidência de como cada eleitor votaria.`;
+const RG=['N','NE','CO','SE','S'];
+$('#rg').innerHTML='<thead><tr><th>Região</th><th class="n">Eleitorado</th><th class="n">Abstenção</th><th class="n">Abstentos</th><th class="n">Brancos+nulos</th></tr></thead><tbody>'+RG.map(g=>{const rs=rows.filter(r=>r.r===g);const el=sum(rs.map(r=>r.el)),ab=sum(rs.map(r=>r.ab)),cp=sum(rs.map(r=>r.comp));const bn=sum(rs.map(r=>U(r.u).vb+U(r.u).vn));return`<tr><td>${R.regs[g]}</td><td class="n">${fi(el)}</td><td class="n">${fp(ab/el,1)}</td><td class="n">${fi(ab)}</td><td class="n">${fp(bn/cp,1)}</td></tr>`}).join('')+'</tbody>';
+/* simulador */
+function sim(){const dp=+$('#dp').value/100,b=+$('#bi').value/100;$('#dpo').textContent='+'+fd(dp*100,2)+' p.p.';$('#bio').textContent=(b>0?'+':'')+fd(b*100,0)+' p.p.';
+ const per=rows.map(r=>{const N=Math.min(dp*r.el,r.ab);const net=N*(r.net*1+b);return{r,N,net}});const NT=sum(per.map(x=>x.N)),T=sum(per.map(x=>x.net));
+ $('#sim').innerHTML=[['Novos votantes',fi(NT),'nos 27 estados'],['Saldo líquido (Lula − Flávio)',fs(T),T>0?'favorece Lula':T<0?'favorece Flávio':'empate'],['Por 1 milhão de novos votantes',fs(NT?T/NT*1e6:0),'votos líquidos']].map(a=>`<div class="stat"><div class="lab">${a[0]}</div><div class="val">${a[1]}</div><div class="pc">${a[2]}</div></div>`).join('');
+ const srt=per.slice().sort((a,b)=>b.net-a.net);
+ $('#simc').innerHTML=barsDiv(srt.map(x=>({k:up(x.r.u),v:x.net,tip:`<b>${esc(x.r.n)}</b><br>${fi(x.N)} novos votantes<br>saldo ${fs(x.net)}`})),{fmt:v=>fs(v),rh:15,cp:'f1',cn:'f2',aria:'Saldo por estado'})}
+$('#dp').oninput=sim;$('#bi').oninput=sim;sim();
+function conv(){const X=+$('#cv').value/100;$('#cvo').textContent=fd(X*100,1)+'%';let N=0,T=0;const lst=[];rows.forEach(r=>{if(r.abp>X){const n=(r.abp-X)*r.el;N+=n;T+=n*r.net;lst.push(r.u)}});
+ $('#cvs').innerHTML=[['Estados abrangidos',lst.length+' de 27',''],['Novos votantes',fi(N),''],['Saldo líquido (Lula − Flávio)',fs(T),T>0?'favorece Lula':'favorece Flávio']].map(a=>`<div class="stat"><div class="lab">${a[0]}</div><div class="val">${a[1]}</div><div class="pc">${a[2]}</div></div>`).join('');
+ const rg={};rows.forEach(r=>{if(r.abp>X){const n=(r.abp-X)*r.el;rg[r.r]=(rg[r.r]||0)+n*r.net}});$('#cvn').textContent=lst.length?'Estados: '+lst.map(up).join(', ')+'. Saldo por região: '+Object.keys(rg).map(g=>R.regs[g]+' '+fs(rg[g])).join('; ')+' (positivo favorece Lula). O padrão de voto atual de cada estado é mantido.':''}
+$('#cv').oninput=conv;conv();
+/* voto cruzado */
+const X=R.cross.map(a=>({u:a[0],L:a[1],pt:a[2],dpt:a[3],F:a[4],pl:a[5],dpl:a[6]}));
+const n10=X.filter(x=>Math.max(Math.abs(x.dpt),Math.abs(x.dpl))>10).length,n5=X.filter(x=>Math.abs(x.dpt)<=5||Math.abs(x.dpl)<=5).length;
+$('#cxn').textContent=`Em ${n10} dos 27 estados, pelo menos uma das duas somas (governadores com PT ou com PL na coligação) difere em mais de 10 pontos do voto presidencial correspondente; em ${n5}, ao menos uma das duas fica a até 5 pontos.`;
+let ck='pt';
+function cx(){const k=ck,key=k==='pt'?'dpt':'dpl';const xs=X.slice().sort((a,b)=>b[key]-a[key]);
+ $('#cx').innerHTML=barsDiv(xs.map(x=>({k:up(x.u),v:x[key],tip:`<b>${up(x.u)}</b><br>${k==='pt'?'Lula':'Flávio'} ${fd(k==='pt'?x.L:x.F,1)}% · governadores com ${k.toUpperCase()} ${fd(x[k],1)}%<br>diferença ${fd(x[key],1)} p.p.`})),{max:55,fmt:v=>(v>0?'+':v<0?'−':'')+fd(Math.abs(v),1),rh:15,cp:'f3',cn:'fo',aria:'Voto cruzado'});
+ $('#cxt').innerHTML=`<thead><tr><th>UF</th><th class="n">${k==='pt'?'Lula':'Flávio'} (%)</th><th class="n">Governadores com ${k.toUpperCase()} (%)</th><th class="n">Diferença (p.p.)</th></tr></thead><tbody>`+xs.map(x=>`<tr><td><b>${up(x.u)}</b></td><td class="n">${fd(k==='pt'?x.L:x.F,1)}</td><td class="n">${fd(x[k],1)}</td><td class="n ${x[key]>0?'pos':'neg'}">${(x[key]>0?'+':x[key]<0?'−':'')+fd(Math.abs(x[key]),1)}</td></tr>`).join('')+'</tbody>'}
+cx();$$('#cxs button').forEach(b=>b.onclick=()=>{ck=b.dataset.k;$$('#cxs button').forEach(x=>x.setAttribute('aria-pressed',x===b));cx()});
+
+</script></body></html>
