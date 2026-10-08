@@ -494,7 +494,7 @@ function viewTroca(){
 function viewMet(){
   const rows=ALL27.filter(u=>D[u].kind==='estimada').map(u=>u.toUpperCase()).join(', ');
   return `<div class="card prose"><h2>Método</h2>
-  <p>Reprodução do notebook de 2022 (segundo turno): para cada UF, a velocidade de apuração é a fração <code>f_UF(t)</code> de seções totalizadas ao longo do tempo. O total nacional parcial é <code>Σ f_UF(t)·V_UF,k / Σ f_UF(t)·V_UF</code>, com <code>V</code> os votos válidos finais, isto é, cada UF contribui com seus votos finais proporcionalmente ao que já apurou.</p>
+  <p>Para cada UF, a velocidade de apuração é a fração <code>f_UF(t)</code> de seções totalizadas ao longo do tempo. O total nacional parcial é <code>Σ f_UF(t)·V_UF,k / Σ f_UF(t)·V_UF</code>, com <code>V</code> os votos válidos finais, isto é, cada UF contribui com seus votos finais proporcionalmente ao que já apurou.</p>
   <p>As <b>trocas</b> atribuem a um estado a curva de velocidade de outro, e o <b>ranking</b> ordena os estados pelo horário em que alcançam 50% das seções. Como no notebook, o exterior fica de fora por padrão.</p>
   <h3>Origem das curvas</h3>
   <p>O TSE não publica o histórico minuto a minuto, mas cada seção carrega o horário de sua totalização nos arquivos de configuração de seções. Capturei esses horários às ${SNAP_AT} (horário de Brasília). Para estados já encerrados, o TSE regravou todos os horários de uma vez, perdendo a curva. Esses estados (<b>${rows}</b>) usam uma <b>curva estimada</b>: a curva média dos estados com horários reais, ajustada à hora de término informada pelo TSE. Os 16 demais têm <b>horários reais</b>.</p>
