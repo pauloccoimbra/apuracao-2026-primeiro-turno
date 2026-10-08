@@ -587,7 +587,7 @@ function viewDep(sub){
 function viewRitmo(){
   const ufs=UFS.concat('zz'),rank=ufRanking(),pr=presProj();
   const opts=ufs.map(u=>`<option value="${u}">${u.toUpperCase()} · ${esc(UFN[u])}</option>`).join('');
-  let h=`<div class="callout" style="margin-bottom:14px">Esta aba reproduz a análise do notebook de 2022: o ritmo de totalização de cada UF define como a contagem nacional se move. Aqui o ritmo vem da reconstituição da noite de 04/10, a partir dos horários de totalização de cada seção registrados pelo TSE (e, se esta página tiver ficado aberta durante a apuração, das leituras guardadas neste navegador).</div>`;
+  let h=`<div class="callout" style="margin-bottom:14px">O ritmo de totalização de cada UF define como a contagem nacional se move. Aqui o ritmo vem da reconstituição da noite de 04/10, a partir dos horários de totalização de cada seção registrados pelo TSE (e, se esta página tiver ficado aberta durante a apuração, das leituras guardadas neste navegador).</div>`;
   h+=`<div class="card" style="margin-bottom:14px"><h2>Seções totalizadas por UF<span class="sub">passe o mouse para identificar a linha</span></h2><div class="chart" id="ch-speed"></div></div>`;
   h+=`<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-bottom:14px">
    <div class="card"><h2>Mais rápidas<span class="sub">tempo até 50% das seções</span></h2>${rankTable(rank.slice(0,8))}</div>
@@ -599,7 +599,7 @@ function viewRitmo(){
      <button class="btn" type="button" data-act="swap-clear">Limpar</button></div>
     <div class="chips" style="margin-bottom:10px">${S.swaps.map((s,i)=>`<span class="chip">${s[0].toUpperCase()} ⇆ ${s[1].toUpperCase()}<button type="button" data-swap-rm="${i}" aria-label="Remover troca">×</button></span>`).join('')||'<span style="color:var(--muted)">Nenhuma troca. A linha tracejada coincide com a sólida.</span>'}</div>
     <div class="chart" id="ch-sim"></div>
-    <div class="note">Como no notebook: o voto final de cada UF é mantido e só a velocidade muda. O voto final de cada UF é a projeção atual (votos apurados divididos pela fração de seções), e a curva sólida é o modelo sem trocas, que reproduz a contagem nacional se cada município apurasse no ritmo médio do seu estado. ${pr?`Projeção usa ${pr.n} UFs com votos.`:''}</div></div>`;
+    <div class="note">O voto final de cada UF é mantido e só a velocidade muda. O voto final de cada UF é a projeção atual (votos apurados divididos pela fração de seções), e a curva sólida é o modelo sem trocas, que reproduz a contagem nacional se cada município apurasse no ritmo médio do seu estado. ${pr?`Projeção usa ${pr.n} UFs com votos.`:''}</div></div>`;
   return h;
 }
 function rankTable(rows,slow){
