@@ -278,7 +278,7 @@ $('#play').addEventListener('click',()=>{if(S.play){stop();return}if(S.p>=100)se
 document.addEventListener('keydown',e=>{if(e.target.matches('input,select'))return;if(e.key==='ArrowRight')setP(S.p+0.5);if(e.key==='ArrowLeft')setP(S.p-0.5)});
 S.pf=1;render();setP(1);
 </script><script>/* Barra de navegação comum a todas as páginas do site. */
-(function(){const P=[['index.html','Painel'],['evolucao.html','Evolução'],['atemporal.html','Atemporal'],['mapa.html','Mapa'],['perfil.html','Perfil do voto'],['participacao.html','Participação'],['segundo-turno.html','2º turno'],['governadores.html','Governadores'],['congresso.html','Congresso'],['maiorias.html','Maiorias'],['bancadas.html','Bancadas'],['assembleias.html','Assembleias']];
+(function(){const P=[['index.html','Painel'],['evolucao.html','Evolução'],['atemporal.html','Atemporal'],['mapa.html','Mapa'],['sintese.html','Síntese'],['perfil.html','Perfil do voto'],['participacao.html','Participação'],['segundo-turno.html','2º turno'],['governadores.html','Governadores'],['congresso.html','Congresso'],['maiorias.html','Maiorias'],['bancadas.html','Bancadas'],['assembleias.html','Assembleias']];
  const cur=(location.pathname.split('/').pop()||'index.html');
  const css=`#sitenav{background:var(--surface,#fff);border-bottom:1px solid var(--line,#d9dde4);font:500 13px/1.2 var(--sans,system-ui,sans-serif);position:relative;z-index:30}
 #sitenav .in{max-width:1240px;margin:0 auto;padding:0 16px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin;align-items:center}
@@ -287,6 +287,27 @@ S.pf=1;render();setP(1);
 #sitenav .sep{width:1px;height:16px;background:var(--line,#d9dde4);margin:0 6px;flex:none}`;
  const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
  const n=document.createElement('nav');n.id='sitenav';n.setAttribute('aria-label','Páginas do site');
- n.innerHTML='<div class="in">'+P.map((p,i)=>((i===4||i===8)?'<span class="sep"></span>':'')+`<a href="${p[0]}"${p[0]===cur?' aria-current="page"':''}>${p[1]}</a>`).join('')+'</div>';
+ n.innerHTML='<div class="in">'+P.map((p,i)=>((i===4||i===9)?'<span class="sep"></span>':'')+`<a href="${p[0]}"${p[0]===cur?' aria-current="page"':''}>${p[1]}</a>`).join('')+'</div>';
  const go=()=>document.body.insertBefore(n,document.body.firstChild);document.body?go():document.addEventListener('DOMContentLoaded',go)})();
+
+/* ===== Contador de visitas (GoatCounter) =====
+   Preencha GC_CODE com o código do seu site no GoatCounter (a parte antes de .goatcounter.com).
+   Enquanto estiver vazio, nada é carregado nem exibido. A contagem fica no servidor do GoatCounter,
+   por isso não depende do navegador nem é zerada quando o site é republicado. */
+(function(){
+  const GC_CODE='';
+  if(!GC_CODE)return;
+  const base='https://'+GC_CODE+'.goatcounter.com/';
+  const s=document.createElement('script');s.async=true;s.src='https://gc.zgo.at/count.js';
+  s.setAttribute('data-goatcounter',base+'count');document.head.appendChild(s);
+  const box=document.createElement('div');
+  box.style.cssText='text-align:center;font-size:12px;color:var(--muted,#888);padding:14px 16px 22px';
+  box.setAttribute('aria-live','polite');
+  (document.querySelector('footer')||document.body).appendChild(box);
+  const fmt=n=>Number(n).toLocaleString('pt-BR');
+  fetch(base+'counter/TOTAL.json').then(r=>r.ok?r.json():Promise.reject()).then(j=>{
+    const v=parseInt(String(j.count).replace(/\D/g,''),10);
+    if(isFinite(v))box.textContent='Visualizações do site: '+fmt(v);
+  }).catch(()=>{});
+})();
 </script></body></html>
