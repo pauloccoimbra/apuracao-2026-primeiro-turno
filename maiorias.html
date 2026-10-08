@@ -309,6 +309,7 @@ function bloc(h,o){o=Object.assign({W:760,H:78,marks:true,gs:null},o);const q=qu
 #sitenav .in{max-width:1240px;margin:0 auto;padding:0 16px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin;align-items:center}
 #sitenav a{padding:9px 11px;color:var(--fg2,#4a5262);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent}
 #sitenav a:hover{color:var(--fg,#161a22)}#sitenav a[aria-current=page]{color:var(--fg,#161a22);border-bottom-color:var(--accent,#0b5cad)}
+@media(max-width:700px){#sitenav .in{flex-wrap:wrap;overflow:visible;padding:2px 8px;gap:0}#sitenav a{padding:7px 9px;font-size:12.5px}#sitenav .sep{display:none}}
 #sitenav .sep{width:1px;height:16px;background:var(--line,#d9dde4);margin:0 6px;flex:none}`;
  const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
  const n=document.createElement('nav');n.id='sitenav';n.setAttribute('aria-label','Páginas do site');
@@ -320,7 +321,7 @@ function bloc(h,o){o=Object.assign({W:760,H:78,marks:true,gs:null},o);const q=qu
    Enquanto estiver vazio, nada é carregado nem exibido. A contagem fica no servidor do GoatCounter,
    por isso não depende do navegador nem é zerada quando o site é republicado. */
 (function(){
-  const GC_CODE='';
+  const GC_CODE='pauloccoimbra';
   if(!GC_CODE)return;
   const base='https://'+GC_CODE+'.goatcounter.com/';
   const s=document.createElement('script');s.async=true;s.src='https://gc.zgo.at/count.js';

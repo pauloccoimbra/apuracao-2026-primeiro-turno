@@ -708,6 +708,7 @@ loadHist();render();tick(true).then(schedule);
 #sitenav .in{max-width:1240px;margin:0 auto;padding:0 16px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin;align-items:center}
 #sitenav a{padding:9px 11px;color:var(--fg2,#4a5262);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent}
 #sitenav a:hover{color:var(--fg,#161a22)}#sitenav a[aria-current=page]{color:var(--fg,#161a22);border-bottom-color:var(--accent,#0b5cad)}
+@media(max-width:700px){#sitenav .in{flex-wrap:wrap;overflow:visible;padding:2px 8px;gap:0}#sitenav a{padding:7px 9px;font-size:12.5px}#sitenav .sep{display:none}}
 #sitenav .sep{width:1px;height:16px;background:var(--line,#d9dde4);margin:0 6px;flex:none}`;
  const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
  const n=document.createElement('nav');n.id='sitenav';n.setAttribute('aria-label','Páginas do site');
@@ -718,9 +719,21 @@ loadHist();render();tick(true).then(schedule);
    Preencha GC_CODE com o código do seu site no GoatCounter (a parte antes de .goatcounter.com).
    Enquanto estiver vazio, nada é carregado nem exibido. A contagem fica no servidor do GoatCounter,
    por isso não depende do navegador nem é zerada quando o site é republicado. */
-
-<script data-goatcounter="https://pauloccoimbra.goatcounter.com/count"
-        async src="//gc.zgo.at/count.js"></script>
-  
+(function(){
+  const GC_CODE='pauloccoimbra';
+  if(!GC_CODE)return;
+  const base='https://'+GC_CODE+'.goatcounter.com/';
+  const s=document.createElement('script');s.async=true;s.src='https://gc.zgo.at/count.js';
+  s.setAttribute('data-goatcounter',base+'count');document.head.appendChild(s);
+  const box=document.createElement('div');
+  box.style.cssText='text-align:center;font-size:12px;color:var(--muted,#888);padding:14px 16px 22px';
+  box.setAttribute('aria-live','polite');
+  (document.querySelector('footer')||document.body).appendChild(box);
+  const fmt=n=>Number(n).toLocaleString('pt-BR');
+  fetch(base+'counter/TOTAL.json').then(r=>r.ok?r.json():Promise.reject()).then(j=>{
+    const v=parseInt(String(j.count).replace(/\D/g,''),10);
+    if(isFinite(v))box.textContent='Visualizações do site: '+fmt(v);
+  }).catch(()=>{});
+})();
 </script></body>
 </html>
