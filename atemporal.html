@@ -1,11 +1,9 @@
 <!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Apuração Atemporal 2026</title>
+<title>Atemporal · Apuração 2026 · 1º turno</title>
 <meta name="description" content="Exercício atemporal: estados somados em sequência, cada um apurado de forma homogênea, e a evolução do percentual de cada candidato a cada 1% dos votos do país.">
 <meta name="theme-color" content="#0b5cad">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b5cad'/%3E%3Cpath d='M5 26L27 6' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 /* Layout: painel de controle. Cabeçalho fixo com estado da apuração, abas, e blocos de leitura (KPIs, barras, gráficos, tabelas). */
 :root{
@@ -153,7 +151,63 @@ ul.src{margin:6px 0;padding-left:18px} ul.src li{margin:3px 0}
 .seg i{position:absolute;left:0;bottom:0;height:4px;background:var(--fg);opacity:.55;width:0}
 .scur{position:absolute;top:0;bottom:0;width:2px;background:var(--fg);pointer-events:none}
 </style>
-</head><body>
+<!-- LAYOUT:HEAD:INICIO --><style>@font-face{font-family:'IBM Plex Sans';font-style:normal;font-display:swap;font-weight:400;src:url(fonts/ibm-plex-sans-greek-400-normal.woff2) format('woff2');unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF;}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-display:swap;font-weight:400;src:url(fonts/ibm-plex-sans-latin-ext-400-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-display:swap;font-weight:400;src:url(fonts/ibm-plex-sans-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-display:swap;font-weight:500;src:url(fonts/ibm-plex-sans-greek-500-normal.woff2) format('woff2');unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF;}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-display:swap;font-weight:500;src:url(fonts/ibm-plex-sans-latin-ext-500-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-display:swap;font-weight:500;src:url(fonts/ibm-plex-sans-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-display:swap;font-weight:600;src:url(fonts/ibm-plex-sans-greek-600-normal.woff2) format('woff2');unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF;}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-display:swap;font-weight:600;src:url(fonts/ibm-plex-sans-latin-ext-600-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-display:swap;font-weight:600;src:url(fonts/ibm-plex-sans-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-display:swap;font-weight:400;src:url(fonts/ibm-plex-mono-latin-ext-400-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-display:swap;font-weight:400;src:url(fonts/ibm-plex-mono-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-display:swap;font-weight:500;src:url(fonts/ibm-plex-mono-latin-ext-500-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-display:swap;font-weight:500;src:url(fonts/ibm-plex-mono-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
+/* Layout comum a todas as páginas. Gerado por tools/aplicar_layout.py a partir deste arquivo. */
+:root{--navh:42px}
+@view-transition{navigation:auto}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.18s}
+#sitenav{view-transition-name:sitenav}
+@keyframes pgin{from{opacity:0}to{opacity:1}}
+@supports not (view-transition-name:none){main{animation:pgin .18s ease-out}}
+@media (prefers-reduced-motion:reduce){
+ @view-transition{navigation:none}
+ ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}
+ main{animation:none!important}
+}
+.skip{position:absolute;left:-999px;top:0;background:var(--accent,#0b5cad);color:#fff;padding:8px 12px;z-index:100;border-radius:0 0 6px 0}
+.skip:focus{left:0}
+main:focus{outline:none}
+header.top{top:var(--navh)!important}
+#sitenav{position:sticky;top:0;z-index:40;height:var(--navh);background:var(--surface,#fff);border-bottom:1px solid var(--line,#d9dde4);font:500 13px/1.2 var(--sans,system-ui,sans-serif)}
+#sitenav .in{max-width:1240px;height:100%;margin:0 auto;padding:0 12px;display:flex;align-items:center;gap:2px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+#sitenav .in::-webkit-scrollbar{display:none}
+#sitenav a{padding:0 10px;height:100%;display:inline-flex;align-items:center;color:var(--fg2,#4a5262);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;box-sizing:border-box}
+#sitenav a:hover{color:var(--fg,#161a22)}
+#sitenav a[aria-current=page]{color:var(--fg,#161a22);border-bottom-color:var(--accent,#0b5cad);font-weight:600}
+#sitenav a:focus-visible{outline:2px solid var(--accent,#0b5cad);outline-offset:-2px}
+#sitenav .mk{font-weight:700;color:var(--fg,#161a22);padding-right:14px}
+#sitenav .g{display:flex;align-items:center;height:100%;border-left:1px solid var(--line,#d9dde4);margin-left:6px;padding-left:6px}
+#sitenav .gl{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#7b8494);padding:0 6px;white-space:nowrap;display:none}
+@media(min-width:1800px){#sitenav .gl{display:inline}}
+.serve{padding-top:10px;padding-bottom:0}.serve p{margin:0;color:var(--fg2,#4a5262);font-size:13.5px;border-left:3px solid var(--accent,#0b5cad);padding:2px 0 2px 10px}
+.veja{padding-top:10px;color:var(--fg2,#4a5262);font-size:13.5px}.veja a{color:var(--accent,#0b5cad);text-decoration:none;margin-right:12px}.veja a:hover{text-decoration:underline}
+.pager{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding-top:14px;padding-bottom:6px;font-size:13.5px}
+.pager a{color:var(--accent,#0b5cad);text-decoration:none;padding:6px 10px;border:1px solid var(--line,#d9dde4);border-radius:8px;background:var(--surface,#fff)}.pager a:hover{border-color:var(--accent,#0b5cad)}
+.pager .vz{border:none;background:none}
+.site-rodape{padding-top:10px;padding-bottom:26px;color:var(--muted,#6b7385);font-size:12.5px;border-top:1px solid var(--line,#d9dde4);margin-top:14px}
+.site-rodape p{margin:0 0 4px}.site-rodape a{color:inherit}
+.fonte-pg{margin:10px 0 0;color:var(--muted,#6b7385);font-size:12.5px}
+
+/* Tipografia única em todas as abas */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{font-size:14px;line-height:1.45}
+body p,body li,body .lead{font-size:13.5px}
+body label{font-size:13px!important}
+
+#sitenav .mk{padding-right:8px}#sitenav a.seg{flex:none;margin-right:6px;font-weight:600;border:1px solid var(--accent);border-radius:999px;padding:0 10px;height:26px;color:var(--accent)}
+</style><link rel="prefetch" href="evolucao.html"><link rel="prefetch" href="perfil.html"><!-- LAYOUT:HEAD:FIM --></head><body><!-- LAYOUT:NAV:INICIO --><a class="skip" href="#main">Pular para o conteúdo</a><nav id="sitenav" aria-label="Páginas do site"><div class="in"><a class="mk" href="index.html">Apuração 2026 · 1º turno</a><a class="seg" href="https://pauloccoimbra.github.io/apuracao-2026-segundo-turno/" rel="noopener" title="Site do 2º turno (25 de outubro)">2º turno ↗</a><div class="g" role="group" aria-label="Início"><span class="gl">Início</span><a href="index.html">Resumo</a></div><div class="g" role="group" aria-label="Acompanhar a apuração"><span class="gl">Acompanhar a apuração</span><a href="painel.html">Painel</a><a href="mapa.html">Mapa</a></div><div class="g" role="group" aria-label="Reconstituir a noite"><span class="gl">Reconstituir a noite</span><a href="evolucao.html">Evolução</a><a href="atemporal.html" aria-current="page">Atemporal</a></div><div class="g" role="group" aria-label="Entender o 1º turno"><span class="gl">Entender o 1º turno</span><a href="perfil.html">Perfil do voto</a><a href="participacao.html">Participação</a></div><div class="g" role="group" aria-label="Governos estaduais"><span class="gl">Governos estaduais</span><a href="governadores.html">Governadores</a></div><div class="g" role="group" aria-label="Poder legislativo"><span class="gl">Poder legislativo</span><a href="congresso.html">Congresso</a><a href="maiorias.html">Maiorias</a><a href="bancadas.html">Bancadas</a><a href="assembleias.html">Assembleias</a></div></div></nav><script>(function(){var n=document.querySelector("#sitenav .in"),a=n&&n.querySelector("[aria-current]");if(a)n.scrollLeft=a.offsetLeft-(n.clientWidth-a.offsetWidth)/2})()</script><!-- LAYOUT:NAV:FIM -->
 <header class="top"><div class="wrap">
  <div class="bar"><div class="brand">Apuração Atemporal<small>Presidente · 1º turno 2026 · ficção: estados somados em sequência, cada um apurado de forma homogênea</small></div>
   <div class="ctrl"><a class="ext" href="evolucao.html">Evolução no tempo real</a><a class="ext" href="mapa.html">Mapa</a><a class="ext" href="https://resultados.tse.jus.br/oficial/app/index.html" target="_blank" rel="noopener">Site do TSE</a></div></div>
@@ -164,7 +218,14 @@ ul.src{margin:6px 0;padding-left:18px} ul.src li{margin:3px 0}
   <label class="since" for="pin">Ir para</label><input id="pin" class="pctin" type="number" min="0" max="100" step="0.1" value="1" aria-label="Percentual dos votos do país apurado">
   <label for="ord" class="since">Ordem</label><select id="ord"></select><label for="spd" class="since">Ritmo</label><select id="spd"><option value="2">2%/s</option><option value="5" selected>5%/s</option><option value="10">10%/s</option><option value="25">25%/s</option></select>
  </div></div></header>
-<main class="wrap" id="main"></main>
+<!-- LAYOUT:SERVE:INICIO --><div class="serve wrap"><p><b>Para que serve:</b> Exercício fictício sobre como a ordem de apuração dos estados muda o caminho dos percentuais.</p></div><!-- LAYOUT:SERVE:FIM --><main class="wrap" id="main"></main><!-- LAYOUT:RODAPE:INICIO --><aside class="veja wrap" aria-label="Veja também"><b>Veja também:</b> <a href="evolucao.html">Evolução</a></aside><nav class="pager wrap" aria-label="Navegação entre abas"><a rel="prev" href="evolucao.html">← Evolução</a><a class="vz" href="index.html">Voltar ao Resumo</a><a rel="next" href="perfil.html">Perfil do voto →</a></nav><footer class="site-rodape wrap">
+<p>Projeto independente de Paulo C. Coimbra, sem vínculo com o TSE, partidos ou candidaturas. Números oficiais: <a href="https://resultados.tse.jus.br/" target="_blank" rel="noopener">resultados.tse.jus.br</a>.</p>
+<p>Este site cobre o <b>1º turno</b> (4 de outubro de 2026). O 2º turno (25 de outubro) terá site próprio: <a href="https://pauloccoimbra.github.io/apuracao-2026-segundo-turno/">apuracao-2026-segundo-turno</a>.</p>
+<p>Cenários e projeções são hipóteses de trabalho, não previsão nem pesquisa eleitoral.</p>
+<p>Fonte dos dados: arquivos públicos de divulgação de resultados do TSE, com malhas do IBGE e lista de senadores do Senado Federal onde indicado. Cálculos próprios, que podem conter erros.</p>
+<p>Contagem anônima de visitas (GoatCounter, sem cookies). A escolha de espectro e o histórico de ritmo ficam só no seu navegador. <span id="visitas" aria-live="polite"></span></p>
+</footer>
+<script>(function(){var c="apuracao-2026-primeiro-turno";if(!c)return;var b="https://"+c+".goatcounter.com/",s=document.createElement("script");s.async=true;s.src="https://gc.zgo.at/count.js";s.setAttribute("data-goatcounter",b+"count");document.head.appendChild(s);fetch(b+"counter/TOTAL.json").then(function(r){return r.ok?r.json():Promise.reject()}).then(function(j){var v=parseInt(String(j.count).replace(/\D/g,""),10),e=document.getElementById("visitas");if(isFinite(v)&&v>0&&e)e.textContent="Visualizações do site: "+v.toLocaleString("pt-BR")}).catch(function(){})})();(function(){var m=document.getElementById("main");if(!m)return;m.setAttribute("tabindex","-1");if(!location.hash){window.scrollTo(0,0)}m.focus({preventScroll:true})})();</script><!-- LAYOUT:RODAPE:FIM -->
 <div class="tip" id="tip"></div>
 <script>
 'use strict';
@@ -238,7 +299,7 @@ function render(){
   const rows=ord.map(i=>`<div class="row p4" data-i="${i}"><div class="nm"><span class="sw" style="background:${col(CANDS[i][0])}"></span><span class="t">${esc(CANDS[i][1])}</span><small>${CANDS[i][0]}</small></div><div class="trk"><i style="background:${col(CANDS[i][0])};width:0"></i></div><div class="v">0</div><div class="p">0%</div><div class="proj">${fp(TOT[i]/sum*100)}</div></div>`).join('');
   const ch1=chart('c1',{series:top.map(k=>({c:col(k),ys:SER.sh[ci(k)],w:2.2})),ymin:0,ymax:70,yf:v=>v.toFixed(0)+"%",tipf:p=>{const r=at(p),s=r.V.reduce((a,b)=>a+b,0);return `<b>${p}% dos votos do país</b>${r.cur?` · em ${r.cur.u.toUpperCase()}`:''}<br>`+top.map(k=>`${esc(CANDS[ci(k)][1])}: ${fp(s?r.V[ci(k)]/s*100:0)}`).join('<br>')},aria:'Percentual de cada candidato em função do percentual de votos do país apurado'});
   const fl=(TOT[IF]-TOT[IL])/sum*100;
-  const ch2=chart('c2',{series:[{c:'var(--fg)',ys:SER.ld,w:2.2}],hl:[{y:0},{y:fl,c:'var(--good)'}],ymin:-12,ymax:30,yf:v=>(v>=0?'+':'−')+Math.abs(v).toFixed(0)+' p.p.',tipf:p=>{const r=at(p),s=r.V.reduce((a,b)=>a+b,0);return `<b>${p}%</b><br>Flávio − Lula: ${fs(s?(r.V[IF]-r.V[IL])/s*100:0)} p.p.`},aria:'Diferença entre Flávio Bolsonaro e Lula em pontos percentuais'});
+  const ch2=chart('c2',{series:[{c:'var(--fg)',ys:SER.ld,w:2.2}],hl:[{y:0},{y:fl,c:'var(--good)'}],ymin:-12,ymax:30,yf:v=>(v>=0?'+':'−')+Math.abs(v).toFixed(0)+' p.p.',tipf:p=>{const r=at(p),s=r.V.reduce((a,b)=>a+b,0);return `<b>${p}%</b><br>Flávio Bolsonaro − Lula: ${fs(s?(r.V[IF]-r.V[IL])/s*100:0)} p.p.`},aria:'Diferença entre Flávio Bolsonaro e Lula em pontos percentuais'});
   const strip=SEG.map(s=>`<button class="seg" data-u="${s.u}" data-a="${s.pa}" style="width:${s.vv/N*100}%;background:color-mix(in srgb,var(${lead(s.u)>=0?'--c2':'--c1'}) ${Math.round(18+Math.min(55,Math.abs(lead(s.u))/s.vv*100*1.1))}%,var(--surface2))" title="${UFN[s.u]}: ${fp(s.pa,1)} a ${fp(s.pb,1)}"><b>${s.vv/N>0.012?s.u.toUpperCase():''}</b><i data-f="${s.u}"></i></button>`).join('');
   $('#ord').innerHTML=Object.entries(ORDERS).map(([k,v])=>`<option value="${k}"${k===S.ord?' selected':''}>${v.n}</option>`).join('');
   $('#main').innerHTML=`<div class="callout" style="margin-bottom:14px"><b>Cenário fictício.</b> Os estados entram um de cada vez, na ordem escolhida, e cada estado é apurado de forma homogênea: os votos que entram têm sempre a mesma composição do resultado final do estado. O eixo mostra o % dos <b>votos válidos do país</b> já apurados, de modo que 1% corresponde a ${fi(N/100)} votos. A ordem muda o caminho do percentual de cada candidato, mas todas chegam ao mesmo resultado em 100%.</div>
@@ -248,7 +309,7 @@ function render(){
   <div class="card" style="margin-top:14px"><h2>Ordem em que os estados entram<span class="sub">largura = votos válidos · azul: Flávio à frente · vermelho: Lula à frente · <label><input type="checkbox" id="rev"${S.rev?' checked':''}> inverter</label> · <label><input type="checkbox" id="ext"${S.exterior?' checked':''}> incluir exterior</label></span></h2><div class="strip" id="strip">${strip}<span class="scur" id="scur"></span></div><div class="note" id="snote"></div></div>
   <div class="card" style="margin-top:14px"><h2>Evolução do percentual de cada candidato<span class="sub">x: % dos votos válidos do país apurados · clique para ir ao ponto</span></h2>${ch1}<div class="legend">${top.map(k=>`<span><i class="sw" style="background:${col(k)}"></i>${esc(CANDS[ci(k)][1])}</span>`).join('')}<span>linhas pontilhadas verticais: entrada de cada estado</span></div></div>
   <div class="grid two" style="margin-top:14px"><div class="card"><h2>Resultado nacional no ponto</h2><div class="res"><div class="row p4 head"><div>Candidato</div><div></div><div style="text-align:right">Votos</div><div style="text-align:right">Parcial</div><div class="proj" style="text-align:right">Final</div></div>${rows}</div></div>
-  <div class="card"><h2>Diferença Flávio − Lula<span class="sub">pontos percentuais</span></h2>${ch2}<div class="legend"><span style="color:var(--good)">linha verde: resultado final</span></div></div></div></div>
+  <div class="card"><h2>Diferença Flávio Bolsonaro − Lula<span class="sub">pontos percentuais</span></h2>${ch2}<div class="legend"><span style="color:var(--good)">linha verde: resultado final</span></div></div></div></div>
   <div class="card" style="margin-top:14px"><h2>Estados na ordem de entrada</h2><div class="tw"><table><thead><tr><th class="n">#</th><th>UF</th><th class="n">Votos válidos</th><th class="n">Entra em</th><th class="n">Termina em</th><th class="n">Apurado no estado</th><th class="n">Lula %</th><th class="n">Flávio %</th></tr></thead><tbody id="tb"></tbody></table></div></div>`;
   upd();
 }
@@ -277,38 +338,4 @@ function stop(){S.play=false;$('#play').textContent='Reproduzir'}
 $('#play').addEventListener('click',()=>{if(S.play){stop();return}if(S.p>=100)setP(0);S.pf=S.p;S.play=true;$('#play').textContent='Pausar';last=performance.now();requestAnimationFrame(tick)});
 document.addEventListener('keydown',e=>{if(e.target.matches('input,select'))return;if(e.key==='ArrowRight')setP(S.p+0.5);if(e.key==='ArrowLeft')setP(S.p-0.5)});
 S.pf=1;render();setP(1);
-</script><script>/* Barra de navegação comum a todas as páginas do site. */
-(function(){const P=[['index.html','Painel'],['evolucao.html','Evolução'],['atemporal.html','Atemporal'],['mapa.html','Mapa'],['sintese.html','Síntese'],['perfil.html','Perfil do voto'],['participacao.html','Participação'],['segundo-turno.html','2º turno'],['governadores.html','Governadores'],['congresso.html','Congresso'],['maiorias.html','Maiorias'],['bancadas.html','Bancadas'],['assembleias.html','Assembleias']];
- const cur=(location.pathname.split('/').pop()||'index.html');
- const css=`#sitenav{background:var(--surface,#fff);border-bottom:1px solid var(--line,#d9dde4);font:500 13px/1.2 var(--sans,system-ui,sans-serif);position:relative;z-index:30}
-#sitenav .in{max-width:1240px;margin:0 auto;padding:0 16px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin;align-items:center}
-#sitenav a{padding:9px 11px;color:var(--fg2,#4a5262);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent}
-#sitenav a:hover{color:var(--fg,#161a22)}#sitenav a[aria-current=page]{color:var(--fg,#161a22);border-bottom-color:var(--accent,#0b5cad)}
-@media(max-width:700px){#sitenav .in{flex-wrap:wrap;overflow:visible;padding:2px 8px;gap:0}#sitenav a{padding:7px 9px;font-size:12.5px}#sitenav .sep{display:none}}
-#sitenav .sep{width:1px;height:16px;background:var(--line,#d9dde4);margin:0 6px;flex:none}`;
- const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
- const n=document.createElement('nav');n.id='sitenav';n.setAttribute('aria-label','Páginas do site');
- n.innerHTML='<div class="in">'+P.map((p,i)=>((i===4||i===9)?'<span class="sep"></span>':'')+`<a href="${p[0]}"${p[0]===cur?' aria-current="page"':''}>${p[1]}</a>`).join('')+'</div>';
- const go=()=>document.body.insertBefore(n,document.body.firstChild);document.body?go():document.addEventListener('DOMContentLoaded',go)})();
-
-/* ===== Contador de visitas (GoatCounter) =====
-   Preencha GC_CODE com o código do seu site no GoatCounter (a parte antes de .goatcounter.com).
-   Enquanto estiver vazio, nada é carregado nem exibido. A contagem fica no servidor do GoatCounter,
-   por isso não depende do navegador nem é zerada quando o site é republicado. */
-(function(){
-  const GC_CODE='apuracao-2026';
-  if(!GC_CODE)return;
-  const base='https://'+GC_CODE+'.goatcounter.com/';
-  const s=document.createElement('script');s.async=true;s.src='https://gc.zgo.at/count.js';
-  s.setAttribute('data-goatcounter',base+'count');document.head.appendChild(s);
-  const box=document.createElement('div');
-  box.style.cssText='text-align:center;font-size:12px;color:var(--muted,#888);padding:14px 16px 22px';
-  box.setAttribute('aria-live','polite');
-  (document.querySelector('footer')||document.body).appendChild(box);
-  const fmt=n=>Number(n).toLocaleString('pt-BR');
-  fetch(base+'counter/TOTAL.json').then(r=>r.ok?r.json():Promise.reject()).then(j=>{
-    const v=parseInt(String(j.count).replace(/\D/g,''),10);
-    if(isFinite(v))box.textContent='Visualizações do site: '+fmt(v);
-  }).catch(()=>{});
-})();
 </script></body></html>

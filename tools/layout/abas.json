@@ -1,0 +1,25 @@
+{
+ "marca": "Apuração 2026 · 1º turno",
+ "grupos": [
+  {"id": "inicio", "nome": "Início", "pergunta": "Por onde começo?"},
+  {"id": "acompanhar", "nome": "Acompanhar a apuração", "pergunta": "Como está (ou ficou) a contagem, agora e no território?"},
+  {"id": "reconstituir", "nome": "Reconstituir a noite", "pergunta": "Como a contagem avançou, e o que a ordem de apuração muda?"},
+  {"id": "entender", "nome": "Entender o 1º turno", "pergunta": "Como o voto e a abstenção se distribuíram?"},
+  {"id": "governos", "nome": "Governos estaduais", "pergunta": "Quem governa cada estado e como estão os segundos turnos estaduais?"},
+  {"id": "legislativo", "nome": "Poder legislativo", "pergunta": "Como se compõem as casas e quanto cada decisão exige?"}
+ ],
+ "abas": [
+  {"arquivo": "index.html", "nome": "Resumo", "grupo": "inicio", "serve": "", "veja": []},
+  {"arquivo": "painel.html", "nome": "Painel", "grupo": "acompanhar", "serve": "Acompanhar a apuração em tempo real: presidente, governador, senador e deputados, por estado.", "veja": ["mapa.html", "evolucao.html"]},
+  {"arquivo": "mapa.html", "nome": "Mapa", "grupo": "acompanhar", "serve": "Ver o resultado no território, do país às zonas eleitorais.", "veja": ["painel.html", "perfil.html"]},
+  {"arquivo": "evolucao.html", "nome": "Evolução", "grupo": "reconstituir", "serve": "Reconstituir como a contagem do 1º turno avançou ao longo da noite.", "veja": ["atemporal.html", "painel.html"]},
+  {"arquivo": "atemporal.html", "nome": "Atemporal", "grupo": "reconstituir", "serve": "Exercício fictício sobre como a ordem de apuração dos estados muda o caminho dos percentuais.", "veja": ["evolucao.html"]},
+  {"arquivo": "perfil.html", "nome": "Perfil do voto", "grupo": "entender", "serve": "Descrever polarização, fragmentação e geografia do voto presidencial.", "veja": ["participacao.html", "mapa.html"]},
+  {"arquivo": "participacao.html", "nome": "Participação", "grupo": "entender", "serve": "Descrever abstenção, brancos, nulos e voto cruzado.", "veja": ["perfil.html", "governadores.html"]},
+  {"arquivo": "governadores.html", "nome": "Governadores", "grupo": "governos", "serve": "Mostrar os governadores eleitos, as coligações e os segundos turnos estaduais.", "veja": ["assembleias.html", "participacao.html"]},
+  {"arquivo": "congresso.html", "nome": "Congresso", "grupo": "legislativo", "serve": "Mostrar a composição do Senado e da Câmara por partido e por espectro.", "veja": ["maiorias.html", "bancadas.html"]},
+  {"arquivo": "maiorias.html", "nome": "Maiorias", "grupo": "legislativo", "serve": "Mostrar quanto cada tipo de decisão exige e quanto cada bloco tem.", "veja": ["congresso.html", "assembleias.html"]},
+  {"arquivo": "bancadas.html", "nome": "Bancadas", "grupo": "legislativo", "serve": "Mostrar os eleitos por estado, o voto presidencial × bancada e o peso do voto.", "veja": ["congresso.html", "perfil.html"]},
+  {"arquivo": "assembleias.html", "nome": "Assembleias", "grupo": "legislativo", "serve": "Mostrar os deputados estaduais e distritais por espectro e a relação com o governador.", "veja": ["governadores.html", "maiorias.html"]}
+ ]
+}
